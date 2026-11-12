@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run --passWithNoTests --silent=false"
+    "test": "vitest run --passWithNoTests --silent=false",
+    "e2e": "playwright test --trace off"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"

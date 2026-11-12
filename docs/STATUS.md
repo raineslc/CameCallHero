@@ -1,5 +1,11 @@
 # Status
 
+## Owner action (Phase 3, not blocking)
+
+Open the Pages link on your Android phone → **Mic check** → tap **Start mic** → send a
+screenshot of the "Phone audio processing" table and one WAV (Record 5 s → Download WAV)
+of each call you can make.
+
 ## Owner decision (answers the Phase 1 gate)
 
 Proceed with **gobble only**. Only `public/audio/turkey/gobble-*.wav` exist (6 clips,
@@ -17,7 +23,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
 | 1 | Reference audio | partial — gate failed (gobble only) | [#1](https://github.com/raineslc/CameCallHero/pull/1) |
 | 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
-| 3 | Mic check | | |
+| 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | | |
 | 5 | Practice | | |
 | 6 | Feedback release | | |
@@ -55,6 +61,21 @@ Open issues (from Codex review of #2, P2):
   lengths and gaps; DTW can also absorb spacing differences. Notes with the same
   totals but different spacing score the same. Fix with per-note alignment once a
   multi-note call (yelp, cut, kee kee run) has references to calibrate against.
+
+## Phase 3 notes
+
+- Mic check at `#/mic`: live level, clipping warning and noise floor (both from the Phase 2
+  `extractFeatures` / `checkTake` gates on the last 3 s), requested vs. actual
+  `track.getSettings()`, AudioContext sample rate, 5 s take with spectrogram, scorer
+  verdict and WAV download.
+- Playwright (`npm run e2e`, runs in CI after the build) uses Chromium's fake mic fed with
+  `gobble-1.wav`: level above zero, 5 s WAV of the right size, tracks `ended` and
+  AudioContext `closed` after leaving the screen; denied / no-mic messages.
+- Chromium's fake device reports 2 channels although 1 was requested; the worklet
+  down-mixes to mono either way. What real Android phones report is unknown until the
+  owner's screenshot.
+- Not verified: anything on a real phone (voice processing actually off, sample rate,
+  level of a real call, behaviour when another app holds the mic).
 
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).
