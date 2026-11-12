@@ -8,7 +8,7 @@
   Measured with `extractFeatures`: peak -10.6 dBFS (74% of full scale, no clipping),
   noise floor -39.4 dBFS, 12 notes over 3.51 s: one 0.29 s note, then ten notes of
   0.08-0.10 s about 0.3 s apart. Scorer accepts it (about 29 dB above the floor).
-  Yelp is still locked (no free-licensed references), so it cannot be scored yet.
+  Yelp is unlocked since Phase 2b: this take scores 51.2 as yelp.
 - Open: the noise floor is high (CI fake-mic take: -62 dBFS). With auto gain off this is
   real background or mic noise; the cause is not known.
 - Still wanted from the owner: one WAV of each other call they can make, named by call.
@@ -36,25 +36,26 @@ any is wrong. No xeno-canto recordist labels a yelp, cut,
 purr or kee kee run; candidates for cut/purr (XC377125, XC700666, XC778473) were not clear
 enough to classify.
 
-**Yelp and kee kee run stay `locked`.** Unlocking them with the current scorer
-(uncalibrated equal weights) fails the calibration test, so they need scoring work before
-the app can use them. Measured with both unlocked (not committed):
+**Scoring update (Phase 2b, branch `phase-2b-calibrate-yelp-kee-kee`): yelp unlocked,
+kee kee run still locked.**
 
-| Check | Result (needs >= 15) |
-|---|---|
-| yelp leave-one-out vs worst negative (putt-4) | yelp-1 3.8, yelp-2 12.5, yelp-3 20.6 |
-| kee kee run leave-one-out | passes |
-| matrix: kee kee run takes scored as yelp | -5.7 |
-| matrix: yelp takes scored as kee kee run | 0.6 |
-| matrix: gobble takes scored as yelp | 5.2 |
+- New in `src/audio/score.ts`: per-note rhythm (each note's length and spacing, aligned note
+  by note with DTW; closes the Phase 2 open issue below) and a per-note "break" in pitch
+  (spectral centroid of a note's first third minus its last third; yelps break downward).
+- Yelp weights `{ rhythm: 3, pitch: 0.5, tone: 0.5 }` from a grid search (each weight 0.5-3).
+  shortcut: fitted to 3 clips from one session (XC779658); re-tune with yelps from other birds.
+- Calibration now (all need >= 15): yelp leave-one-out 22.6 / 28.6 / 31.5 (worst negative
+  putt-2); gobble 23.4-41.5 (was 28.1 minimum before; still passes); matrix: gobble takes
+  score 26.2 as yelp vs 66.2 yelp-as-yelp, yelp takes 35.2 as gobble vs 77.2.
+- Owner's phone yelp (`test/fixtures/phone/yelp-mouth-1.wav`, by mouth): 51.2 as yelp
+  (rhythm 61, pitch 18, tone 24), 25.6 as gobble. Accepted, not scored highly.
+- **Kee kee run stays locked (owner decision, 2026-11-12).** No scoring variant or weights
+  separated yelp from kee kee run by 15 (best 7.7): a kee kee run contains yelps by
+  definition (SC DNR). Owner chose to keep the strict test and unlock yelp only. The four
+  kee kee run clips stay in `public/audio/turkey/` for later.
+- Tried and dropped: comparing tone only inside notes (helped yelp, cut gobble's margin to 16).
 
-Likely cause: the open Phase 2 issue below (rhythm ignores per-note spacing), and yelp-like
-notes inside every kee kee run.
-
-**Next (owner picks):**
-1. A scoring phase to calibrate yelp and kee kee run (per-note rhythm, weights), then unlock.
-2. Cut and purr: owner field recordings (CC0), or permission from recordists.
-3. Both.
+**Next:** cut and purr references (owner field recordings, CC0, or recordist permission).
 
 ## Earlier decision (Phase 2): proceed with gobble only
 
@@ -73,6 +74,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
 | 1 | Reference audio | partial — gobble, yelp, kee kee run; cut and purr missing | [#1](https://github.com/raineslc/CameCallHero/pull/1), re-run: [#5](https://github.com/raineslc/CameCallHero/pull/5) |
 | 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
+| 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | this branch |
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
 | 5 | Practice | | |
@@ -108,10 +110,8 @@ Limits: only two birds/sessions; no speech junk clip; real phone recordings not 
 gave a 18.1 minimum margin before the review fixes).
 
 Open issues (from Codex review of #2, P2):
-- Rhythm compares only call length, note count and voiced fraction, not per-note
-  lengths and gaps; DTW can also absorb spacing differences. Notes with the same
-  totals but different spacing score the same. Fix with per-note alignment once a
-  multi-note call (yelp, cut, kee kee run) has references to calibrate against.
+- ~~Rhythm compares only call length, note count and voiced fraction, not per-note
+  lengths and gaps.~~ Fixed in Phase 2b (per-note alignment).
 
 ## Phase 3 notes
 

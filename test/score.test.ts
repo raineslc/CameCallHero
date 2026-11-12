@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fft } from '../src/audio/fft';
 import { extractFeatures, type AudioClip } from '../src/audio/features';
-import { scoreTake, checkTake, combine, compare, type Weights } from '../src/audio/score';
+import { scoreTake, checkTake, combine, compare, compareNotes, noteShapes, type Weights } from '../src/audio/score';
 import { TURKEY_CALLS, callById } from '../src/calls/turkey';
 import { readWav } from './wav';
 
@@ -125,7 +125,7 @@ describe('take gates', () => {
 
   it('returns no-reference for a locked call', () => {
     const locked = TURKEY_CALLS.filter((c) => c.locked);
-    expect(locked.map((c) => c.id)).toEqual(['yelp', 'cut', 'purr', 'kee-kee-run']);
+    expect(locked.map((c) => c.id)).toEqual(['cut', 'purr', 'kee-kee-run']);
     for (const c of locked) {
       expect(c.references).toEqual([]);
       expect(scoreTake(take, [], c.weights).rejected?.reason).toBe('no-reference');
@@ -173,5 +173,57 @@ describe('normalization does not depend on sample rate or padding', () => {
     const ref = extractFeatures(tone(44100, 1.7, 0.5));
     const s = compare(extractFeatures(tone(44100, 1.7, 0.15)), ref);
     expect(s.tone).toBeGreaterThan(90);
+  });
+});
+
+describe('per-note rhythm and break', () => {
+  const sr = 44100;
+  /** Notes of `len` s at onsets `at` (s); each glides from f0 to f1 Hz. Quiet noise in between. */
+  function notes(at: number[], len: number, f0: number, f1: number): AudioClip {
+    const r = rng(7);
+    const total = at[at.length - 1] + len + 0.5;
+    const x = new Float32Array(Math.round(total * sr));
+    for (let i = 0; i < x.length; i++) x[i] = (r() * 2 - 1) * 0.001;
+    for (const t0 of at) {
+      let ph = 0;
+      const n = Math.round(len * sr);
+      for (let i = 0; i < n; i++) {
+        const f = f0 + ((f1 - f0) * i) / n;
+        ph += (2 * Math.PI * f) / sr;
+        const env = Math.sin((Math.PI * i) / n);
+        x[Math.round(t0 * sr) + i] += 0.3 * env * Math.sin(ph);
+      }
+    }
+    return { samples: x, sampleRate: sr };
+  }
+  const even = extractFeatures(notes([0.5, 0.8, 1.1, 1.4], 0.12, 2200, 1200));
+  // Same note count, length and total span, but uneven spacing: the case the old rhythm missed.
+  const uneven = extractFeatures(notes([0.5, 0.68, 1.22, 1.4], 0.12, 2200, 1200));
+  const flat = extractFeatures(notes([0.5, 0.8, 1.1, 1.4], 0.12, 1600, 1600));
+
+  it('finds the notes', () => {
+    expect(even.notes.length).toBe(4);
+    expect(uneven.notes.length).toBe(4);
+  });
+
+  it('a downward glide has a positive break, a steady note about none', () => {
+    for (const n of noteShapes(even)) expect(n.fall).toBeGreaterThan(2);
+    for (const n of noteShapes(flat)) expect(Math.abs(n.fall)).toBeLessThan(1);
+  });
+
+  it('identical note sequences match exactly', () => {
+    expect(compareNotes(noteShapes(even), noteShapes(even))).toEqual({ timing: 0, fall: 0 });
+  });
+
+  it('uneven spacing lowers rhythm; a missing break lowers pitch', () => {
+    const self = compare(even, even);
+    expect(compare(uneven, even).rhythm).toBeLessThan(self.rhythm - 10);
+    expect(compare(flat, even).pitch).toBeLessThan(self.pitch - 10);
+  });
+
+  it('is finite and in 0..100 for an empty note list', () => {
+    expect(compareNotes([], noteShapes(even))).toEqual({ timing: Infinity, fall: Infinity });
+    const s = compare(extractFeatures({ samples: new Float32Array(sr), sampleRate: sr }), even);
+    for (const v of [s.rhythm, s.pitch, s.tone]) expect(v).toBeGreaterThanOrEqual(0);
   });
 });

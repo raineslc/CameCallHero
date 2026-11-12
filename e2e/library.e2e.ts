@@ -71,7 +71,7 @@ for (const c of TURKEY_CALLS) {
     for (let i = 0; i < c.references.length; i++) {
       const clip = clips.nth(i);
       await expect(clip.locator('.attribution')).toContainText(/xeno-canto XC\d+/);
-      await expect(clip.locator('.attribution')).toContainText(/CC BY(-SA)? \d/);
+      await expect(clip.locator('.attribution')).toContainText(/CC BY(-NC)?(-SA)? \d/);
       const clipResponse = page.waitForResponse((r) => r.url().endsWith(c.references[i]));
       await clip.getByRole('button', { name: `Play clip ${i + 1}` }).click();
       expect((await clipResponse).status()).toBeLessThan(400);
