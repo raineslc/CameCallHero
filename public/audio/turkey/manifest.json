@@ -1,0 +1,102 @@
+{
+  "about": "Reference recordings of wild turkey (Meleagris gallopavo). Licenses were checked on each recording's own page. trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps at least 0.3 s before the call for the noise floor.",
+  "calls": [
+    "yelp",
+    "cut",
+    "purr",
+    "gobble",
+    "kee-kee-run"
+  ],
+  "clips": [
+    {
+      "file": "gobble-1.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/136045",
+      "sourceId": "XC136045",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 2.15,
+      "trimEndSec": 4.08,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Male seen <10 m away (recordist remarks). Clean, close bird. Followed 1.4 s later by the 'click' the recordist mentions; the click is outside the trim. Peak sample 0.56 of full scale (not clipped)."
+    },
+    {
+      "file": "gobble-2.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/136045",
+      "sourceId": "XC136045",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 118.49,
+      "trimEndSec": 120.43,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Male seen <10 m away (recordist remarks). Clean, close bird, louder than gobble-1. Click after the gobble is outside the trim. Peak sample 0.82 of full scale (not clipped)."
+    },
+    {
+      "file": "gobble-3.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/136045",
+      "sourceId": "XC136045",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 149.33,
+      "trimEndSec": 151.26,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Male seen <10 m away (recordist remarks). Clean, close bird. Click after the gobble is outside the trim. Peak sample 0.77 of full scale (not clipped)."
+    },
+    {
+      "file": "gobble-4.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/134155",
+      "sourceId": "XC134155",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 185.16,
+      "trimEndSec": 187.21,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Unseen bird on a wooded hillside (recordist remarks); forest echo tail. Songbird whistles at 3-4 kHz in the background. Peak sample 0.86 of full scale (not clipped)."
+    },
+    {
+      "file": "gobble-5.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/134155",
+      "sourceId": "XC134155",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 220.73,
+      "trimEndSec": 222.78,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Unseen bird, forest echo tail. Songbird whistles at 3-4 kHz in the background, also during the lead-in. Peak sample 0.8 of full scale (not clipped)."
+    },
+    {
+      "file": "gobble-6.wav",
+      "call": "gobble",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/134155",
+      "sourceId": "XC134155",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 250.73,
+      "trimEndSec": 252.73,
+      "modifications": "Trimmed; decoded from MP3 and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Classified as gobble by measurement: a single ~0.95 s burst of rapid broadband pulses, energy peak about 1.4-3 kHz, far louder than anything else (40-60 dB above the noise floor); xeno-canto type 'song', sex 'male', remarks say 'gobbling'. Unseen bird, forest echo tail, quieter than gobble-4/5. Songbird whistles in the background. Peak sample 0.73 of full scale (not clipped)."
+    }
+  ]
+}
