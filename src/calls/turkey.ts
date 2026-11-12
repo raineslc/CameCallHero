@@ -37,7 +37,7 @@ export const TURKEY_CALLS: CallDef[] = [
     references: refs('gobble', 6),
     // From test/calibration.test.ts: the dominant-frequency track does not separate gobbles
     // from putts or the tone sweep (gobble is a burst of broadband pulses), tone does.
-    // Equal weights pass with min margin 18.1; these give 26.7 (numbers in the Phase 2 PR).
+    // Equal weights passed with min margin 18.1; these give 28.1 (numbers in docs/STATUS.md).
     weights: { rhythm: 1, pitch: 0.5, tone: 1.5 },
     description: empty,
   },

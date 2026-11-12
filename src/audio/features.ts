@@ -21,6 +21,8 @@ export interface Features {
   frameCount: number;
   /** Frame RMS in dBFS. */
   rmsDb: Float32Array;
+  /** Mel bands 0..validBands-1 are measurable at this sample rate (all 40 at 17.8 kHz and up). */
+  validBands: number;
   /** Per frame: log-mel energy above the recording's own per-band noise floor, in dB, >= 0. */
   mel: Float32Array[];
   /** Per frame: dominant frequency in Hz inside a note, 0 outside notes. */
@@ -56,21 +58,32 @@ const NOTE_MIN_REL_DB = 20;
 const MEL_NOISE_MARGIN_DB = 6;
 /** Mel bands more than this far below the frame's loudest band are ignored (window leakage, reverb). */
 const MEL_FRAME_RANGE_DB = 40;
+/** Frames this close to a note are not background; at least MIN_BACKGROUND_FRAMES are needed. */
+const BACKGROUND_GUARD_FRAMES = 3;
+const MIN_BACKGROUND_FRAMES = 10;
 /** shortcut: takes longer than this are cut (DTW cost grows with length^2); raise if longer calls are added. */
 export const MAX_SECONDS = 15;
 
 const hzToMel = (hz: number) => 2595 * Math.log10(1 + hz / 700);
 const melToHz = (mel: number) => 700 * (10 ** (mel / 2595) - 1);
 
-/** Triangular mel filters as [firstBin, weights[]] over an n/2+1 bin spectrum. */
+/**
+ * Triangular mel filters as [firstBin, weights[]] over an n/2+1 bin spectrum.
+ * Band edges are always MIN_HZ..MAX_HZ, so band b means the same frequencies at every
+ * sample rate. Bands reaching above `maxHz` cannot be measured and get no weights.
+ */
 function melFilters(fftSize: number, sampleRate: number, maxHz: number): { first: number; w: Float64Array }[] {
   const binHz = sampleRate / fftSize;
   const lo = hzToMel(MIN_HZ);
-  const hi = hzToMel(maxHz);
+  const hi = hzToMel(MAX_HZ);
   const edges = Array.from({ length: MEL_BANDS + 2 }, (_, i) => melToHz(lo + ((hi - lo) * i) / (MEL_BANDS + 1)));
   const filters = [];
   for (let b = 0; b < MEL_BANDS; b++) {
     const [f0, f1, f2] = [edges[b], edges[b + 1], edges[b + 2]];
+    if (f2 > maxHz) {
+      filters.push({ first: 0, w: new Float64Array(0) });
+      continue;
+    }
     const first = Math.max(0, Math.floor(f0 / binHz));
     const last = Math.min(fftSize / 2, Math.ceil(f2 / binHz));
     const w = new Float64Array(last - first + 1);
@@ -174,10 +187,21 @@ export function extractFeatures(clip: AudioClip): Features {
   // Per-recording normalization: measure each band against the band's own noise floor
   // (20th percentile; removes level and the steady colouring of mic and room) and against
   // the frame's loudest band (keeps only the frame's spectral shape).
-  const bandFloor = Array.from({ length: MEL_BANDS }, (_, b) => percentile(logMel.map((m) => m[b]), 0.2));
+  // The band floor comes from background frames only (away from notes), so a long steady
+  // note is not taken for noise. Without enough background, only the frame range applies.
+  const validBands = filters.filter((f) => f.w.length > 0).length;
+  const nearNote = new Uint8Array(frameCount);
+  for (const n of notes)
+    for (let f = Math.max(0, n.start - BACKGROUND_GUARD_FRAMES); f < Math.min(frameCount, n.end + BACKGROUND_GUARD_FRAMES); f++) nearNote[f] = 1;
+  const background = logMel.filter((_, f) => !nearNote[f]);
+  const bandFloor = Array.from({ length: MEL_BANDS }, (_, b) =>
+    background.length >= MIN_BACKGROUND_FRAMES ? percentile(background.map((m) => m[b]), 0.5) : SILENT_DB,
+  );
   const mel = logMel.map((m) => {
-    const top = Math.max(...m);
-    return m.map((v, b) => Math.max(0, v - Math.max(bandFloor[b] + MEL_NOISE_MARGIN_DB, top - MEL_FRAME_RANGE_DB)));
+    const top = Math.max(...m.subarray(0, validBands));
+    return m.map((v, b) =>
+      b < validBands ? Math.max(0, v - Math.max(bandFloor[b] + MEL_NOISE_MARGIN_DB, top - MEL_FRAME_RANGE_DB)) : 0,
+    );
   });
 
   const domHz = new Float32Array(frameCount);
@@ -186,6 +210,7 @@ export function extractFeatures(clip: AudioClip): Features {
   return {
     sampleRate,
     frameCount,
+    validBands,
     rmsDb,
     mel,
     domHz,

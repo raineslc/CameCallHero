@@ -39,16 +39,22 @@ silence, white/pink noise, wind), required margin 15:
 
 | Take | Same call | Other session only | Worst negative | Margin |
 |---|---|---|---|---|
-| gobble-1 | 76.8 | 74.5 | putt-3 47.0 | 29.8 |
-| gobble-2 | 76.8 | 71.7 | putt-3 46.3 | 30.5 |
-| gobble-3 | 73.8 | 69.5 | putt-3 47.0 | 26.7 |
-| gobble-4 | 82.1 | 74.5 | putt-3 47.0 | 35.0 |
-| gobble-5 | 80.9 | 68.6 | putt-3 47.0 | 33.8 |
-| gobble-6 | 82.1 | 71.6 | putt-3 47.0 | 35.0 |
+| gobble-1 | 76.8 | 74.1 | putt-3 45.3 | 31.5 |
+| gobble-2 | 76.8 | 72.9 | putt-3 44.7 | 32.1 |
+| gobble-3 | 73.4 | 69.7 | putt-3 45.3 | 28.1 |
+| gobble-4 | 81.5 | 74.1 | putt-3 45.3 | 36.3 |
+| gobble-5 | 80.2 | 67.3 | putt-3 45.3 | 35.0 |
+| gobble-6 | 81.5 | 70.7 | putt-3 45.3 | 36.3 |
 
 Limits: only two birds/sessions; no speech junk clip; real phone recordings not tested
 (needs the owner, Phase 3+). Gobble weights rhythm 1, pitch 0.5, tone 1.5 (equal weights
-give a 18.1 minimum margin).
+gave a 18.1 minimum margin before the review fixes).
+
+Open issues (from Codex review of #2, P2):
+- Rhythm compares only call length, note count and voiced fraction, not per-note
+  lengths and gaps; DTW can also absorb spacing differences. Notes with the same
+  totals but different spacing score the same. Fix with per-note alignment once a
+  multi-note call (yelp, cut, kee kee run) has references to calibrate against.
 
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).

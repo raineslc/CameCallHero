@@ -61,11 +61,12 @@ export function checkTake(f: Features, noiseFloorDb?: number): Rejection | null 
   return null;
 }
 
-function cosineDistance(a: Float32Array, b: Float32Array): number {
+/** Cosine distance over the first `bands` mel bands (those measurable in both recordings). */
+function cosineDistance(a: Float32Array, b: Float32Array, bands: number): number {
   let dot = 0;
   let na = 0;
   let nb = 0;
-  for (let i = 0; i < a.length; i++) {
+  for (let i = 0; i < bands; i++) {
     dot += a[i] * b[i];
     na += a[i] * a[i];
     nb += b[i] * b[i];
@@ -76,14 +77,14 @@ function cosineDistance(a: Float32Array, b: Float32Array): number {
 }
 
 /** DTW with steps (1,0), (0,1), (1,1). Returns mean cost along the path and the path. */
-export function dtw(a: Float32Array[], b: Float32Array[]): { meanCost: number; path: [number, number][] } {
+export function dtw(a: Float32Array[], b: Float32Array[], bands = a[0]?.length ?? 0): { meanCost: number; path: [number, number][] } {
   const n = a.length;
   const m = b.length;
   if (n === 0 || m === 0) return { meanCost: 1, path: [] };
   const cost = new Float64Array(n * m);
   for (let i = 0; i < n; i++)
     for (let j = 0; j < m; j++) {
-      const d = cosineDistance(a[i], b[j]);
+      const d = cosineDistance(a[i], b[j], bands);
       if (i === 0 && j === 0) cost[0] = d;
       else {
         const up = i > 0 ? cost[(i - 1) * m + j] : Infinity;
@@ -131,7 +132,7 @@ export function compare(take: Features, ref: Features): SubScores {
   if (!take.span || !ref.span) return { rhythm: 0, pitch: 0, tone: 0 };
   const a = take.mel.slice(take.span.start, take.span.end);
   const b = ref.mel.slice(ref.span.start, ref.span.end);
-  const { meanCost, path } = dtw(a, b);
+  const { meanCost, path } = dtw(a, b, Math.min(take.validBands, ref.validBands));
   const tone = 100 * Math.exp(-meanCost / TONE_SCALE);
 
   // Pitch: dominant-frequency shape (relative to each recording's median) along the

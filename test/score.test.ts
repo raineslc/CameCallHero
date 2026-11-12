@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fft } from '../src/audio/fft';
 import { extractFeatures, type AudioClip } from '../src/audio/features';
-import { scoreTake, checkTake, combine, type Weights } from '../src/audio/score';
+import { scoreTake, checkTake, combine, compare, type Weights } from '../src/audio/score';
 import { TURKEY_CALLS, callById } from '../src/calls/turkey';
 import { readWav } from './wav';
 
@@ -130,5 +130,30 @@ describe('invariances', () => {
     lead.set(take.samples, 22050);
     const shifted = scoreTake({ samples: lead, sampleRate: take.sampleRate }, refs, gobble.weights);
     expect(Math.abs(shifted.score - base.score)).toBeLessThan(3);
+  });
+});
+
+describe('normalization does not depend on sample rate or padding', () => {
+  /** A 1 kHz tone of `toneSec` with `padSec` of silence on each side, 20 ms fades. */
+  const tone = (sampleRate: number, toneSec: number, padSec: number): AudioClip => {
+    const pad = Math.round(padSec * sampleRate);
+    const n = Math.round(toneSec * sampleRate);
+    const fade = Math.round(0.02 * sampleRate);
+    const samples = new Float32Array(n + 2 * pad);
+    for (let i = 0; i < n; i++) samples[pad + i] = 0.3 * Math.min(1, i / fade, (n - i) / fade) * Math.sin((2 * Math.PI * 1000 * i) / sampleRate);
+    return { samples, sampleRate };
+  };
+
+  it('the same tone at 44.1, 48, 16 and 8 kHz matches on tone', () => {
+    const ref = extractFeatures(tone(44100, 1, 0.5));
+    for (const rate of [48000, 16000, 8000]) {
+      expect(compare(extractFeatures(tone(rate, 1, 0.5)), ref).tone, `${rate} Hz`).toBeGreaterThan(90);
+    }
+  });
+
+  it('a long steady note is not normalized away when there is little background', () => {
+    const ref = extractFeatures(tone(44100, 1.7, 0.5));
+    const s = compare(extractFeatures(tone(44100, 1.7, 0.15)), ref);
+    expect(s.tone).toBeGreaterThan(90);
   });
 });
