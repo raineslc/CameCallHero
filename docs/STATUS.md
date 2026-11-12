@@ -1,10 +1,18 @@
 # Status
 
-## Owner action (Phase 3, not blocking)
+## Phase 3 phone result (owner, Android, Chrome, 2026-11-12)
 
-Open the Pages link on your Android phone → **Mic check** → tap **Start mic** → send a
-screenshot of the "Phone audio processing" table and one WAV (Record 5 s → Download WAV)
-of each call you can make.
+- Settings table: echo cancellation, noise suppression and auto gain all **off** as
+  requested; 1 channel; track and AudioContext both 48000 Hz. The phone honoured every request.
+- One 5 s take, a yelp made by mouth (owner's words); not committed to the repo.
+  Measured with `extractFeatures`: peak -10.6 dBFS (74% of full scale, no clipping),
+  noise floor -39.4 dBFS, 12 notes over 3.51 s: one 0.29 s note, then ten notes of
+  0.08-0.10 s about 0.3 s apart. Scorer accepts it (about 29 dB above the floor).
+  Yelp is still locked (no free-licensed references), so it cannot be scored yet.
+- Open: the noise floor is high (CI fake-mic take: -62 dBFS). With auto gain off this is
+  real background or mic noise; the cause is not known.
+- Still wanted from the owner: one WAV of each other call they can make, named by call.
+  Owner recordings are practice takes for tuning, not references (references are wild-turkey recordings, see `docs/PLAN.md`).
 
 ## Owner decision (answers the Phase 1 gate)
 
