@@ -37,6 +37,20 @@ export function paddedClip(source: string, name: string): string {
   return fileURLToPath(file);
 }
 
+/** Steady uniform noise at `rmsDb` dBFS, `seconds` long (a mic in a noisy place). */
+export function noiseClip(name: string, rmsDb: number, seconds = 12, sr = 48000): string {
+  const amp = 10 ** (rmsDb / 20) * Math.sqrt(3);
+  let seed = 7;
+  const out = Float32Array.from({ length: Math.round(seconds * sr) }, () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return amp * (2 * (seed / 0x7fffffff) - 1);
+  });
+  mkdirSync(outDir, { recursive: true });
+  const file = new URL(name, outDir);
+  writeFileSync(file, encodeWav(out, sr));
+  return fileURLToPath(file);
+}
+
 export const fakeMicArgs = (wavPath: string) => [
   '--use-fake-ui-for-media-stream',
   '--use-fake-device-for-media-stream',

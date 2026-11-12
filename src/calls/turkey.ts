@@ -9,8 +9,10 @@ export type TurkeyCallId = 'yelp' | 'cut' | 'purr' | 'gobble' | 'kee-kee-run';
 export interface CallDef {
   id: TurkeyCallId;
   name: string;
-  /** True while there are no reference recordings to score against. */
+  /** True while the app cannot score this call (no references, or the scorer cannot tell it apart). */
   locked: boolean;
+  /** Why a locked call is locked, as shown on screen. Default: LOCK_NO_RECORDINGS. */
+  lock?: LockInfo;
   /** Paths relative to public/ (and to the site base URL). */
   references: string[];
   weights: Weights;
@@ -18,6 +20,21 @@ export interface CallDef {
   description: { meaning: string; when: string };
   sources: Source[];
 }
+
+export interface LockInfo {
+  /** Short badge text. */
+  label: string;
+  /** One line on the call page. */
+  reason: string;
+}
+
+export const LOCK_NO_RECORDINGS: LockInfo = {
+  label: 'Recordings needed',
+  reason: 'There are no reference recordings with an allowed license for this call yet, so it cannot be played or practiced.',
+};
+
+/** Badge and reason of a locked call. */
+export const lockInfo = (call: CallDef): LockInfo => call.lock ?? LOCK_NO_RECORDINGS;
 
 export interface Source {
   title: string;
@@ -110,6 +127,12 @@ export const TURKEY_CALLS: CallDef[] = [
     id: 'kee-kee-run',
     name: 'Kee kee run',
     locked: true,
+    // Four reference clips exist (public/audio/turkey/kee-kee-run-1..4.wav), but no scoring
+    // variant separated them from yelps by the calibration margin (Phase 2b, docs/STATUS.md).
+    lock: {
+      label: 'Coming soon',
+      reason: 'We have 4 recordings of this call, but the scorer cannot yet tell it apart from a yelp, so it cannot be practiced yet.',
+    },
     references: [],
     weights: UNCALIBRATED,
     // SC DNR: the kee kee is the call of lost young turkeys, adults make variations; the

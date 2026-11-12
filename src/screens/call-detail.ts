@@ -1,10 +1,11 @@
 // Call detail, compact: what the call means, how many notes and how long (measured from the
 // reference clips), spectrogram with a playhead, then Play and Practice within the first
 // screen. When turkeys use it (cited) and the clip list with attribution are collapsible.
-// Locked calls (no references) show "Recordings needed".
+// Locked calls show their lock badge and reason ("Recordings needed", or "Coming soon" for a
+// call with recordings the scorer cannot yet tell apart).
 
 import type { Features } from '../audio/features';
-import { TURKEY_CALLS, type CallDef } from '../calls/turkey';
+import { lockInfo, TURKEY_CALLS, type CallDef } from '../calls/turkey';
 import {
   assetUrl,
   clipInfo,
@@ -61,7 +62,7 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
   );
 
   root.replaceChildren(
-    el('div', { className: 'title-row' }, el('h2', { textContent: call.name }), ...(call.locked ? [el('span', { className: 'badge', textContent: 'Recordings needed' })] : [])),
+    el('div', { className: 'title-row' }, el('h2', { textContent: call.name }), ...(call.locked ? [el('span', { className: 'badge', textContent: lockInfo(call).label })] : [])),
     el('p', { className: 'lead', textContent: call.description.meaning }),
   );
 
@@ -69,7 +70,8 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
     root.append(
       el('p', {
         className: 'notice',
-        textContent: 'Recordings needed: there are no reference recordings with an allowed license for this call yet, so it cannot be played or practiced.',
+        id: 'call-lock-reason',
+        textContent: `${lockInfo(call).label}: ${lockInfo(call).reason}`,
       }),
       el('div', { className: 'actions' }, el('button', { type: 'button', className: 'btn primary', disabled: true, textContent: 'Practice' })),
       when,

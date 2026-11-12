@@ -286,7 +286,7 @@ describe('tips', () => {
     for (const take of takes)
       for (const ref of [one, falling, level, ...yelpRefs, refs[0]])
         for (const v of ['Good', 'Close', 'Needs work'] as const)
-          for (const lv of [levels, null]) for (const t of tipsFor(at(v), take, ref, lv)) texts.push(`${t.label} ${t.text}`);
+          for (const lv of [levels, null]) for (const t of tipsFor(at(v), take, ref, lv)) texts.push(`${t.label} ${t.text} ${t.action ?? ''}`);
     for (const text of texts) {
       expect(text).not.toMatch(/semitone|spectral|centroid/i);
       expect(text).not.toMatch(/pitch|tone\b|rhythm|frequenc|\bhz\b|dominant|\bmel\b|decibel|\bdb\b/i);

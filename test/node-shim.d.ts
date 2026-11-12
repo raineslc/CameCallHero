@@ -12,3 +12,4 @@ declare module 'node:fs' {
   export function writeFileSync(path: string | URL, data: Uint8Array): void;
   export function mkdirSync(path: string | URL, options?: { recursive?: boolean }): void;
 }
+declare const process: { env: Record<string, string | undefined> };

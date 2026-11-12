@@ -20,6 +20,13 @@ export interface LaneNote {
   end: number;
   /** Median dominant frequency of the note, Hz; 0 if it has none. */
   hz: number;
+  /**
+   * Median dominant frequency of the note's first and last third (the thirds of the scorer's
+   * note break), Hz; both equal `hz` for notes under 3 frames. The lane slants the block
+   * from hzStart (bottom) to hzEnd (top), so a yelp's downward break is visible.
+   */
+  hzStart: number;
+  hzEnd: number;
 }
 
 export interface PracticePlan {
@@ -46,10 +53,23 @@ function median(v: number[]): number {
 export function notesOf(f: Features): LaneNote[] {
   if (!f.span) return [];
   const t0 = f.span.start;
-  return f.notes.map((n) => {
+  const hzOf = (a: number, b: number) => {
     const hz: number[] = [];
-    for (let i = n.start; i < n.end; i++) if (f.domHz[i] > 0) hz.push(f.domHz[i]);
-    return { start: (n.start - t0) * HOP_SEC, end: (n.end - t0) * HOP_SEC, hz: median(hz) };
+    for (let i = a; i < b; i++) if (f.domHz[i] > 0) hz.push(f.domHz[i]);
+    return median(hz);
+  };
+  return f.notes.map((n) => {
+    const len = n.end - n.start;
+    const third = Math.max(1, Math.floor(len / 3));
+    const hz = hzOf(n.start, n.end);
+    const short = len < 3;
+    return {
+      start: (n.start - t0) * HOP_SEC,
+      end: (n.end - t0) * HOP_SEC,
+      hz,
+      hzStart: short ? hz : hzOf(n.start, n.start + third),
+      hzEnd: short ? hz : hzOf(n.end - third, n.end),
+    };
   });
 }
 

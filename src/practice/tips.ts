@@ -21,6 +21,11 @@ export interface Tip {
   /** Null when the call has fewer than 2 references (no reference level to compare with). */
   verdict: Verdict | null;
   text: string;
+  /**
+   * The one thing to do for this part, short and plain (no final full stop), or null when the
+   * verdict is Good and nothing measured differs.
+   */
+  action: string | null;
 }
 
 /**
@@ -91,58 +96,102 @@ const closer = (text: string, verdict: Verdict | null) =>
 export const describeNotes = (count: number, span: number) =>
   count === 1 ? `1 note lasting ${seconds(span)}` : `${plural(count, 'note')} in ${seconds(span)}`;
 
-function timingText(take: Features, ref: Features, verdict: Verdict | null): string {
+type Line = { text: string; action: string | null };
+
+function timingText(take: Features, ref: Features, verdict: Verdict | null): Line {
   const a = spanSeconds(take);
   const b = spanSeconds(ref);
   const dn = take.notes.length - ref.notes.length;
   const todo: string[] = [];
   if (dn > 0) todo.push(`make ${plural(dn, 'fewer note')}`);
   if (dn < 0) todo.push(`make ${plural(-dn, 'more note')}`);
-  if (b > 0 && Math.abs(a - b) > LENGTH_TIP_FRACTION * b) todo.push(a > b ? 'make the whole call shorter' : 'make the whole call longer');
+  const lengthOff = b > 0 && Math.abs(a - b) > LENGTH_TIP_FRACTION * b;
+  if (lengthOff) todo.push(a > b ? 'make the whole call shorter' : 'make the whole call longer');
   const measured = `You made ${describeNotes(take.notes.length, a)}. The closest turkey recording has ${describeNotes(ref.notes.length, b)}.`;
   const advice = todo.length
     ? closer(sentence(todo), verdict)
     : verdict === 'Good'
       ? 'Keep it up.'
       : 'Listen again and copy when each note starts and how long it lasts.';
-  return `${measured} ${advice}`;
+  const action =
+    dn !== 0
+      ? `Make ${plural(ref.notes.length, 'note')} instead of ${take.notes.length}`
+      : lengthOff
+        ? `Make the whole call about ${seconds(b)} long instead of ${seconds(a)}`
+        : verdict === 'Good'
+          ? null
+          : 'Copy when each note starts and how long it lasts';
+  return { text: `${measured} ${advice}`, action };
 }
 
-function highLowText(take: Features, ref: Features, verdict: Verdict | null): string {
+function highLowText(take: Features, ref: Features, verdict: Verdict | null): Line {
   const lines: string[] = [];
+  const actions: string[] = [];
   const a = medianHz(take);
   const b = medianHz(ref);
   const st = a > 0 && b > 0 ? 12 * Math.log2(a / b) : 0;
-  if (st >= HIGH_LOW_TIP_SEMITONES) lines.push("Your call was higher than the turkey's. Make it deeper.");
-  if (st <= -HIGH_LOW_TIP_SEMITONES) lines.push("Your call was deeper than the turkey's. Make it higher.");
+  if (st >= HIGH_LOW_TIP_SEMITONES) {
+    lines.push("Your call was higher than the turkey's. Make it deeper.");
+    actions.push('Make your call deeper');
+  }
+  if (st <= -HIGH_LOW_TIP_SEMITONES) {
+    lines.push("Your call was deeper than the turkey's. Make it higher.");
+    actions.push('Make your call higher');
+  }
 
   // Each note's drop from high to low (the scorer's per-note break).
   const takeFall = median(noteShapes(take).map((s) => s.fall));
   const refFall = median(noteShapes(ref).map((s) => s.fall));
   if (take.notes.length > 0 && ref.notes.length > 0) {
     if (refFall - takeFall >= BREAK_TIP_BANDS) {
-      if (refFall >= BREAK_TIP_BANDS)
+      if (refFall >= BREAK_TIP_BANDS) {
         lines.push(
           `Each turkey note starts high and drops lower. Yours ${takeFall <= 0 ? 'did not drop' : 'dropped less'}. Let each note break downward.`,
         );
-      else lines.push("Your notes rise toward their end; the turkey's do not. Keep the end of each note from going up.");
-    } else if (takeFall - refFall >= BREAK_TIP_BANDS)
+        actions.push('Let each note start high and break downward');
+      } else {
+        lines.push("Your notes rise toward their end; the turkey's do not. Keep the end of each note from going up.");
+        actions.push('Keep the end of each note from going up');
+      }
+    } else if (takeFall - refFall >= BREAK_TIP_BANDS) {
       lines.push("Your notes drop from high to low more than the turkey's. Keep each note steadier.");
+      actions.push('Keep each note steadier');
+    }
   }
-  if (lines.length) return closer(lines.join(' '), verdict);
-  return verdict === 'Good' ? 'Keep it up.' : "Listen again and follow where the turkey's call goes higher and lower.";
+  if (lines.length) return { text: closer(lines.join(' '), verdict), action: actions[0] };
+  return verdict === 'Good'
+    ? { text: 'Keep it up.', action: null }
+    : { text: "Listen again and follow where the turkey's call goes higher and lower.", action: "Follow where the turkey's call goes higher and lower" };
 }
 
-function soundText(verdict: Verdict | null): string {
-  return verdict === 'Good' ? 'Keep it up.' : 'Listen again and copy the sound of the turkey, not just the timing.';
+function soundText(verdict: Verdict | null): Line {
+  return verdict === 'Good'
+    ? { text: 'Keep it up.', action: null }
+    : { text: 'Listen again and copy the sound of the turkey, not just the timing.', action: 'Copy the sound of the turkey, not just the timing' };
 }
 
 /** One line per part, in the order timing, high/low, sound. `ref` is the closest reference. */
 export function tipsFor(scores: SubScores, take: Features, ref: Features, levels: SubScores | null): Tip[] {
   return PARTS.map((part) => {
     const verdict = levels ? verdictFor(scores[part], levels[part]) : null;
-    const text =
-      part === 'rhythm' ? timingText(take, ref, verdict) : part === 'pitch' ? highLowText(take, ref, verdict) : soundText(verdict);
-    return { part, label: PART_LABELS[part], verdict, text };
+    const line = part === 'rhythm' ? timingText(take, ref, verdict) : part === 'pitch' ? highLowText(take, ref, verdict) : soundText(verdict);
+    return { part, label: PART_LABELS[part], verdict, ...line };
   });
+}
+
+export const SAME_AGAIN = 'Do it again the same way';
+
+/**
+ * The single most useful thing to do next: the action of the part that costs the total score
+ * the most, i.e. the largest weight x (reference level - sub-score), or weight x (100 -
+ * sub-score) without reference levels. Parts with no action are skipped; if none has one, the
+ * take matched the references on every part.
+ */
+export function nextStep(tips: Tip[], scores: SubScores, levels: SubScores | null, weights: Weights): string {
+  const cost = (p: Part) => {
+    const gap = levels ? Math.max(0, levels[p] - scores[p]) : 100 - scores[p];
+    return weights[p] * (Number.isFinite(gap) ? gap : 0);
+  };
+  const ranked = tips.filter((t) => t.action !== null).sort((a, b) => cost(b.part) - cost(a.part));
+  return ranked[0]?.action ?? SAME_AGAIN;
 }

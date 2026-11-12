@@ -1,5 +1,63 @@
 # Status
 
+## Practice and mic check redesign (owner request, 2026-11-12, branch `practice-redesign`)
+
+Owner's question: how can the sound measuring interface look better and help make better calls.
+All six approved items are built on the practice and mic check screens.
+
+**Owner: try on the phone (Galaxy S25+, Chrome)** — none of this is verified on a real phone:
+1. Mic check: call into the phone; the meter should read **Good** for a normal call, **Back off** when
+   very close and loud, **Move closer** when quiet. Your floor of -39 dBFS gives a green quiet light.
+2. Yelp practice: does the quiet light turn green during the 3-2-1? Do blocks turn orange ("Hit") when
+   you call on them, and does the count ("4 of 10 hit · Streak 4") feel right, not early or late?
+3. Results: do "Play yours" and "Play turkey" play, and is the "Next try" line useful?
+
+What changed:
+- **Hit or miss per note.** A lane note is hit when your sound is on (the chunk's loudest scorer frame
+  >= 10 dB above the count-in floor, the scorer's own note threshold) inside the note's window: start
+  and end widened by 0.15 s, never past the middle of the gap to a neighbouring note, after the tap-test
+  offset. 0.15 s = half a mic chunk (~23 ms) + untuned margin for the tap-test shortcut (marked
+  `shortcut:` in `src/practice/hits.ts`). Running count and streak above the lane; visual only, the
+  score is unchanged. Only the newest "Hit"/"Miss" label is drawn (labels of close yelp notes overlapped).
+  `Lane.draw` still allocates nothing.
+- **Blocks shaped like the sound.** Each block is slanted from the median dominant frequency of the note's
+  first third (bottom) to its last third (top) — the scorer's note-break thirds. 51%+ of yelp reference
+  notes slant downward (unit test). Gobble's dominant frequency jumps (broadband pulses), so its slants
+  are irregular; that is what is measured.
+- **Quiet light during the 3-2-1.** Green "Quiet enough" / red "Too much background noise. Move away from
+  fans, wind or traffic." Threshold: the highest floor at which a call like the references can be 15 dB
+  (scorer's `minSnrDb`) above it without clipping = 20·log10(0.99) − 6.1 dB crest − 15 ≈ -21.2 dBFS. The
+  6.1 dB crest is the smallest of the gobble/yelp references (yelp-3, 6.17 dB), rounded down; a unit
+  test checks the light agrees with `checkTake` on every reference scaled to just below clipping, for
+  floors from -40 to -15 dBFS. This is lenient: a green light means a pass is possible, not easy.
+  The count-in floor is now measured live (`LiveFloor`), equal to the previous `extractFeatures` value (unit test).
+- **Loudness meter with zones** (practice and mic check): too quiet below max(-50 dBFS, floor + 15),
+  too loud from the clip-safe level (≈ -6.2 dBFS) or any sample at the clipping level; labels "Move
+  closer" / "Good" / "Back off". Level = loudest scorer frame of each mic chunk, held 0.6 s.
+- **Results.** 1–5 stars (equal 20-point bands, `shortcut:` comment in `hits.ts`; reference gobbles score
+  73–82 against each other = 4–5 stars), a bar per part, "Play yours" (the take, from memory, through a
+  new AudioContext closed when playback ends) and "Play turkey" (closest reference). Both are on the
+  results screen only; starting a take stops all playback first. Overlay of your notes vs. the closest
+  reference: filled = hit, hollow = missed/extra, plus "You hit n of N turkey notes".
+  The lane counts hits against reference clip 1 (the one shown); results count them against the
+  closest clip, so the two numbers can differ.
+- **One next step**, big: the action of the part that costs the total most (weight × gap to the
+  reference level), e.g. "Next try: make 6 notes instead of 12".
+- **Kee kee run** shows "Coming soon" (home, call page, practice) with the reason: 4 recordings, but the
+  scorer cannot yet tell it apart from a yelp. Cut and purr keep "Recordings needed".
+- Removed the practice screen's own "← Gobble" link (the header has a back button).
+- No vibration anywhere.
+
+Verified: `npm ci && npm test` (163 unit tests), `npm run build`, `npm run e2e` (43 passed, run twice,
+2 and 4 workers). New e2e with the fake mic: gobble and yelp references get hits (yelp 10 of 10),
+silence gets a green light and all misses, steady noise 6 dB above the threshold gets a red light and
+is refused; Play yours / Play turkey play with the mic closed; mic check meter reaches Good; a11y pass on
+count-in and take. Screenshots (360 px): `docs/screenshots/practice-count-in-360.png`,
+`practice-lane-hits-360.png`, `practice-results-360.png`, `mic-check-meter-360.png`
+(`SCREENSHOTS=1 npx playwright test e2e/screenshots.e2e.ts`).
+
+Not verified: anything on a real phone; whether the hit tolerance feels right; frame rate.
+
 ## Owner: new link after the rename (look PR, 2026-11-12)
 
 The app is now called **Game Call Hero** everywhere a person reads it, and you renamed the

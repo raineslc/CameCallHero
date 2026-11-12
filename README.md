@@ -7,14 +7,12 @@ yourself, and get a score for how close you came. Free test build, Android phone
 
 ## What works now — and what does not
 
-- **Gobble is the only call you can practice.** It is scored against 6 clips of real wild
-  gobblers (2 recording sessions by one recordist), so the scorer has a narrow idea of a
-  good gobble.
-- **Yelp, cut, purr and kee kee run are listed but locked** ("Recordings needed"). The app
-  needs free-licensed recordings of real turkeys making them:
-  - cut and purr: no usable recordings found yet;
-  - yelp and kee kee run: a few clips from one recordist; too few for the scorer to tell
-    them apart reliably, so they stay locked until more recordings arrive.
+- **Gobble and yelp can be practiced.** Gobble is scored against 6 clips of real wild
+  gobblers (2 recording sessions by one recordist), yelp against 3 clips from one session,
+  so the scorer has a narrow idea of a good call.
+- **Cut, purr and kee kee run are listed but locked.** Cut and purr: "Recordings needed" (no
+  usable free-licensed recordings found yet). Kee kee run: "Coming soon" (4 clips exist, but
+  the scorer cannot yet tell it apart from a yelp).
 - **Tested platform: Chrome on Android.** Other browsers and iPhone are untested. Even on
   Android, the automated tests use a simulated microphone; real-phone results are what this
   test round is for.
