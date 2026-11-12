@@ -1,7 +1,7 @@
 # Attribution
 
 Audio used in Game Call Hero. Machine-readable source of truth:
-`public/audio/turkey/manifest.json` (trim times, quality notes),
+`public/audio/turkey/manifest.json` and `public/audio/barred-owl/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings
@@ -35,6 +35,45 @@ www.xeno-canto.org/779658." (also XC779655, XC614092).
 
 Yelp and kee kee run were classified by measurement (notes in the manifest), not
 confirmed by the recordists or an expert.
+
+## Barred owl reference recordings
+
+Wild barred owls (*Strix varia*) from xeno-canto; every recording's page says no playback was
+used. All clips were trimmed from the original and converted to mono 44.1 kHz 16-bit WAV
+(stereo originals: channels averaged; 48 kHz originals: resampled). No filtering or gain change
+by this project (XC593644 was normalized to -3 dB by its recordist). Clips are shared under the
+same license as the original (CC BY-SA and CC BY-NC-SA require this). NonCommercial (NC) clips
+may only be used non-commercially; Game Call Hero is free, with no ads, purchases or donations.
+Machine-readable details, measurements and cited call definitions:
+`public/audio/barred-owl/manifest.json`.
+
+| File | Call | Original | Recordist | License |
+|---|---|---|---|---|
+| `public/audio/barred-owl/two-phrase-hoot-1.wav` | two phrase hoot | [XC1141309](https://xeno-canto.org/1141309), 1.87–6.00 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-2.wav` | two phrase hoot | [XC1141309](https://xeno-canto.org/1141309), 25.76–30.00 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-3.wav` | two phrase hoot | [XC715195](https://xeno-canto.org/715195), 2.43–6.80 s | Doug Hynes | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-4.wav` | two phrase hoot | [XC715195](https://xeno-canto.org/715195), 14.29–18.60 s | Doug Hynes | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-5.wav` | two phrase hoot | [XC911365](https://xeno-canto.org/911365), 1.37–5.71 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-6.wav` | two phrase hoot | [XC911365](https://xeno-canto.org/911365), 9.39–13.60 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/two-phrase-hoot-7.wav` | two phrase hoot | [XC690957](https://xeno-canto.org/690957), 2.38–6.63 s | Christopher McPherson | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-1.wav` | ascending hoot | [XC911364](https://xeno-canto.org/911364), 1.92–6.20 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-2.wav` | ascending hoot | [XC911364](https://xeno-canto.org/911364), 25.30–30.18 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-3.wav` | ascending hoot | [XC1001471](https://xeno-canto.org/1001471), 42.79–47.00 s | Barry Edmonston | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-4.wav` | ascending hoot | [XC1001471](https://xeno-canto.org/1001471), 58.39–62.80 s | Barry Edmonston | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-5.wav` | ascending hoot | [XC545772](https://xeno-canto.org/545772), 0.40–4.16 s | John Middleton | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/ascending-hoot-6.wav` | ascending hoot | [XC172893](https://xeno-canto.org/172893), 0.11–6.74 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/inspection-call-1.wav` | inspection call | [XC683551](https://xeno-canto.org/683551), 7.79–9.38 s | Barry Edmonston | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/inspection-call-2.wav` | inspection call | [XC1002439](https://xeno-canto.org/1002439), 1.06–2.86 s | steve | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `public/audio/barred-owl/inspection-call-3.wav` | inspection call | [XC550538](https://xeno-canto.org/550538), 1.58–2.95 s | John Baur | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/caterwaul-1.wav` | caterwaul | [XC413729](https://xeno-canto.org/413729), 21.86–26.45 s | Bruce Lagerquist | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/caterwaul-2.wav` | caterwaul | [XC593644](https://xeno-canto.org/593644), 4.13–8.65 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/barred-owl/caterwaul-3.wav` | caterwaul | [XC911366](https://xeno-canto.org/911366), 8.21–14.30 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+
+Citation form requested by xeno-canto, e.g. "Scott Olmstead, XC1141309. Accessible at
+www.xeno-canto.org/1141309." (same form for each number above).
+
+Calls were classified by measurement against cited descriptions (notes in the manifest), not
+confirmed by the recordists or an expert. The three caterwaul clips are marked uncertain.
 
 ## Test fixtures
 
