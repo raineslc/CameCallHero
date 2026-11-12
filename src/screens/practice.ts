@@ -22,6 +22,7 @@ import { showSpectrogram } from '../ui/spectrogram';
 const TRAIL_ABOVE_FLOOR_DB = 10;
 /** No mic sample this long after the mic opened means the mic is not delivering audio. */
 const NO_AUDIO_TIMEOUT_MS = 3000;
+const WATCHDOG_INTERVAL_MS = 500;
 /** The lane's clock may run ahead of the last mic chunk by at most this much (s). */
 const MAX_EXTRAPOLATE_SEC = 0.1;
 /** Count-in text by whole seconds left; index 0 once the count-in is over. */
@@ -140,6 +141,8 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
 
   // Calibration state.
   let calibCtx: AudioContext | null = null;
+  /** True from the Tap test button until the test ends; Ready stays disabled meanwhile. */
+  let calibrating = false;
   let calibTimers: number[] = [];
   let taps: number[] = [];
   let clicks: number[] = [];
@@ -195,7 +198,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       plan = makePlan(fs[0], fs);
       lane = new Lane($<HTMLCanvasElement>('practice-lane'), plan);
       $('practice-loading').hidden = true;
-      readyBtn.disabled = false;
+      readyBtn.disabled = calibrating;
     })
     .catch(() => {
       if (alive) $('practice-loading').textContent = 'Could not load the reference clips. Check your connection and reload.';
@@ -203,6 +206,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
 
   // --- Tap calibration ----------------------------------------------------------------
   const endCalibration = () => {
+    calibrating = false;
     calibTimers.forEach((t) => clearTimeout(t));
     calibTimers = [];
     if (calibCtx && calibCtx.state !== 'closed') void calibCtx.close().catch(() => undefined);
@@ -222,6 +226,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
 
   calibBtn.addEventListener('click', async () => {
     stopAudio();
+    calibrating = true;
     calibBtn.disabled = true;
     readyBtn.disabled = true;
     listenBtn.disabled = true;
@@ -235,7 +240,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       const ctx = new AudioContext();
       calibCtx = ctx;
       await ctx.resume();
-      if (!alive || calibCtx !== ctx) return;
+      if (!alive || calibCtx !== ctx || !calibrating) return;
       tapBtn.disabled = false;
       const ctxNow = ctx.currentTime;
       const perfNow = performance.now();
@@ -290,7 +295,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     pitch = null;
     floorDb = null;
     cancelAnimationFrame(raf);
-    clearTimeout(watchdog);
+    clearInterval(watchdog);
   };
 
   const frame = (ts: number) => {
@@ -382,7 +387,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
   };
 
   const startTake = async () => {
-    if (!plan || !lane) return;
+    if (!plan || !lane || calibrating) return;
     stopAudio();
     stopTake();
     const id = takeId;
@@ -407,12 +412,18 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       lastChunkT = 0;
       lastChunkPerf = performance.now();
       raf = requestAnimationFrame(frame);
-      watchdog = window.setTimeout(() => {
-        if (id !== takeId || !recorder || recorder.recorded > 0) return;
+      // Fails the take if the mic stops delivering audio, before or after the first chunk.
+      watchdog = window.setInterval(() => {
+        if (id !== takeId || !recorder || performance.now() - lastChunkPerf < NO_AUDIO_TIMEOUT_MS) return;
+        const none = recorder.recorded === 0;
         stopTake();
         show('intro');
-        showError('The microphone sent no sound. Close other apps that use it, then try again.');
-      }, NO_AUDIO_TIMEOUT_MS);
+        showError(
+          none
+            ? 'The microphone sent no sound. Close other apps that use it, then try again.'
+            : 'The microphone stopped sending sound during the take. Try again.',
+        );
+      }, WATCHDOG_INTERVAL_MS);
     } catch (err) {
       if (!alive || id !== takeId) return;
       show('intro');

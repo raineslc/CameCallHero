@@ -110,3 +110,34 @@ test('mic permission denied shows a clear message', async ({ page }) => {
   await expect(page.locator('#practice-error')).toContainText('permission was denied');
   await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled();
 });
+
+test('Ready stays disabled while the tap test runs, even when the references finish loading', async ({ page }) => {
+  // Hold the reference WAVs until the tap test has started.
+  let release!: () => void;
+  const held = new Promise<void>((r) => (release = r));
+  await page.route('**/audio/turkey/gobble-*.wav', async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto('#/practice/gobble');
+  const ready = page.getByRole('button', { name: "I'm ready" });
+  await expect(ready).toBeDisabled();
+  await page.getByRole('button', { name: 'Tap test' }).click();
+  release();
+  await expect(page.locator('#practice-loading')).toBeHidden({ timeout: 10_000 });
+  await expect(ready).toBeDisabled();
+  await expect(page.locator('#practice-calib-status')).not.toHaveText('Tap when you hear each click.', { timeout: 10_000 });
+  await expect(ready).toBeEnabled();
+});
+
+test('a mic that stops mid-take is reported and released', async ({ page }) => {
+  await spy(page);
+  await page.goto('#/practice/gobble');
+  await page.getByRole('button', { name: "I'm ready" }).click();
+  await expect(page.locator('#practice-count')).toHaveText(/^[21]$/, { timeout: 10_000 });
+  // Suspending the capture context stops the chunks after some have arrived.
+  await page.evaluate(() => window.__contexts[0].suspend());
+  await expect(page.locator('#practice-error')).toHaveText('The microphone stopped sending sound during the take. Try again.', { timeout: 10_000 });
+  await expect(page.getByRole('button', { name: "I'm ready" })).toBeVisible();
+  await expect.poll(() => micState(page)).toEqual({ streams: 1, live: 0, contexts: ['closed'] });
+});
