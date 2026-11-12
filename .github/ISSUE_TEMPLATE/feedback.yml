@@ -1,0 +1,69 @@
+name: Tester feedback
+description: Tell us how a practice take went on your phone.
+title: "Feedback: "
+labels: [feedback]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing CameCallHero. Please do not attach recordings of yourself here
+        unless you want them public: GitHub issues are public. The app itself never uploads audio.
+  - type: input
+    id: phone
+    attributes:
+      label: Phone model
+      placeholder: e.g. Pixel 8, Galaxy S23
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      description: Android Chrome is the tested browser. In Chrome, Settings > About Chrome shows the version.
+      placeholder: e.g. Chrome 142
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Call device
+      options:
+        - Mouth (diaphragm) call
+        - Box call
+        - Slate (pot) call
+        - Voice
+        - Other (say which in Notes)
+    validations:
+      required: true
+  - type: dropdown
+    id: call
+    attributes:
+      label: Which call
+      description: Only gobble can be practiced for now.
+      options:
+        - Gobble
+        - None (mic check, library or Add to Home Screen only)
+    validations:
+      required: true
+  - type: input
+    id: score
+    attributes:
+      label: Score
+      description: The score shown, or the message if the take was rejected.
+      placeholder: e.g. 64, or "Too quiet"
+  - type: dropdown
+    id: fair
+    attributes:
+      label: Did the score feel fair?
+      options:
+        - "Yes"
+        - Too high
+        - Too low
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else. Where you were (indoors, outdoors, wind), what you expected, what went wrong, screenshots.
