@@ -8,11 +8,15 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
-// Allowed: CC0, CC BY, CC BY-SA, US-government public domain. Never NC or ND.
+// Allowed: CC0, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, US-government public domain.
+// NonCommercial is allowed only because the app stays free (AGENTS.md "Hard rules").
+// Never ND (NoDerivatives): every clip is trimmed, which ND forbids.
 const ALLOWED = [
   { name: /^CC0 1\.0$/, url: /^https:\/\/creativecommons\.org\/publicdomain\/zero\/1\.0\/$/ },
   { name: /^CC BY [0-9.]+$/, url: /^https:\/\/creativecommons\.org\/licenses\/by\/[0-9.]+\/$/ },
   { name: /^CC BY-SA [0-9.]+$/, url: /^https:\/\/creativecommons\.org\/licenses\/by-sa\/[0-9.]+\/$/ },
+  { name: /^CC BY-NC [0-9.]+$/, url: /^https:\/\/creativecommons\.org\/licenses\/by-nc\/[0-9.]+\/$/ },
+  { name: /^CC BY-NC-SA [0-9.]+$/, url: /^https:\/\/creativecommons\.org\/licenses\/by-nc-sa\/[0-9.]+\/$/ },
   { name: /^Public domain \(US government work\)$/, url: /^https?:\/\/.+/ },
 ];
 
@@ -49,7 +53,7 @@ for (const { dir, needsCall, trimmed } of sets) {
       const lic = ALLOWED.find((a) => a.name.test(c.license));
       expect(lic, `license "${c.license}" not allowed`).toBeDefined();
       expect(c.licenseUrl).toMatch(lic.url);
-      expect(`${c.license} ${c.licenseUrl}`).not.toMatch(/\bnc\b|\bnd\b|-nc|-nd|noncommercial|noderiv/i);
+      expect(`${c.license} ${c.licenseUrl}`).not.toMatch(/\bnd\b|-nd|noderiv/i);
       expect(c.author).toBeTruthy();
       expect(c.sourceUrl).toBeTruthy();
       expect(c.notes).toBeTruthy();

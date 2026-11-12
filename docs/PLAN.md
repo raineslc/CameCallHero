@@ -13,7 +13,8 @@ Other species (elk, deer, ducks, owls) come after the turkey version is proven.
 |---|---|
 | Delivery | Web app on GitHub Pages. No app-store publishing until feedback is in. |
 | Test device | Android, Chrome. |
-| Reference audio | Free-licensed recordings only (CC0, CC-BY, CC-BY-SA, US-government public domain). |
+| Reference audio | Free-licensed recordings only (CC0, CC-BY, CC-BY-SA, CC-BY-NC, CC-BY-NC-SA, US-government public domain). NC allowed since 2026-11-12 because the app stays free; ND never. |
+| Money | The app is free and open source: no ads, no purchases, no donations. Code: MIT (`LICENSE`); audio keeps each file's own license (`ATTRIBUTION.md`). |
 | Repo | https://github.com/raineslc/CameCallHero — all work goes through it. |
 | Review | Codex reviews every PR. Claude agents build and fix. See `AGENTS.md`. |
 | Sessions | One phase = one new agent session, to keep context small. |
