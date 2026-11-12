@@ -1,6 +1,6 @@
-// Library home: one card per wild turkey call (name, meaning, small spectrogram of the
-// first reference clip, or "Recordings needed" when the call has none yet), and the best
-// practice score saved on this device.
+// Library home: one compact row per wild turkey call (name, one-line meaning, small
+// spectrogram of the first reference clip or a "Recordings needed" badge, and the best
+// practice score saved on this device).
 
 import { TURKEY_CALLS } from '../calls/turkey';
 import { loadSpectrogram } from '../library/references';
@@ -11,24 +11,31 @@ export function homeScreen(root: HTMLElement): () => void {
   root.innerHTML = `
     <h2>Wild turkey</h2>
     <ul class="cards">
-      ${TURKEY_CALLS.map(
-        (c) => `
+      ${TURKEY_CALLS.map((c) => {
+        const best = c.locked ? null : loadBest(c.id);
+        return `
         <li>
           <a class="card" href="#/call/${c.id}" data-call="${c.id}">
-            <span class="card-name">${c.name}</span>
-            <span class="card-meaning">${c.description.meaning}</span>
+            <span class="card-text">
+              <span class="card-head">
+                <span class="card-name">${c.name}</span>
+                ${best !== null ? `<span class="card-best">Best: <span class="accent">${best}</span> / 100</span>` : ''}
+              </span>
+              <span class="card-meaning">${c.description.meaning}</span>
+            </span>
             ${
               c.locked
-                ? '<span class="badge">Recordings needed</span>'
-                : `<canvas class="spectrogram small" role="img" aria-label="Spectrogram of a ${c.name.toLowerCase()}"></canvas>`
+                ? '<span class="badge card-side">Recordings needed</span>'
+                : `<canvas class="spectrogram thumb card-side" role="img" aria-label="Spectrogram of a ${c.name.toLowerCase()}"></canvas>`
             }
-            ${!c.locked && loadBest(c.id) !== null ? `<span class="card-best">Best: <span class="accent">${loadBest(c.id)}</span> / 100</span>` : ''}
           </a>
-        </li>`,
-      ).join('')}
+        </li>`;
+      }).join('')}
     </ul>
-    <p class="muted">Before practicing, check what your phone's microphone does:</p>
-    <a class="btn" href="#/mic">Mic check</a>
+    <div class="inline-cta">
+      <p class="muted">Before practicing, check what your phone's microphone does.</p>
+      <a class="btn" href="#/mic">Mic check</a>
+    </div>
   `;
   let alive = true;
   for (const c of TURKEY_CALLS) {

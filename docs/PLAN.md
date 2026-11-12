@@ -1,4 +1,4 @@
-# CameCallHero — Plan
+# Game Call Hero — Plan
 
 A phone app that teaches hunting game calls the way a rhythm game teaches songs.
 Browse an animal's sounds (like Merlin), then practice each one: the app records

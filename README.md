@@ -1,4 +1,4 @@
-# CameCallHero
+# Game Call Hero
 
 Practice hunting game calls like a rhythm game: hear a real wild turkey, make the call
 yourself, and get a score for how close you came. Free test build, Android phones first.

@@ -1,6 +1,6 @@
 {
-  "name": "CameCallHero",
-  "short_name": "CallHero",
+  "name": "Game Call Hero",
+  "short_name": "Game Call Hero",
   "description": "Practice wild turkey calls and get scored against real recordings. Audio never leaves your phone.",
   "start_url": "./",
   "scope": "./",

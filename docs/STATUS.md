@@ -1,5 +1,19 @@
 # Status
 
+## Owner action: rename the repository (look PR, 2026-11-12)
+
+The app is now called **Game Call Hero** everywhere a person reads it. The GitHub repository
+is still named `CameCallHero`, and only you can rename it:
+
+1. GitHub → the repo → Settings → General → Repository name → `GameCallHero` → Rename.
+2. The site then moves to **https://raineslc.github.io/GameCallHero/**. The old link
+   (`/CameCallHero/`) stops working: GitHub Pages does not redirect after a rename. Remove the
+   old home-screen app and install it again from the new link.
+3. The build no longer depends on the repo name (relative paths), so nothing in the code
+   has to change for the site to work. Afterwards, ask an agent to update the links in
+   README, docs and the footer's feedback link (GitHub itself redirects the old repo links).
+4. Check the new look on your phone (Galaxy S25+): header, call list, a call page.
+
 ## Owner: next steps (Phase 6, feedback release, 2026-11-12)
 
 All six phases are done. Nothing more is planned; the next work depends on your decisions.
@@ -56,6 +70,33 @@ All six phases are done. Nothing more is planned; the next work depends on your 
   to prove the check catches them. Found nothing to fix. Limits: text drawn on canvases (lane,
   spectrograms) and disabled buttons are not checked.
 - Playwright: 37 tests, run 3x in a row (1 worker) and 2x with 4 workers: no failures.
+
+## Look update notes (branch `look-rename-camo-layout`)
+
+- Name: "Game Call Hero" in the header, `<title>`, web manifest (name and short_name; a
+  launcher may shorten the label), README, docs, AGENTS.md, issue form, LICENSE, package name
+  `gamecallhero`. Kept: repo and Pages links (repo not renamed yet) and the `localStorage`
+  prefix `camecallhero.` (renaming it would lose saved best scores).
+- Paths: Vite `base: './'`, manifest `start_url` / `scope` `./`, audio and icons relative.
+  `e2e/base-path.e2e.ts` serves the same build under `/mirror/GameCallHero/` (all other e2e
+  tests use `/CameCallHero/`): home, camo, clip playback, manifest and icons load, and no
+  request leaves the prefix.
+- Camo: `scripts/make-camo.mjs` writes `public/camo.png` (512 px, 4-colour indexed PNG,
+  about 8 kB, shown at 256 CSS px): three seeded periodic noise fields with domain warping,
+  cut into olive base, brown and dark-green shapes and broken black strands, from the
+  `--camo-*` tokens. The noise wraps at the tile edge, so it tiles without seams; the script
+  fails if colour changes across the wrap edge are unusually frequent. Our own pattern, no
+  commercial camo copied. A static PNG, so no runtime filter cost.
+- Layout: 56 px sticky header (back button on inner screens, name, Calls, Mic check, all on
+  solid plates over the camo). Home: one compact row per call (name, best score, one-line
+  meaning, spectrogram thumbnail or "Recordings needed"); all five rows fit at 360 x 740
+  (e2e). Call page: facts line, 128 px spectrogram, Play + Practice on the first screen
+  (e2e), "When turkeys use it" and "Reference clips and licenses" in `<details>`.
+- Practice and mic check screens were not restructured (another session redesigns them);
+  they only pick up the new header, footer and heading sizes. Practice still has its own
+  "← Gobble" link besides the header back button.
+- Screenshots (before/after, 360 and 412 px): `docs/screenshots/`.
+- Not verified: the look on a real phone.
 
 ## Phase 3 phone result (owner, Android, Chrome, 2026-11-12)
 

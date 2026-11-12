@@ -12,7 +12,19 @@ export function matchRoute(path: string, routes: Record<string, unknown>, fallba
   return key in routes ? [key, rest.join('/')] : [fallback, ''];
 }
 
-export function startRouter(root: HTMLElement, routes: Record<string, Screen>, fallback = '/'): void {
+/** Where the header's back button goes from a route: practice → its call, other inner screens → home, home → none. */
+export function backHref(route: string, param: string): string | null {
+  if (route === '/') return null;
+  if (route === '/practice' && param) return `#/call/${param}`;
+  return '#/';
+}
+
+export function startRouter(
+  root: HTMLElement,
+  routes: Record<string, Screen>,
+  fallback = '/',
+  onRender?: (route: string, param: string) => void,
+): void {
   let cleanup: (() => void) | undefined;
   const leave = () => {
     const done = cleanup;
@@ -23,6 +35,7 @@ export function startRouter(root: HTMLElement, routes: Record<string, Screen>, f
     leave();
     const path = location.hash.replace(/^#/, '') || fallback;
     const [route, param] = matchRoute(path, routes, fallback);
+    onRender?.(route, param);
     root.replaceChildren();
     window.scrollTo(0, 0);
     cleanup = routes[route](root, param) ?? undefined;

@@ -1,4 +1,4 @@
-# Agent instructions — CameCallHero
+# Agent instructions — Game Call Hero
 
 Read this whole file before doing anything. It applies to every agent:
 Claude builder sessions and the Codex PR reviewer.
@@ -77,7 +77,7 @@ Hunting look, phone first (360 px wide up).
 
 - Base: near-black and dark grey (`--bg`, `--surface` in `src/styles/theme.css`).
 - Accent: hunter orange (`--accent`) for the primary action, active note, score.
-- Texture: woodland camo pattern (`.camo`) on header and section bands only —
+- Texture: woodland camo pattern (`.camo`, tile from `scripts/make-camo.mjs`) on header and section bands only —
   never behind text that must be read.
 - Use the CSS tokens; do not hard-code colours.
 - Text contrast at least WCAG AA (4.5:1). Touch targets at least 44 px.

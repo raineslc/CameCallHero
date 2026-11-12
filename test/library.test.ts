@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { extractFeatures, HOP_SEC } from '../src/audio/features';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { callSeconds, clipInfo, describeMeasure, measure, playheadFraction, type ClipInfo } from '../src/library/references';
-import { matchRoute } from '../src/router';
+import { backHref, matchRoute } from '../src/router';
 import { readWav } from './wav';
 
 const root = new URL('..', import.meta.url);
@@ -74,5 +74,15 @@ describe('matchRoute', () => {
     expect(matchRoute('/mic', routes, '/')).toEqual(['/mic', '']);
     expect(matchRoute('/call/gobble', routes, '/')).toEqual(['/call', 'gobble']);
     expect(matchRoute('/nope/x', routes, '/')).toEqual(['/', '']);
+  });
+});
+
+describe('backHref', () => {
+  it('practice goes back to its call, other inner screens to home, home has none', () => {
+    expect(backHref('/', '')).toBeNull();
+    expect(backHref('/mic', '')).toBe('#/');
+    expect(backHref('/call', 'gobble')).toBe('#/');
+    expect(backHref('/practice', 'gobble')).toBe('#/call/gobble');
+    expect(backHref('/practice', '')).toBe('#/');
   });
 });

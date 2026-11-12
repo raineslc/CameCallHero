@@ -1,6 +1,6 @@
 # Attribution
 
-Audio used in CameCallHero. Machine-readable source of truth:
+Audio used in Game Call Hero. Machine-readable source of truth:
 `public/audio/turkey/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
@@ -9,7 +9,7 @@ Audio used in CameCallHero. Machine-readable source of truth:
 All clips were trimmed from the original and converted to mono 44.1 kHz 16-bit
 WAV (the stereo XC779658 and XC779655 originals: channels averaged). No filtering or gain change. Clips are
 shared under the same license as the original (CC BY-SA and CC BY-NC-SA require this).
-NonCommercial (NC) clips may only be used non-commercially; CameCallHero is free, with
+NonCommercial (NC) clips may only be used non-commercially; Game Call Hero is free, with
 no ads, purchases or donations.
 
 | File | Call | Original | Recordist | License |
