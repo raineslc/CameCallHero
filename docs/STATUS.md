@@ -75,7 +75,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
-| 5 | Practice | | |
+| 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/CameCallHero/pull/8) |
 | 6 | Feedback release | | |
 
 ## Phase 1 search log (2026-11-12)
@@ -148,6 +148,37 @@ Open issues (from Codex review of #2, P2):
 - Playwright at 360 px: every call page loads, every gobble clip plays with no HTTP error,
   attribution shown, no horizontal scroll, audio paused and source dropped on leaving.
 - Not verified: playback on a real phone.
+
+## Phase 5 notes
+
+- Practice at `#/practice/<id>`: Listen (reference clip 1, with spectrogram) → **I'm ready** →
+  3-2-1 count-in (noise floor measured, passed to the scorer) → perform against a silent lane →
+  Results. The timeline runs on the mic's own sample count; the mic opens per take and is
+  released as soon as the take ends (and on Cancel / leaving the screen).
+- Lane: reference notes (grey, orange outline while active) scroll down to the hit line; pitch
+  on a log axis from the references' own 10th–90th percentile dominant frequency, widened by an
+  octave each side; the live dominant frequency (same measure as the scorer's) is the orange
+  trail, drawn only when the chunk is 10 dB above the count-in floor. `Lane.draw` allocates
+  nothing (preallocated trail buffers, colours read once). Checked by reading the code, not by
+  a profiler.
+- Take length: 0.5 s lead + longest reference call + 1.5 s tail (about 3.2 s for gobble).
+- Results: score, rhythm / pitch / tone, overlay of your notes vs. the closest reference's
+  notes, one tip from the weakest sub-score (states measured lengths / note counts / semitone
+  offset only), Try again, Listen again. Rejected takes show the scorer's reason, no score.
+- Best score per call in `localStorage` (`camecallhero.best.<id>`), shown on home cards.
+- Tap test (4 clicks, 1 s apart) stores `camecallhero.latencyMs`; used only to shift the
+  trail and the overlay. shortcut: it measures speaker + touch delay, not mic input delay;
+  scoring does not use it.
+- Playwright (fake mic): files built at test time from `gobble-1.wav` and `putt-3.wav`
+  (count-in background noise at the clip's own noise floor + clip + tail; written to the
+  git-ignored `e2e/.fake-mic/`, not shipped). Gobble take scored 95.6–96.6 (it is one of the
+  six references, so this checks the plumbing, not calibration); same-call level (lowest
+  leave-one-out, computed in the test) 73.4; putt take 46.5. Also: mic released after the
+  take, on Cancel and when leaving during the count-in; locked call never opens the mic;
+  permission denied message; tap test stores a latency; 360 px, no horizontal scroll, 44 px
+  targets.
+- Not verified: anything on a real phone (lane frame rate, trail offset, tap-test values,
+  whether a real gobble call from a person or a box call scores like the references).
 
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).

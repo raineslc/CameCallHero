@@ -1,8 +1,10 @@
 // Library home: one card per wild turkey call (name, meaning, small spectrogram of the
-// first reference clip, or "Recordings needed" when the call has none yet).
+// first reference clip, or "Recordings needed" when the call has none yet), and the best
+// practice score saved on this device.
 
 import { TURKEY_CALLS } from '../calls/turkey';
 import { loadSpectrogram } from '../library/references';
+import { loadBest } from '../practice/storage';
 import { showSpectrogram } from '../ui/spectrogram';
 
 export function homeScreen(root: HTMLElement): () => void {
@@ -20,6 +22,7 @@ export function homeScreen(root: HTMLElement): () => void {
                 ? '<span class="badge">Recordings needed</span>'
                 : `<canvas class="spectrogram small" role="img" aria-label="Spectrogram of a ${c.name.toLowerCase()}"></canvas>`
             }
+            ${!c.locked && loadBest(c.id) !== null ? `<span class="card-best">Best: <span class="accent">${loadBest(c.id)}</span> / 100</span>` : ''}
           </a>
         </li>`,
       ).join('')}

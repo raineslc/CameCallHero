@@ -47,8 +47,9 @@ export interface Features {
 export const HOP_SEC = 0.01;
 export const CLIP_LEVEL = 0.99;
 const MEL_BANDS = 40;
-const MIN_HZ = 150;
-const MAX_HZ = 8000;
+/** Frequency range of the mel bands and of the dominant-frequency search. */
+export const MIN_HZ = 150;
+export const MAX_HZ = 8000;
 const SILENT_DB = -120;
 /** Notes: frames louder than max(noise floor + NOTE_ABOVE_FLOOR_DB, peak - NOTE_BELOW_PEAK_DB). */
 const NOTE_ABOVE_FLOOR_DB = 10;
