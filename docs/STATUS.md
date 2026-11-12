@@ -28,11 +28,12 @@ Options (pick one or combine):
    gobble only (rhythm/tone are testable; pitch-shape scoring for yelp and kee kee
    cannot be calibrated without real examples). The other four calls stay locked
    in the app until references exist.
-4. Allow more sources in the environment: Freesound (returns 403 to this
+4. Re-run Phase 1 later to check the Commons videos listed in the search log (blocked by rate limits this time).
+5. Allow more sources in the environment: Freesound (returns 403 to this
    environment), fws.gov (USFWS media now redirects there; blocked by the proxy).
    Unknown whether they hold usable turkey audio.
 
-Reply in the PR or edit this section, then start Phase 1 again (option 1/2/4)
+Reply in the PR or edit this section, then start Phase 1 again (option 1/2/4/5)
 or Phase 2 (option 3).
 
 ## Phases
@@ -52,7 +53,7 @@ or Phase 2 (option 3).
 | Source | Result |
 |---|---|
 | xeno-canto (website search; API v3 needs a key) | 141 recordings. Licenses: 102 BY-NC-SA 4.0, 12 BY-NC-SA 3.0, 17 BY-NC-ND 2.5, 4 BY-NC-ND 4.0, 5 BY-SA 3.0, 1 BY-SA 4.0. Used: XC136045, XC134155 (gobble). Checked, not used: XC104532, XC104533, XC134744, XC320490 (putts; juvenile whistles at XC104532 ~79–82 s are a possible kee kee candidate but not a full run). |
-| Wikimedia Commons | Audio: only mirrors of the same xeno-canto files, plus `Gobbler.ogg` (pdsounds.org "public domain" by user "bod", tagged poultry — not a US-government work and probably domestic: rejected). Videos with possible call audio checked separately (see PR). |
+| Wikimedia Commons | Audio: only mirrors of the same xeno-canto files, plus `Gobbler.ogg` (pdsounds.org "public domain" by user "bod", tagged poultry — not a US-government work and probably domestic: rejected). Videos whose sound track may hold calls were **not checked**: Wikimedia answered every download with HTTP 429 for 30+ min. Candidates: `Wild Turkey (Meleagris gallopavo).webm` (USFWS, public domain), `Wild Turkeys in North bay.webm`, `Wild Turkey Red Hill Valley 1.webm` / `2.webm`, `20260428 wild tom turkey matthaei botanical gardens wm.webm` (all CC BY-SA 4.0). |
 | Freesound | HTTP 403 from this environment; not searched. |
 | NPS sound gallery | No turkey recordings listed. |
 | USFWS digital media | digitalmedia.fws.gov redirects to fws.gov, which the environment blocks. |
