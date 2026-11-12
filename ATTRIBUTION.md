@@ -24,6 +24,22 @@ www.xeno-canto.org/136045." (same for XC134155).
 
 ## Test fixtures
 
-`test/fixtures/junk/*.wav` (silence, white noise, wind, claps) are synthesized by
-`scripts/make-junk-clips.mjs`. Not recordings. Released under
+`test/fixtures/junk/*.wav` (silence, white noise, wind, claps, pink noise, tone
+sweep) are synthesized by `scripts/make-junk-clips.mjs`. Not recordings. Released under
 [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+`test/fixtures/turkey-other/*.wav` are non-gobble wild turkey sounds (short
+putt-like clicks) used only as wrong-call negatives in the calibration test; not
+shipped in the app. Trimmed from the original and converted to mono 44.1 kHz 16-bit
+WAV (the 48 kHz originals were resampled). No filtering or gain change. Shared under
+the same license as the original. Details: `test/fixtures/turkey-other/manifest.json`.
+
+| File | Original | Recordist | License |
+|---|---|---|---|
+| `test/fixtures/turkey-other/putt-1.wav` | [XC104532](https://xeno-canto.org/104532), 25.8–27.8 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| `test/fixtures/turkey-other/putt-2.wav` | [XC104533](https://xeno-canto.org/104533), 15.1–17.1 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| `test/fixtures/turkey-other/putt-3.wav` | [XC134744](https://xeno-canto.org/134744), 4.5–6.5 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| `test/fixtures/turkey-other/putt-4.wav` | [XC320490](https://xeno-canto.org/320490), 32.6–35.2 s | Jonathon Jongsma | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+
+Citation form requested by xeno-canto: "Jonathon Jongsma, XC104532. Accessible at
+www.xeno-canto.org/104532." (same for the other numbers).

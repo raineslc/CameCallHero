@@ -1,0 +1,65 @@
+{
+  "about": "Non-gobble wild turkey sounds used only as wrong-call negatives in test/calibration.test.ts. Not shipped in the app. Licenses checked on each recording page. trimStartSec/trimEndSec are seconds in the original file.",
+  "clips": [
+    {
+      "file": "putt-1.wav",
+      "kind": "putt-like",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/104532",
+      "sourceId": "XC104532",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 25.8,
+      "trimEndSec": 27.8,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Wrong-call negative for calibration, not a reference. Short isolated clicks measured on the spectrogram; Phase 1 called these putts, not confirmed by an expert. Original remarks: nervous calls and foraging sounds from 3 adults after juveniles flushed. Clip holds two strong clicks (~0.38 s and ~1.32 s) and fainter ones: each a ~40 ms click whose energy sweeps up from about 1.4 to 3 kHz, plus a faint broadband tick."
+    },
+    {
+      "file": "putt-2.wav",
+      "kind": "putt-like",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/104533",
+      "sourceId": "XC104533",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 15.1,
+      "trimEndSec": 17.1,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Wrong-call negative for calibration, not a reference. Short isolated clicks measured on the spectrogram; Phase 1 called these putts, not confirmed by an expert. Original remarks: agitated calls from 2 juveniles perched above the recordist. Clip holds five ~40 ms clicks about 0.35-0.55 s apart; energy sweeps up from about 1.5 to 5-6 kHz with a broadband tick at the onset."
+    },
+    {
+      "file": "putt-3.wav",
+      "kind": "putt-like",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/134744",
+      "sourceId": "XC134744",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 4.5,
+      "trimEndSec": 6.5,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz (resampled to 44.1 kHz)) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Wrong-call negative for calibration, not a reference. Short isolated clicks measured on the spectrogram; Phase 1 called these putts, not confirmed by an expert. Original remarks: nervous calls from a female on a trail. Clip holds one ~40 ms click (~0.5 s) sweeping up from about 1.5 to 4 kHz; louder background noise below 1.5 kHz and insect/bird tones near 4.3 kHz."
+    },
+    {
+      "file": "putt-4.wav",
+      "kind": "putt-like",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/320490",
+      "sourceId": "XC320490",
+      "author": "Jonathon Jongsma",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "licenseCheckedOn": "2026-11-12",
+      "trimStartSec": 32.6,
+      "trimEndSec": 35.2,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz (resampled to 44.1 kHz)) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change.",
+      "notes": "Wrong-call negative for calibration, not a reference. Short isolated clicks measured on the spectrogram; Phase 1 called these putts, not confirmed by an expert. Original remarks: agitated adult in a disturbed family group. Clip holds four ~30 ms clicks (~0.36, 1.16, 1.88, 2.30 s) with energy about 1.4-3 kHz. Ends before the wing noise at 35.8 s."
+    }
+  ]
+}

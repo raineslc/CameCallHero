@@ -40,6 +40,26 @@
       "author": "CameCallHero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "file": "pink-noise.wav",
+      "kind": "pink-noise",
+      "notes": "2 s steady pink noise (Kellet filter), RMS about -21 dBFS.",
+      "source": "synthesized",
+      "sourceUrl": "scripts/make-junk-clips.mjs",
+      "author": "CameCallHero contributors",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "file": "tone-sweep.wav",
+      "kind": "tone-sweep",
+      "notes": "0.5 s quiet, then a 1.2 s exponential sine sweep 300 Hz to 3 kHz at 0.3 amplitude, 20 ms fades.",
+      "source": "synthesized",
+      "sourceUrl": "scripts/make-junk-clips.mjs",
+      "author": "CameCallHero contributors",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     }
   ]
 }

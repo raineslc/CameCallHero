@@ -35,14 +35,25 @@ Your phase brief: `docs/phases/phase-N-*.md`.
    Never force-push `main`. The owner can revoke this by editing this section.
 9. Update `docs/STATUS.md` in the PR (before merge): phase done, PR link,
    open issues, anything the owner must do.
-10. Hand off: start the next phase in a **new** session (`create_session` on
-    `https://github.com/raineslc/CameCallHero`, same environment) with the prompt:
-    > Read AGENTS.md and docs/STATUS.md in this repo, then do Phase N+1 from docs/phases/.
-    If you cannot create sessions, write that prompt as the last line of
-    `docs/STATUS.md` and stop.
+10. Do not start the next phase yourself. The orchestrator (parent) session starts it
+    after your merge. Send it a short summary with `send_message` to `@parent` if available.
 11. **Stop instead of handing off** if the phase brief's gate fails, or if anything
     needs the owner (a phone test, a decision, a credential). Put the question at
     the top of `docs/STATUS.md`.
+
+## GitHub API
+
+`gh pr ...` commands use GraphQL, which this environment blocks. Use REST via `gh api`
+(or the GitHub MCP tools):
+
+| Action | Call |
+|---|---|
+| Create PR | `gh api repos/raineslc/CameCallHero/pulls -f title=... -f head=<branch> -f base=main -f body=...` |
+| Reviews | `gh api repos/raineslc/CameCallHero/pulls/<n>/reviews` |
+| Inline comments | `gh api repos/raineslc/CameCallHero/pulls/<n>/comments` |
+| Ready for review | `gh api -X POST repos/raineslc/CameCallHero/pulls/<n>/ccr/ready_for_review` |
+| Merge | `gh api -X PUT repos/raineslc/CameCallHero/pulls/<n>/merge -f merge_method=squash` |
+| Checks | `gh api repos/raineslc/CameCallHero/commits/<sha>/check-runs` |
 
 ## Hard rules
 
