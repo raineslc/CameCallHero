@@ -1,5 +1,5 @@
 // Generates the synthetic junk clips used by the calibration test (Phase 2):
-// silence, white noise, wind-like noise and hand-clap-like bursts.
+// silence, white noise, wind-like noise, hand-clap-like bursts, pink noise and a tone sweep.
 // All are made from code here, so they carry no third-party license (CC0, this repo).
 // Deterministic: a seeded PRNG gives byte-identical files on every run.
 // Usage: node scripts/make-junk-clips.mjs
@@ -59,8 +59,31 @@ for (const at of [0.5, 1.0, 1.5]) {
   for (let i = 0; i < len(0.08); i++) claps[start + i] += 0.6 * noise() * Math.exp(-i / len(0.008));
 }
 
+// Pink noise (Paul Kellet's economy filter on white noise), steady level.
+// Generated after the clips above so their PRNG sequence, and bytes, stay unchanged.
+let b0 = 0, b1 = 0, b2 = 0;
+const pink = Float32Array.from({ length: len(2) }, () => {
+  const w = noise();
+  b0 = 0.99765 * b0 + w * 0.099046;
+  b1 = 0.963 * b1 + w * 0.2965164;
+  b2 = 0.57 * b2 + w * 1.0526913;
+  return 0.05 * (b0 + b1 + b2 + w * 0.1848);
+});
+
+// Tone sweep: 0.5 s quiet, then a 1.2 s exponential sine sweep 300 Hz -> 3 kHz, 20 ms fades.
+const sweep = new Float32Array(len(2));
+{
+  const start = len(0.5), n = len(1.2), f0 = 300, f1 = 3000, k = Math.log(f1 / f0);
+  for (let i = 0; i < n; i++) {
+    const t = i / SR, T = n / SR;
+    const phase = (2 * Math.PI * f0 * T * (Math.exp((t / T) * k) - 1)) / k;
+    const fade = Math.min(1, i / len(0.02), (n - i) / len(0.02));
+    sweep[start + i] = 0.3 * fade * Math.sin(phase);
+  }
+}
+
 mkdirSync(OUT, { recursive: true });
-for (const [name, s] of Object.entries({ silence, 'white-noise': white, wind, claps })) {
+for (const [name, s] of Object.entries({ silence, 'white-noise': white, wind, claps, 'pink-noise': pink, 'tone-sweep': sweep })) {
   writeFileSync(new URL(`${name}.wav`, OUT), wav(s));
   console.log(`wrote test/fixtures/junk/${name}.wav`);
 }

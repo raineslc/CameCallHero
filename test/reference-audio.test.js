@@ -17,8 +17,9 @@ const ALLOWED = [
 ];
 
 const sets = [
-  { dir: 'public/audio/turkey', needsCall: true },
-  { dir: 'test/fixtures/junk', needsCall: false },
+  { dir: 'public/audio/turkey', needsCall: true, trimmed: true },
+  { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
+  { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
 ];
 
 function wavFormat(path) {
@@ -32,7 +33,7 @@ function wavFormat(path) {
   };
 }
 
-for (const { dir, needsCall } of sets) {
+for (const { dir, needsCall, trimmed } of sets) {
   describe(`${dir}/manifest.json`, () => {
     const abs = join(root, dir);
     const manifest = JSON.parse(readFileSync(join(abs, 'manifest.json'), 'utf8'));
@@ -55,6 +56,8 @@ for (const { dir, needsCall } of sets) {
       if (needsCall) {
         expect(manifest.calls).toContain(c.call);
         expect(c.file).toMatch(new RegExp(`^${c.call}-\\d+\\.wav$`));
+      }
+      if (trimmed) {
         expect(c.sourceUrl).toMatch(/^https:\/\//);
         expect(c.trimStartSec).toBeGreaterThanOrEqual(0);
         expect(c.trimEndSec).toBeGreaterThan(c.trimStartSec);

@@ -1,40 +1,14 @@
 # Status
 
-## Owner decision needed — Phase 1 gate failed (stopped, no hand-off)
+## Owner decision (answers the Phase 1 gate)
 
-Only **gobble** has 3+ legally usable clips (6 clips, two males). **Yelp, cut,
-purr and kee kee run have 0 usable clips.** Phase 2 has not been started.
+Proceed with **gobble only**. Only `public/audio/turkey/gobble-*.wav` exist (6 clips,
+CC BY-SA). The engine is built for all five calls; yelp, cut, purr and kee kee run are
+`locked: true` in `src/calls/turkey.ts` with no references, and the 5x5 cross-call
+matrix test activates by itself once 2+ calls have 3+ references.
 
-Why: of 141 wild turkey recordings on xeno-canto, 135 are NonCommercial and/or
-NoDerivatives. The 6 CC BY-SA recordings (all by Jonathon Jongsma) are two gobbling
-males and four "nervous/agitated" family groups. Measured on spectrograms, the
-agitated ones are mostly putts (single broadband clicks), plus some high juvenile
-whistles and pulsed trills I could not tie to one of the five calls with confidence.
-Other sources: see "Phase 1 search log" below.
-
-Options (pick one or combine):
-1. **Owner field recordings** of real hens/poults (spring, roost or feeding areas),
-   phone voice memo is enough to start. You would license them CC0 to the project.
-2. **Ask xeno-canto recordists for permission** (NC/ND are not on the allowed
-   list, so this needs written permission or a relicense to CC BY / CC BY-SA). Candidates whose own descriptions mention the
-   missing calls:
-   - Valerie Heemstra — XC767336, XC769323 (clucks, "yelp ending"), CC BY-NC-SA 4.0
-   - Paul Driver — XC70534 ("3 birds inc purring"), CC BY-NC-ND 2.5
-   - Richard E. Webster — XC700666 (clucks, soft tremulous calls), CC BY-NC-SA 4.0
-   - Thomas G. Graves — XC377125 (hen with chicks, clucking), CC BY-NC-SA 4.0
-   - Allen T. Chartier — XC30895, XC30896 (clucking), CC BY-NC-SA 3.0
-   Jonathon Jongsma (CC BY-SA, already used) may also have unpublished hen recordings.
-3. **Proceed with fewer examples**: Phase 2 builds and calibrates the scorer on
-   gobble only (rhythm/tone are testable; pitch-shape scoring for yelp and kee kee
-   cannot be calibrated without real examples). The other four calls stay locked
-   in the app until references exist.
-4. Re-run Phase 1 later to check the Commons videos listed in the search log (blocked by rate limits this time).
-5. Allow more sources in the environment: Freesound (returns 403 to this
-   environment), fws.gov (USFWS media now redirects there; blocked by the proxy).
-   Unknown whether they hold usable turkey audio.
-
-Reply in the PR or edit this section, then start Phase 1 again (option 1/2/4/5)
-or Phase 2 (option 3).
+**Missing references: yelp, cut, purr, kee kee run.** Options for getting them are in
+the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCallHero/pull/1).
 
 ## Phases
 
@@ -42,7 +16,7 @@ or Phase 2 (option 3).
 |---|---|---|---|
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
 | 1 | Reference audio | partial — gate failed (gobble only) | [#1](https://github.com/raineslc/CameCallHero/pull/1) |
-| 2 | Scoring engine | blocked on owner decision | |
+| 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
 | 3 | Mic check | | |
 | 4 | Library | | |
 | 5 | Practice | | |
@@ -58,10 +32,29 @@ or Phase 2 (option 3).
 | NPS sound gallery | No turkey recordings listed. |
 | USFWS digital media | digitalmedia.fws.gov redirects to fws.gov, which the environment blocks. |
 
+## Phase 2 calibration (gobble, leave-one-out)
+
+Same-call score vs. the worst negative (4 putt-like turkey clips, claps, tone sweep,
+silence, white/pink noise, wind), required margin 15:
+
+| Take | Same call | Other session only | Worst negative | Margin |
+|---|---|---|---|---|
+| gobble-1 | 76.8 | 74.5 | putt-3 47.0 | 29.8 |
+| gobble-2 | 76.8 | 71.7 | putt-3 46.3 | 30.5 |
+| gobble-3 | 73.8 | 69.5 | putt-3 47.0 | 26.7 |
+| gobble-4 | 82.1 | 74.5 | putt-3 47.0 | 35.0 |
+| gobble-5 | 80.9 | 68.6 | putt-3 47.0 | 33.8 |
+| gobble-6 | 82.1 | 71.6 | putt-3 47.0 | 35.0 |
+
+Limits: only two birds/sessions; no speech junk clip; real phone recordings not tested
+(needs the owner, Phase 3+). Gobble weights rhythm 1, pitch 0.5, tone 1.5 (equal weights
+give a 18.1 minimum margin).
+
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).
 - Project environment `camecallhero` allows: xeno-canto.org, commons.wikimedia.org,
   upload.wikimedia.org, freesound.org, cdn.freesound.org, www.nps.gov, digitalmedia.fws.gov.
 - Wikimedia rate-limits this environment heavily (HTTP 429); expect slow downloads.
 - Junk clips for the calibration test are synthesized (`scripts/make-junk-clips.mjs`):
-  silence, white noise, wind, claps. No speech clip yet.
+  silence, white noise, wind, claps, pink noise, tone sweep. No speech clip yet.
+- Wrong-call negatives: `test/fixtures/turkey-other/putt-*.wav` (Jongsma, CC BY-SA), test-only.
