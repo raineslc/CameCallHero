@@ -18,6 +18,14 @@ async function noHorizontalScroll(page: Page) {
   expect(scroll).toBeLessThanOrEqual(client);
 }
 
+/** Every link and button in the screen is at least 44 px tall (AGENTS.md design rule). */
+async function tapTargets(page: Page) {
+  const small = await page.locator('main a, main button').evaluateAll((els) =>
+    els.map((e) => [e.textContent, e.getBoundingClientRect().height] as const).filter(([, h]) => h < 44),
+  );
+  expect(small).toEqual([]);
+}
+
 test.use({ viewport: { width: 360, height: 740 } });
 
 test('home lists all five calls, spectrograms for calls with clips, mic check reachable', async ({ page }) => {
@@ -52,6 +60,7 @@ for (const c of TURKEY_CALLS) {
       await expect(page.getByRole('button', { name: /^Play/ })).toHaveCount(0);
       await expect(page.locator('#call-measure')).toHaveCount(0);
       await noHorizontalScroll(page);
+      await tapTargets(page);
       expect(bad).toEqual([]);
       return;
     }
@@ -73,6 +82,7 @@ for (const c of TURKEY_CALLS) {
     }
     await expect(page.getByRole('link', { name: 'Practice' })).toHaveAttribute('href', `#/practice/${c.id}`);
     await noHorizontalScroll(page);
+    await tapTargets(page);
 
     // Leaving the screen stops playback and drops the source.
     await page.evaluate(() => ((window as unknown as { __a: Element | null }).__a = document.querySelector('#clip-audio')));

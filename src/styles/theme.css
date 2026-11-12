@@ -83,7 +83,12 @@ main { padding: 16px; max-width: 640px; margin: 0 auto; }
 .lead { font-size: 1.1rem; }
 .notice { padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: var(--radius); }
 .sources, .attribution { font-size: 0.9rem; overflow-wrap: anywhere; }
-.sources a, .attribution a { color: var(--text); }
+.sources a, .attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap); /* links inside wrapped text still get a 44 px tap height */
+  color: var(--text);
+}
 
 .clips { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
 .clip { padding: 4px 12px; background: var(--surface); border-radius: var(--radius); }
