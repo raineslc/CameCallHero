@@ -1,8 +1,8 @@
 // Library home: one compact row per wild turkey call (name, one-line meaning, small
-// spectrogram of the first reference clip or a "Recordings needed" badge, and the best
+// spectrogram of the first reference clip or a lock badge ("Recordings needed" / "Coming soon"), and the best
 // practice score saved on this device).
 
-import { TURKEY_CALLS } from '../calls/turkey';
+import { lockInfo, TURKEY_CALLS } from '../calls/turkey';
 import { loadSpectrogram } from '../library/references';
 import { loadBest } from '../practice/storage';
 import { showSpectrogram } from '../ui/spectrogram';
@@ -25,7 +25,7 @@ export function homeScreen(root: HTMLElement): () => void {
             </span>
             ${
               c.locked
-                ? '<span class="badge card-side">Recordings needed</span>'
+                ? `<span class="badge card-side">${lockInfo(c).label}</span>`
                 : `<canvas class="spectrogram thumb card-side" role="img" aria-label="Spectrogram of a ${c.name.toLowerCase()}"></canvas>`
             }
           </a>

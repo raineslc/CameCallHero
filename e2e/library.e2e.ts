@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { TURKEY_CALLS } from '../src/calls/turkey';
+import { lockInfo, TURKEY_CALLS } from '../src/calls/turkey';
 
 /** Fails the test on any HTTP error response (e.g. a 404 clip). */
 function noHttpErrors(page: Page): string[] {
@@ -36,7 +36,7 @@ test('home lists all five calls, spectrograms for calls with clips, mic check re
     const card = page.locator(`.card[data-call="${c.id}"]`);
     await expect(card).toContainText(c.name);
     await expect(card).toContainText(c.description.meaning);
-    if (c.locked) await expect(card).toContainText('Recordings needed');
+    if (c.locked) await expect(card.locator('.badge')).toHaveText(lockInfo(c).label);
     else await expect.poll(() => card.locator('canvas').evaluate((el) => (el as HTMLCanvasElement).width)).toBeGreaterThan(1);
     // Compact rows: every call fits on the first 360 x 740 screen.
     await expect(card).toBeInViewport({ ratio: 1 });
@@ -67,7 +67,8 @@ for (const c of TURKEY_CALLS) {
     for (const s of c.sources) await expect(page.getByRole('link', { name: s.title })).toHaveAttribute('href', s.url);
 
     if (c.locked) {
-      await expect(page.locator('main')).toContainText('Recordings needed');
+      await expect(page.locator('.title-row .badge')).toHaveText(lockInfo(c).label);
+      await expect(page.locator('#call-lock-reason')).toHaveText(`${lockInfo(c).label}: ${lockInfo(c).reason}`);
       await expect(page.getByRole('button', { name: 'Practice' })).toBeDisabled();
       await expect(page.getByRole('button', { name: /^Play/ })).toHaveCount(0);
       await expect(page.locator('#call-measure')).toHaveCount(0);

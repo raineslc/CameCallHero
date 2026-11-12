@@ -1,7 +1,7 @@
 // Live mic monitoring for the Mic check screen. Noise floor and clipping come from the
 // Phase 2 feature extractor and take checks, so the screen shows what the scorer will see.
 
-import { extractFeatures, type Features } from './features';
+import { extractFeatures, frameGeometry, frameRmsDb, type Features } from './features';
 import { checkTake, type Rejection } from './score';
 
 const SILENT_DB = -120;
@@ -21,6 +21,23 @@ export function chunkLevel(x: Float32Array): { rmsDb: number; peak: number } {
   }
   const rmsDb = n ? Math.max(SILENT_DB, 10 * Math.log10(sq / n + 1e-12)) : SILENT_DB;
   return { rmsDb, peak: Math.min(1, peak) };
+}
+
+/**
+ * Loudest frame RMS (dBFS) of one chunk, on the scorer's frame length and hop: the measure the
+ * scorer's loudness gates use (Features.peakDb, noise floor). Frames that cross a chunk edge
+ * are not measured. Allocates nothing.
+ */
+export function chunkFrameDb(x: Float32Array, sampleRate: number): number {
+  const { hop, fftSize } = frameGeometry(sampleRate);
+  if (x.length === 0) return SILENT_DB;
+  if (x.length < fftSize) return frameRmsDb(x, 0, x.length);
+  let best = SILENT_DB;
+  for (let off = 0; off + fftSize <= x.length; off += hop) {
+    const db = frameRmsDb(x, off, fftSize);
+    if (db > best) best = db;
+  }
+  return best;
 }
 
 /** Keeps the most recent `capacity` samples. */

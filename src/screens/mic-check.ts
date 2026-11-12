@@ -1,17 +1,17 @@
-// Mic check screen: live level, clipping warning, noise floor, the phone's actual
-// mic settings, and a 5 s test recording with spectrogram and WAV download.
+// Mic check screen: live level on a meter with the scorer's zones (Move closer / Good /
+// Back off), clipping warning, noise floor, the phone's actual mic settings, and a 5 s test
+// recording with spectrogram and WAV download.
 
 import { classifyMicError, compareSettings, startCapture, type Capture } from '../audio/capture';
 import { HOP_SEC } from '../audio/features';
-import { analyzeTake, chunkLevel, liveStatus, RollingBuffer, TakeRecorder } from '../audio/monitor';
+import { analyzeTake, chunkFrameDb, chunkLevel, liveStatus, RollingBuffer, TakeRecorder } from '../audio/monitor';
 import { encodeWav } from '../audio/wav';
+import { LevelMeter } from '../ui/meter';
 import { drawSpectrogram } from '../ui/spectrogram';
 
 const TAKE_SECONDS = 5;
 const WINDOW_SECONDS = 3;
 const STATUS_INTERVAL_MS = 500;
-/** Meter scale, dBFS. */
-const METER_MIN_DB = -60;
 
 const LABELS: Record<string, string> = {
   echoCancellation: 'Echo cancellation',
@@ -31,7 +31,8 @@ export function micCheckScreen(root: HTMLElement): () => void {
     <p class="error" id="mic-error" role="alert" hidden></p>
     <section id="mic-live" hidden>
       <h3>Level</h3>
-      <div class="meter" aria-hidden="true"><div class="meter-bar" id="mic-meter-bar"></div></div>
+      <div id="mic-meter-slot"></div>
+      <p class="muted caption">Call into the phone: Good means the scorer can use it.</p>
       <p id="mic-level" data-peak="0" aria-live="off">—</p>
       <p class="warn" id="mic-clip" role="status" hidden>Clipping: too loud. Back off the mic.</p>
       <dl class="stats">
@@ -65,7 +66,8 @@ export function micCheckScreen(root: HTMLElement): () => void {
   const startBtn = $<HTMLButtonElement>('mic-start');
   const errorEl = $('mic-error');
   const live = $('mic-live');
-  const meterBar = $('mic-meter-bar');
+  const meter = new LevelMeter('mic-meter');
+  $('mic-meter-slot').replaceWith(meter.el);
   const levelEl = $('mic-level');
   const clipEl = $('mic-clip');
   const floorEl = $('mic-floor');
@@ -80,6 +82,7 @@ export function micCheckScreen(root: HTMLElement): () => void {
   let recorder: TakeRecorder | null = null;
   let rmsDb = -120;
   let peak = 0;
+  let chunkT = 0;
   let raf = 0;
   let timer = 0;
   let downloadUrl = '';
@@ -103,8 +106,6 @@ export function micCheckScreen(root: HTMLElement): () => void {
   };
 
   const draw = () => {
-    const pct = Math.max(0, Math.min(100, ((rmsDb - METER_MIN_DB) / -METER_MIN_DB) * 100));
-    meterBar.style.width = `${pct}%`;
     levelEl.textContent = `Level ${fmtDb(rmsDb)}, peak ${(peak * 100).toFixed(0)}% of full scale`;
     levelEl.dataset.peak = String(peak);
     raf = requestAnimationFrame(draw);
@@ -129,12 +130,20 @@ export function micCheckScreen(root: HTMLElement): () => void {
   startBtn.addEventListener('click', async () => {
     startBtn.disabled = true;
     errorEl.hidden = true;
+    chunkT = 0;
+    meter.setFloor(null);
+    meter.reset();
     try {
       let rate = 0;
       const c = await startCapture((chunk) => {
         const lv = chunkLevel(chunk);
         rmsDb = lv.rmsDb;
         peak = lv.peak;
+        if (rate > 0) {
+          // The first chunks can arrive before startCapture returns the rate.
+          chunkT += chunk.length / rate;
+          meter.set(chunkFrameDb(chunk, rate), peak, chunkT);
+        }
         window3s?.push(chunk);
         if (recorder) {
           const elapsed = recorder.recorded / rate;
@@ -180,6 +189,7 @@ export function micCheckScreen(root: HTMLElement): () => void {
         if (!window3s || window3s.length === 0) return;
         const s = liveStatus(window3s.toArray(), rate);
         floorEl.textContent = s.noiseFloorDb === null ? 'measuring…' : fmtDb(s.noiseFloorDb);
+        meter.setFloor(s.noiseFloorDb);
         clipEl.hidden = !s.clipped;
       }, STATUS_INTERVAL_MS);
     } catch (err) {

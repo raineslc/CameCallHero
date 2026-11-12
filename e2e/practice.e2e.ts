@@ -23,7 +23,7 @@ test.describe('practice with a reference gobble', () => {
     await expect(help.getByRole('heading', { name: 'How it works' })).toBeVisible();
     await expect(help).toContainText("Grey blocks are the turkey's notes. They slide down to the white line.");
     await expect(help).toContainText('Your call draws an orange line. Further right = higher');
-    await expect(help.locator('.legend-item')).toHaveText(['Turkey note', 'Call now', 'The line', 'You']);
+    await expect(help.locator('.legend-item')).toHaveText(['Turkey note', 'Call now', 'Hit', 'Missed', 'The line', 'You']);
 
     // Listen plays the reference; Ready stops it before the mic opens.
     await page.getByRole('button', { name: 'Listen' }).click();
@@ -36,10 +36,23 @@ test.describe('practice with a reference gobble', () => {
     expect(score!).toBeLessThanOrEqual(100);
     await expect(page.locator('#practice-subs dd')).toHaveCount(3);
     for (const k of ['rhythm', 'pitch', 'tone']) {
-      const v = Number(await page.locator(`#practice-subs dd[data-sub="${k}"]`).textContent());
+      const dd = page.locator(`#practice-subs dd[data-sub="${k}"]`);
+      const v = Number(await dd.getAttribute('data-value'));
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(100);
+      await expect(dd.locator('.num')).toHaveText(String(v));
+      expect(await dd.locator('.fill').evaluate((e) => (e as HTMLElement).style.width)).toBe(`${v}%`);
     }
+    // Stars from the total score, one next step, notes marked hit.
+    const stars = Number(await page.locator('#practice-stars').getAttribute('data-stars'));
+    expect(stars).toBe(score! >= 80 ? 5 : score! >= 60 ? 4 : score! >= 40 ? 3 : score! >= 20 ? 2 : 1);
+    await expect(page.locator('#practice-stars')).toHaveAttribute('aria-label', `${stars} of 5 stars`);
+    await expect(page.locator('#practice-stars .star.on')).toHaveCount(stars);
+    await expect(page.locator('#practice-next')).toHaveText(/^Next try: \S.+$/);
+    // The reference gobble hits the lane's notes, live and in the results.
+    expect(Number(await page.locator('#practice-hits').getAttribute('data-hits'))).toBeGreaterThan(0);
+    await expect(page.locator('#practice-hits')).toHaveText(/^\d+ of \d+ hit · Streak \d+$/);
+    expect(Number(await page.locator('#practice-hit-count').getAttribute('data-hit'))).toBeGreaterThan(0);
     await expect(page.locator('#practice-subs dt')).toHaveText(['Timing & notes', 'High/low', 'Sound']);
     const tips = page.locator('#practice-tips li');
     await expect(tips).toHaveCount(3);
@@ -66,6 +79,49 @@ test.describe('practice with a reference gobble', () => {
     await page.getByRole('link', { name: 'Calls', exact: true }).click();
     await expect(page.locator('.card[data-call="gobble"] .card-best')).toHaveText(`Best: ${Math.round(score!)} / 100`);
     await expect(page.locator('.card[data-call="yelp"] .card-best')).toHaveCount(0);
+  });
+
+  test('count-in shows a green quiet light and a loudness meter; results play your take and the turkey without the mic', async ({ page }) => {
+    await spy(page);
+    await page.goto('#/practice/gobble');
+    await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled({ timeout: 10_000 });
+    await page.getByRole('button', { name: "I'm ready" }).click();
+    // The fake mic's count-in is background at the gobble clip's own floor (about -62 dBFS): quiet enough.
+    await expect(page.locator('#practice-quiet')).toHaveAttribute('data-state', 'ok', { timeout: 10_000 });
+    await expect(page.locator('#practice-quiet-text')).toHaveText('Quiet enough');
+    await expect(page.locator('#practice-meter .lmeter-label')).toHaveText(/^(Move closer|Good|Back off)$/);
+    // While the gobble plays into the mic, the meter reaches Good.
+    await expect(page.locator('#practice-meter')).toHaveAttribute('data-zone', 'good', { timeout: 10_000 });
+    // No result buttons while recording.
+    await expect(page.getByRole('button', { name: 'Play yours' })).toBeHidden();
+    await expect(page.locator('#practice-results')).toBeVisible({ timeout: 20_000 });
+    await expect.poll(() => micState(page)).toEqual({ streams: 1, live: 0, contexts: ['closed'] });
+
+    // Play yours: plays the take from memory through a new AudioContext; the mic stays closed.
+    const yours = page.getByRole('button', { name: 'Play yours' });
+    await yours.click();
+    await expect(page.locator('#practice-play-take')).toHaveAttribute('data-playing', 'true');
+    await expect(page.locator('#practice-play-take')).toHaveText('Stop');
+    await expect.poll(() => micState(page)).toEqual({ streams: 1, live: 0, contexts: ['closed', 'running'] });
+    // It stops by itself at the end of the take (about 3 s) and closes its AudioContext.
+    await expect(page.locator('#practice-play-take')).toHaveText('Play yours', { timeout: 10_000 });
+    await expect.poll(() => micState(page)).toEqual({ streams: 1, live: 0, contexts: ['closed', 'closed'] });
+
+    // Play turkey: the closest reference clip.
+    await page.getByRole('button', { name: 'Play turkey' }).click();
+    await expect(page.locator('#practice-play-ref')).toHaveText('Stop');
+    await expect.poll(() => page.locator('#practice-audio').evaluate((a: HTMLAudioElement) => a.currentTime > 0), { timeout: 10_000 }).toBe(true);
+    expect(await page.locator('#practice-audio').getAttribute('data-path')).toMatch(/^audio\/turkey\/gobble-\d\.wav$/);
+    // Play yours stops the turkey; Try again stops everything before the mic opens.
+    await yours.click();
+    expect(await page.locator('#practice-audio').evaluate((a: HTMLAudioElement) => a.paused)).toBe(true);
+    await expect(page.locator('#practice-play-ref')).toHaveText('Play turkey');
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.locator('#practice-run')).toBeVisible();
+    expect(await page.locator('#practice-audio').evaluate((a: HTMLAudioElement) => a.paused)).toBe(true);
+    await expect.poll(async () => (await micState(page)).contexts.slice(0, 3)).toEqual(['closed', 'closed', 'closed']);
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect.poll(() => micState(page)).toEqual({ streams: 2, live: 0, contexts: ['closed', 'closed', 'closed', 'closed'] });
   });
 
   test('leaving during the count-in releases the mic', async ({ page }) => {
@@ -113,7 +169,8 @@ test.describe('practice with a reference gobble', () => {
 test('locked call: Practice stays disabled and the mic is never opened', async ({ page }) => {
   await spy(page);
   await page.goto('#/practice/kee-kee-run');
-  await expect(page.getByText('Recordings needed', { exact: true })).toBeVisible();
+  await expect(page.getByText('Coming soon', { exact: true })).toBeVisible();
+  await expect(page.locator('main')).toContainText('cannot yet tell it apart from a yelp');
   await expect(page.getByRole('button', { name: "I'm ready" })).toBeDisabled();
   expect((await micState(page)).streams).toBe(0);
 });

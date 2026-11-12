@@ -10,6 +10,13 @@ test('fake mic: level above zero, 5 s recording, mic released on leaving', async
   await expect.poll(async () => Number(await level.getAttribute('data-peak')), { timeout: 10_000 }).toBeGreaterThan(0);
   await expect(page.locator('#mic-settings tr')).toHaveCount(4);
   await expect(page.locator('#mic-floor')).toContainText('dBFS');
+  // Zoned meter: the gobble playing into the fake mic reaches Good; zones are set from the floor.
+  await expect(page.locator('#mic-meter .lmeter-label')).toHaveText(/^(Move closer|Good|Back off)$/);
+  await expect(page.locator('#mic-meter')).toHaveAttribute('data-zone', 'good', { timeout: 10_000 });
+  const widths = await page.locator('#mic-meter .lmeter-zone').evaluateAll((els) => els.map((e) => parseFloat((e as HTMLElement).style.width)));
+  expect(widths).toHaveLength(3);
+  for (const w of widths) expect(w).toBeGreaterThan(0);
+  expect(widths.reduce((a, b) => a + b, 0)).toBeCloseTo(100, 0);
 
   await page.getByRole('button', { name: 'Record 5 s' }).click();
   await expect(page.locator('#mic-take')).toBeVisible({ timeout: 15_000 });

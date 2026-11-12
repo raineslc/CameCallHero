@@ -52,7 +52,7 @@ export const MIN_HZ = 150;
 export const MAX_HZ = 8000;
 const SILENT_DB = -120;
 /** Notes: frames louder than max(noise floor + NOTE_ABOVE_FLOOR_DB, peak - NOTE_BELOW_PEAK_DB). */
-const NOTE_ABOVE_FLOOR_DB = 10;
+export const NOTE_ABOVE_FLOOR_DB = 10;
 const NOTE_BELOW_PEAK_DB = 30;
 /** Gaps shorter than this many frames are bridged; notes shorter than MIN_NOTE_FRAMES dropped. */
 const MAX_GAP_FRAMES = 3;
@@ -241,6 +241,47 @@ export class LiveNoteCounter {
   }
 }
 
+/** Fraction used for the noise floor: the 10th percentile of frame RMS. */
+const FLOOR_PERCENTILE = 0.1;
+
+/**
+ * Noise floor of the count-in while it is recorded, by the scorer's own measure (10th
+ * percentile of frame RMS on the extractFeatures grid). Once `countInSamples` are in, value
+ * equals extractFeatures(countIn).noiseFloorDb (unit test).
+ */
+export class LiveFloor {
+  private readonly rms: Float32Array;
+  private readonly hop: number;
+  private readonly fftSize: number;
+  private frames = 0;
+
+  constructor(sampleRate: number, countInSamples: number) {
+    const g = frameGeometry(sampleRate);
+    this.hop = g.hop;
+    this.fftSize = g.fftSize;
+    const len = Math.min(countInSamples, Math.floor(MAX_SECONDS * sampleRate));
+    this.rms = new Float32Array(len >= this.fftSize ? 1 + Math.floor((len - this.fftSize) / this.hop) : 0);
+  }
+
+  /** Frames measured so far. */
+  get frameCount(): number {
+    return this.frames;
+  }
+
+  /** `buf[0, end)` is the recording so far (the count-in starts at sample 0). */
+  update(buf: Float32Array, end: number): void {
+    while (this.frames < this.rms.length && this.frames * this.hop + this.fftSize <= end) {
+      this.rms[this.frames] = frameRmsDb(buf, this.frames * this.hop, this.fftSize);
+      this.frames++;
+    }
+  }
+
+  /** Noise floor of the frames so far (dBFS); null before the first frame. */
+  value(): number | null {
+    return this.frames > 0 ? percentile(this.rms.subarray(0, this.frames), FLOOR_PERCENTILE) : null;
+  }
+}
+
 export interface FeatureOptions {
   /** Noise floor measured during the count-in (dBFS). Used instead of the take's own estimate,
    *  which reads the call itself when the take has little background. */
@@ -301,7 +342,7 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
   }
 
   const noiseFloorDb =
-    opts.noiseFloorDb !== undefined && Number.isFinite(opts.noiseFloorDb) ? opts.noiseFloorDb : percentile(rmsDb, 0.1);
+    opts.noiseFloorDb !== undefined && Number.isFinite(opts.noiseFloorDb) ? opts.noiseFloorDb : percentile(rmsDb, FLOOR_PERCENTILE);
   const peakDb = frameCount ? Math.max(...rmsDb) : SILENT_DB;
   const notes = frameCount ? findNotes(rmsDb, noiseFloorDb, peakDb) : [];
 

@@ -80,6 +80,17 @@ test('design pass: mic check while live and after a take', async ({ page }) => {
   expect(await page.evaluate(audit)).toEqual([]);
 });
 
+test('design pass: practice count-in and take (quiet light, hits, meter)', async ({ page }) => {
+  await page.goto('#/practice/gobble');
+  await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled({ timeout: 10_000 });
+  await page.getByRole('button', { name: "I'm ready" }).click();
+  await expect(page.locator('#practice-quiet')).toHaveAttribute('data-state', 'ok', { timeout: 10_000 });
+  expect(await page.evaluate(audit)).toEqual([]);
+  await expect(page.locator('#practice-hits')).toBeVisible({ timeout: 10_000 });
+  expect(await page.evaluate(audit)).toEqual([]);
+  await page.getByRole('button', { name: 'Cancel' }).click();
+});
+
 test('design pass: practice results', async ({ page }) => {
   await page.goto('#/practice/gobble');
   await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled({ timeout: 10_000 });
