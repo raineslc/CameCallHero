@@ -3,7 +3,7 @@
 Practice hunting game calls like a rhythm game: hear a real wild turkey, make the call
 yourself, and get a score for how close you came. Free test build, Android phones first.
 
-**Try it:** https://raineslc.github.io/CameCallHero/
+**Try it:** https://raineslc.github.io/GameCallHero/
 
 ## What works now — and what does not
 
@@ -22,7 +22,7 @@ yourself, and get a score for how close you came. Free test build, Android phone
 
 ## How to test on Android
 
-1. Open https://raineslc.github.io/CameCallHero/ in **Chrome**.
+1. Open https://raineslc.github.io/GameCallHero/ in **Chrome**.
 2. Optional: Chrome menu (⋮) → **Add to Home screen** (on some phones **Install app**) to get an
    app icon.
 3. Tap **Mic check**, then **Start mic** and allow the microphone. Make a call: the level bar
@@ -30,7 +30,7 @@ yourself, and get a score for how close you came. Free test build, Android phone
 4. Go to **Calls** → **Gobble** → **Practice**. Tap **Listen**, then **I'm ready**, wait for the
    3-2-1 count-in (stay quiet: it measures background noise) and make your call.
 5. Read the score and the tip, try a few times, then
-   [send feedback](https://github.com/raineslc/CameCallHero/issues/new?template=feedback.yml):
+   [send feedback](https://github.com/raineslc/GameCallHero/issues/new?template=feedback.yml):
    phone, browser, call device (mouth, box, slate, voice), score, and whether it felt fair.
    A GitHub account is needed to post.
 
@@ -42,7 +42,7 @@ doing a kee kee run? You can make those calls practicable for everyone:
 1. It must be your own recording of a real bird (no hunters' calls, no playback, no domestic birds).
 2. You release it as **CC0** (public domain) or **CC BY 4.0** (you are credited by name in
    [ATTRIBUTION.md](ATTRIBUTION.md) and in the app).
-3. Open a [recording issue](https://github.com/raineslc/CameCallHero/issues/new?template=recording.yml):
+3. Open a [recording issue](https://github.com/raineslc/GameCallHero/issues/new?template=recording.yml):
    say which call, hen or poult, state and month, and attach the file (zip it if GitHub refuses
    the file type) or give a download link.
 

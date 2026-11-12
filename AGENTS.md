@@ -48,12 +48,12 @@ Your phase brief: `docs/phases/phase-N-*.md`.
 
 | Action | Call |
 |---|---|
-| Create PR | `gh api repos/raineslc/CameCallHero/pulls -f title=... -f head=<branch> -f base=main -f body=...` |
-| Reviews | `gh api repos/raineslc/CameCallHero/pulls/<n>/reviews` |
-| Inline comments | `gh api repos/raineslc/CameCallHero/pulls/<n>/comments` |
-| Ready for review | `gh api -X POST repos/raineslc/CameCallHero/pulls/<n>/ccr/ready_for_review` |
-| Merge | `gh api -X PUT repos/raineslc/CameCallHero/pulls/<n>/merge -f merge_method=squash` |
-| Checks | `gh api repos/raineslc/CameCallHero/commits/<sha>/check-runs` |
+| Create PR | `gh api repos/raineslc/GameCallHero/pulls -f title=... -f head=<branch> -f base=main -f body=...` |
+| Reviews | `gh api repos/raineslc/GameCallHero/pulls/<n>/reviews` |
+| Inline comments | `gh api repos/raineslc/GameCallHero/pulls/<n>/comments` |
+| Ready for review | `gh api -X POST repos/raineslc/GameCallHero/pulls/<n>/ccr/ready_for_review` |
+| Merge | `gh api -X PUT repos/raineslc/GameCallHero/pulls/<n>/merge -f merge_method=squash` |
+| Checks | `gh api repos/raineslc/GameCallHero/commits/<sha>/check-runs` |
 
 ## Hard rules
 

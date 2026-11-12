@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 60_000,
   reporter: 'list',
   use: {
-    baseURL: `http://localhost:${port}/CameCallHero/`,
+    baseURL: `http://localhost:${port}/GameCallHero/`,
     trace: 'off',
     launchOptions: {
       args: [
@@ -25,8 +25,8 @@ export default defineConfig({
   // Serves the production build: run `npm run build` first.
   webServer: [
     {
-      command: `npx vite preview --port ${port} --strictPort --base /CameCallHero/`,
-      url: `http://localhost:${port}/CameCallHero/`,
+      command: `npx vite preview --port ${port} --strictPort --base /GameCallHero/`,
+      url: `http://localhost:${port}/GameCallHero/`,
       reuseExistingServer: false,
     },
     {

@@ -45,7 +45,7 @@ test('home lists all five calls, spectrograms for calls with clips, mic check re
   await expect(page.locator('footer')).toContainText("Check your state's rules on electronic calls.");
   await expect(page.locator('footer').getByRole('link', { name: 'Send feedback' })).toHaveAttribute(
     'href',
-    'https://github.com/raineslc/CameCallHero/issues/new?template=feedback.yml',
+    'https://github.com/raineslc/GameCallHero/issues/new?template=feedback.yml',
   );
   await noHorizontalScroll(page);
   await page.locator('main').getByRole('link', { name: 'Mic check' }).click();

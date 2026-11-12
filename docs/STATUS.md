@@ -1,29 +1,28 @@
 # Status
 
-## Owner action: rename the repository (look PR, 2026-11-12)
+## Owner: new link after the rename (look PR, 2026-11-12)
 
-The app is now called **Game Call Hero** everywhere a person reads it. The GitHub repository
-is still named `CameCallHero`, and only you can rename it:
+The app is now called **Game Call Hero** everywhere a person reads it, and you renamed the
+repository to `GameCallHero` while this PR was open. All links now use the new name.
 
-1. GitHub → the repo → Settings → General → Repository name → `GameCallHero` → Rename.
-2. The site then moves to **https://raineslc.github.io/GameCallHero/**. The old link
-   (`/CameCallHero/`) stops working: GitHub Pages does not redirect after a rename. Remove the
-   old home-screen app and install it again from the new link.
-3. The build no longer depends on the repo name (relative paths), so nothing in the code
-   has to change for the site to work. Afterwards, ask an agent to update the links in
-   README, docs and the footer's feedback link (GitHub itself redirects the old repo links).
-4. Check the new look on your phone (Galaxy S25+): header, call list, a call page.
+1. The site is now **https://raineslc.github.io/GameCallHero/**. Until this PR merges and the
+   Pages deploy runs, that link most likely loads a page without its scripts and styles: the
+   old build had `/CameCallHero/` built into its asset paths (not checked: this environment
+   cannot reach github.io). The new build uses relative paths. The old link `/CameCallHero/` stops working: GitHub Pages does not
+   redirect after a rename. Remove the old home-screen app and install it again from the new
+   link. Saved best scores do not carry over: they belong to the old address.
+2. Check the new look on your phone (Galaxy S25+): header, call list, a call page.
 
 ## Owner: next steps (Phase 6, feedback release, 2026-11-12)
 
 All six phases are done. Nothing more is planned; the next work depends on your decisions.
 
 1. **Check the release on your phone** (not verified by any test): open
-   https://raineslc.github.io/CameCallHero/ in Chrome, ⋮ → Add to Home screen / Install app,
+   https://raineslc.github.io/GameCallHero/ in Chrome, ⋮ → Add to Home screen / Install app,
    confirm the orange turkey-track icon appears and the app opens full screen. Do one gobble
    practice take.
-2. **Share the link** with testers: https://raineslc.github.io/CameCallHero/ (or the README:
-   https://github.com/raineslc/CameCallHero#readme, which has the test steps). Tell them only
+2. **Share the link** with testers: https://raineslc.github.io/GameCallHero/ (or the README:
+   https://github.com/raineslc/GameCallHero#readme, which has the test steps). Tell them only
    gobble can be practiced and that feedback needs a GitHub account.
 3. **Collect issues**: feedback arrives through the "Tester feedback" form
    (`.github/ISSUE_TEMPLATE/feedback.yml`, linked from the README and the app footer); recording
@@ -75,11 +74,12 @@ All six phases are done. Nothing more is planned; the next work depends on your 
 
 - Name: "Game Call Hero" in the header, `<title>`, web manifest (name and short_name; a
   launcher may shorten the label), README, docs, AGENTS.md, issue form, LICENSE, package name
-  `gamecallhero`. Kept: repo and Pages links (repo not renamed yet) and the `localStorage`
-  prefix `camecallhero.` (renaming it would lose saved best scores).
+  `gamecallhero`. Repo and Pages links point to `GameCallHero` (owner renamed the repo during
+  this PR). Kept: the `localStorage` prefix `camecallhero.` (a code identifier; renaming it
+  would drop scores saved at the same address).
 - Paths: Vite `base: './'`, manifest `start_url` / `scope` `./`, audio and icons relative.
-  `e2e/base-path.e2e.ts` serves the same build under `/mirror/GameCallHero/` (all other e2e
-  tests use `/CameCallHero/`): home, camo, clip playback, manifest and icons load, and no
+  `e2e/base-path.e2e.ts` serves the same build under `/mirror/OtherName/` (all other e2e
+  tests use `/GameCallHero/`): home, camo, clip playback, manifest and icons load, and no
   request leaves the prefix.
 - Camo: `scripts/make-camo.mjs` writes `public/camo.png` (512 px, 4-colour indexed PNG,
   about 8 kB, shown at 256 CSS px): three seeded periodic noise fields with domain warping,
@@ -129,7 +129,7 @@ rules"). Code is MIT (`LICENSE`); audio keeps its own licenses (`ATTRIBUTION.md`
 
 Classified by spectrogram measurement against cited descriptions (manifest `notes`), not by
 an expert: **owner, please listen** to the seven files in `public/audio/turkey/` (after
-merge also e.g. https://raineslc.github.io/CameCallHero/audio/turkey/yelp-1.wav) and say if
+merge also e.g. https://raineslc.github.io/GameCallHero/audio/turkey/yelp-1.wav) and say if
 any is wrong. No xeno-canto recordist labels a yelp, cut,
 purr or kee kee run; candidates for cut/purr (XC377125, XC700666, XC778473) were not clear
 enough to classify.
@@ -163,20 +163,20 @@ CC BY-SA). The engine is built for all five calls; yelp, cut, purr and kee kee r
 matrix test activates by itself once 2+ calls have 3+ references.
 
 **Missing references: yelp, cut, purr, kee kee run.** Options for getting them are in
-the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCallHero/pull/1).
+the Phase 1 search log below and in [PR #1](https://github.com/raineslc/GameCallHero/pull/1).
 
 ## Phases
 
 | # | Phase | State | PR |
 |---|---|---|---|
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
-| 1 | Reference audio | partial — gobble, yelp, kee kee run; cut and purr missing | [#1](https://github.com/raineslc/CameCallHero/pull/1), re-run: [#5](https://github.com/raineslc/CameCallHero/pull/5) |
-| 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
-| 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | [#10](https://github.com/raineslc/CameCallHero/pull/10) |
-| 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
-| 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
-| 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/CameCallHero/pull/8) |
-| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | [#9](https://github.com/raineslc/CameCallHero/pull/9) |
+| 1 | Reference audio | partial — gobble, yelp, kee kee run; cut and purr missing | [#1](https://github.com/raineslc/GameCallHero/pull/1), re-run: [#5](https://github.com/raineslc/GameCallHero/pull/5) |
+| 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/GameCallHero/pull/2) |
+| 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | [#10](https://github.com/raineslc/GameCallHero/pull/10) |
+| 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/GameCallHero/pull/3) |
+| 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/GameCallHero/pull/4) |
+| 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/GameCallHero/pull/8) |
+| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | [#9](https://github.com/raineslc/GameCallHero/pull/9) |
 
 ## Phase 1 search log (2026-11-12)
 
@@ -279,7 +279,7 @@ Open issues (from Codex review of #2, P2):
   whether a real gobble call from a person or a box call scores like the references).
 
 ## Notes
-- Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).
+- Live site: https://raineslc.github.io/GameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).
 - Project environment `camecallhero` allows: xeno-canto.org, commons.wikimedia.org,
   upload.wikimedia.org, freesound.org, cdn.freesound.org, www.nps.gov, digitalmedia.fws.gov.
 - Wikimedia rate-limits this environment heavily (HTTP 429); expect slow downloads.

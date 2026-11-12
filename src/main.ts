@@ -15,7 +15,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main id="screen"></main>
   <footer>
     <p class="muted">Practice tool. Check your state's rules on electronic calls.</p>
-    <p><a class="footer-link" href="https://github.com/raineslc/CameCallHero/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a></p>
+    <p><a class="footer-link" href="https://github.com/raineslc/GameCallHero/issues/new?template=feedback.yml" target="_blank" rel="noopener">Send feedback</a></p>
   </footer>
 `;
 

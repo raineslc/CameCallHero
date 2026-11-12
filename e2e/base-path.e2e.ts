@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { otherPort, otherPrefix } from './servers';
 
-// The build has no fixed path (Vite base './'): the same files work under /CameCallHero/
-// (every other test) and under a different, nested prefix here, as after a repo rename.
+// The build has no fixed path (Vite base './'): the same files work under /GameCallHero/
+// (every other test) and under a different, nested prefix here.
 // Every request the app makes must stay under the prefix and succeed.
 
 const base = `http://localhost:${otherPort}${otherPrefix}`;
