@@ -35,7 +35,7 @@ All six phases are done. Nothing more is planned; the next work depends on your 
 - No offline mode (no service worker). Other browsers and iPhone untested.
 - Feedback needs a GitHub account; there is no in-app form (no backend by design).
 
-## Issue #11 fix: plain practice help (tester feedback, 2026-11-12)
+## Issue #11 fix: plain practice help (tester feedback, 2026-11-12, [#12](https://github.com/raineslc/CameCallHero/pull/12))
 
 - Results: one line per part with a verdict and one thing to do, in plain words; sub-scores
   renamed **Timing & notes** (rhythm), **High/low** (pitch), **Sound** (tone); the numbers are unchanged.
