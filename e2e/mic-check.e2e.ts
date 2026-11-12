@@ -1,32 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-
-declare global {
-  interface Window {
-    __streams: MediaStream[];
-    __contexts: AudioContext[];
-  }
-}
-
-/** Records every mic stream and AudioContext the app opens, so the test can check they are released. */
-async function spy(page: Page) {
-  await page.addInitScript(() => {
-    window.__streams = [];
-    window.__contexts = [];
-    const gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = async (c) => {
-      const s = await gum(c);
-      window.__streams.push(s);
-      return s;
-    };
-    const Ctx = window.AudioContext;
-    window.AudioContext = class extends Ctx {
-      constructor(o?: AudioContextOptions) {
-        super(o);
-        window.__contexts.push(this);
-      }
-    };
-  });
-}
+import { expect, test } from '@playwright/test';
+import { spy } from './spy';
 
 test('fake mic: level above zero, 5 s recording, mic released on leaving', async ({ page }) => {
   await spy(page);
