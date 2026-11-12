@@ -1,6 +1,6 @@
 # Status
 
-## Phase 7: barred owl reference audio (owner request, 2026-11-12, PR_LINK)
+## Phase 7: barred owl reference audio (owner request, 2026-11-12, [#15](https://github.com/raineslc/GameCallHero/pull/15))
 
 Gate: passed. Every call has ≥ 3 clips from ≥ 3 recordists; no call is short.
 
@@ -282,7 +282,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/GameCall
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/GameCallHero/pull/4) |
 | 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/GameCallHero/pull/8) |
 | 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | [#9](https://github.com/raineslc/GameCallHero/pull/9) |
-| 7 | Barred owl reference audio | done — 4 calls, 19 clips; caterwaul uncertain | PR_LINK |
+| 7 | Barred owl reference audio | done — 4 calls, 19 clips; caterwaul uncertain | [#15](https://github.com/raineslc/GameCallHero/pull/15) |
 
 ## Phase 1 search log (2026-11-12)
 
