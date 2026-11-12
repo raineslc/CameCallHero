@@ -46,9 +46,13 @@ export const TURKEY_CALLS: CallDef[] = [
   {
     id: 'yelp',
     name: 'Yelp',
-    locked: true,
-    references: [],
-    weights: UNCALIBRATED,
+    locked: false,
+    references: refs('yelp', 3),
+    // Grid search over rhythm/pitch/tone in 0.5..3 (each >= 0.5 so no part is ignored), on the
+    // calibration set: best worst-case margin 22.6 vs putts/junk, 27.2 vs gobble.
+    // shortcut: fitted to 3 clips from one recording session; re-tune with yelps from other
+    // birds and with real phone takes.
+    weights: { rhythm: 3, pitch: 0.5, tone: 0.5 },
     // SC DNR and ODWC: "a basic turkey sound", "often delivered in a series of single-note
     // vocalizations", meaning depends on how the hen uses it.
     description: {
