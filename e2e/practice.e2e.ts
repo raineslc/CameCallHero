@@ -17,6 +17,14 @@ test.describe('practice with a reference gobble', () => {
     await noHorizontalScroll(page);
     await tapTargets(page);
 
+    // Note target from the shown reference, and the always-visible help.
+    await expect(page.locator('#practice-target')).toHaveText(/^Your goal: Make (1 note lasting|\d+ notes in) about \d+\.\d seconds\.$/);
+    const help = page.locator('#practice-help');
+    await expect(help.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(help).toContainText("Grey blocks are the turkey's notes. They slide down to the white line.");
+    await expect(help).toContainText('Your call draws an orange line. Further right = higher');
+    await expect(help.locator('.legend-item')).toHaveText(['Turkey note', 'Call now', 'The line', 'You']);
+
     // Listen plays the reference; Ready stops it before the mic opens.
     await page.getByRole('button', { name: 'Listen' }).click();
     await expect.poll(() => page.locator('#practice-audio').evaluate((a: HTMLAudioElement) => a.currentTime > 0), { timeout: 10_000 }).toBe(true);
@@ -32,7 +40,21 @@ test.describe('practice with a reference gobble', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(100);
     }
-    await expect(page.locator('#practice-tip')).toHaveText(/weakest part/);
+    await expect(page.locator('#practice-subs dt')).toHaveText(['Timing & notes', 'High/low', 'Sound']);
+    const tips = page.locator('#practice-tips li');
+    await expect(tips).toHaveCount(3);
+    await expect(tips.locator('strong')).toHaveText([
+      /^Timing & notes: (Good|Close|Needs work)\.$/,
+      /^High\/low: (Good|Close|Needs work)\.$/,
+      /^Sound: (Good|Close|Needs work)\.$/,
+    ]);
+    await expect(tips.first()).toContainText(/You made \d+ notes? (in|lasting) \d+\.\d seconds\./);
+    await expect(page.locator('#practice-tips-note')).toBeVisible();
+    // The last live note count is the scorer's count for the same take.
+    const scored = (await page.locator('#practice-overlay').getAttribute('aria-label'))!.match(/^Your (\d+) notes/)![1];
+    await expect(page.locator('#practice-notes')).toHaveAttribute('data-count', scored);
+    await expect(page.locator('#practice-notes')).toHaveText(new RegExp(`^Notes so far: ${scored} of \\d+$`));
+    await expect(help).toBeVisible();
     await expect(page.locator('#practice-best')).toHaveText('New best!');
     expect(await page.locator('#practice-overlay').evaluate((c: HTMLCanvasElement) => c.width)).toBeGreaterThan(1);
     await noHorizontalScroll(page);

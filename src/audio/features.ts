@@ -132,6 +132,115 @@ export function findNotes(rmsDb: Float32Array, noiseFloorDb: number, peakDb: num
   return long.filter((n) => notePeak(n) >= loudest - NOTE_MIN_REL_DB);
 }
 
+/** Analysis hop and FFT frame length in samples. */
+export function frameGeometry(sampleRate: number): { hop: number; fftSize: number } {
+  return {
+    hop: Math.max(1, Math.round(HOP_SEC * sampleRate)),
+    // Largest power of two not above 30 ms (1024 at 44.1/48 kHz, about 23 ms).
+    fftSize: 2 ** Math.max(6, Math.floor(Math.log2(Math.max(64, 0.03 * sampleRate)))),
+  };
+}
+
+/** Frame RMS in dBFS of x[off, off + size), with the same sample clean-up and rounding as extractFeatures. */
+export function frameRmsDb(x: Float32Array, off: number, size: number): number {
+  let sq = 0;
+  for (let i = 0; i < size; i++) {
+    const v = x[off + i];
+    const c = Number.isFinite(v) ? Math.max(-1, Math.min(1, v)) : 0;
+    sq += c * c;
+  }
+  return toDb(sq / size);
+}
+
+/**
+ * Walks the notes findNotes would build from rmsDb[0, n). Returns the loudest note's peak
+ * (count = false) or the number of notes whose peak is at least minPeak (count = true).
+ * Allocates nothing, so it can run on every mic chunk.
+ */
+function walkNotes(rmsDb: Float32Array, n: number, threshold: number, count: boolean, minPeak: number): number {
+  let result = count ? 0 : -Infinity;
+  let start = -1;
+  let end = -1;
+  let peak = -Infinity;
+  for (let i = 0; i < n; ) {
+    if (!(rmsDb[i] > threshold)) {
+      i++;
+      continue;
+    }
+    let j = i;
+    let p = -Infinity;
+    while (j < n && rmsDb[j] > threshold) {
+      if (rmsDb[j] > p) p = rmsDb[j];
+      j++;
+    }
+    if (start >= 0 && i - end <= MAX_GAP_FRAMES) {
+      end = j;
+      if (p > peak) peak = p;
+    } else {
+      if (start >= 0 && end - start >= MIN_NOTE_FRAMES) {
+        if (!count) result = Math.max(result, peak);
+        else if (peak >= minPeak) result++;
+      }
+      start = i;
+      end = j;
+      peak = p;
+    }
+    i = j;
+  }
+  if (start >= 0 && end - start >= MIN_NOTE_FRAMES) {
+    if (!count) result = Math.max(result, peak);
+    else if (peak >= minPeak) result++;
+  }
+  return result;
+}
+
+/** findNotes(rmsDb.subarray(0, n), noiseFloorDb, peakDb).length, without allocating. */
+export function countNotes(rmsDb: Float32Array, n: number, noiseFloorDb: number, peakDb: number): number {
+  const threshold = Math.max(noiseFloorDb + NOTE_ABOVE_FLOOR_DB, peakDb - NOTE_BELOW_PEAK_DB);
+  const loudest = walkNotes(rmsDb, n, threshold, false, 0);
+  return loudest === -Infinity ? 0 : walkNotes(rmsDb, n, threshold, true, loudest - NOTE_MIN_REL_DB);
+}
+
+/**
+ * Counts the notes of a take while it is recorded, by the scorer's own segmentation: frame
+ * RMS on the same grid as extractFeatures, the count-in noise floor, and the loudest frame so
+ * far. Once the whole take is in, the count equals extractFeatures(take, { noiseFloorDb }).notes.length.
+ * Before that it can change: a louder note later raises the threshold for all notes.
+ */
+export class LiveNoteCounter {
+  private readonly rms: Float32Array;
+  private readonly hop: number;
+  private readonly fftSize: number;
+  private frames = 0;
+  private peak = SILENT_DB;
+  count = 0;
+
+  constructor(
+    sampleRate: number,
+    takeSamples: number,
+    private readonly noiseFloorDb: number,
+  ) {
+    const g = frameGeometry(sampleRate);
+    this.hop = g.hop;
+    this.fftSize = g.fftSize;
+    const len = Math.min(takeSamples, Math.floor(MAX_SECONDS * sampleRate));
+    this.rms = new Float32Array(len >= this.fftSize ? 1 + Math.floor((len - this.fftSize) / this.hop) : 0);
+  }
+
+  /** `buf[start, end)` is the take recorded so far (start = the take's first sample). Returns the count. */
+  update(buf: Float32Array, start: number, end: number): number {
+    let added = false;
+    while (this.frames < this.rms.length && start + this.frames * this.hop + this.fftSize <= end) {
+      const f = this.frames++;
+      this.rms[f] = frameRmsDb(buf, start + f * this.hop, this.fftSize);
+      if (this.rms[f] > this.peak) this.peak = this.rms[f]; // stored (float32) value, as extractFeatures' peakDb
+      added = true;
+    }
+    if (added) this.count = countNotes(this.rms, this.frames, this.noiseFloorDb, this.peak);
+    return this.count;
+  }
+}
+
 export interface FeatureOptions {
   /** Noise floor measured during the count-in (dBFS). Used instead of the take's own estimate,
    *  which reads the call itself when the take has little background. */
@@ -156,9 +265,7 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
     if (a >= CLIP_LEVEL) clipSamples++;
   }
 
-  const hop = Math.max(1, Math.round(HOP_SEC * sampleRate));
-  // Largest power of two not above 30 ms (1024 at 44.1/48 kHz, about 23 ms).
-  const fftSize = 2 ** Math.max(6, Math.floor(Math.log2(Math.max(64, 0.03 * sampleRate))));
+  const { hop, fftSize } = frameGeometry(sampleRate);
   const frameCount = sampleRate > 0 && x.length >= fftSize ? 1 + Math.floor((x.length - fftSize) / hop) : 0;
   const window = Float64Array.from({ length: fftSize }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / fftSize));
   const maxHz = Math.min(MAX_HZ, 0.45 * sampleRate);

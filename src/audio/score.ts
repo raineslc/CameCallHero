@@ -51,7 +51,7 @@ const TONE_SCALE = 0.35; // mean cosine distance at which tone falls to 100/e
 const PITCH_SHAPE_SCALE = 6; // semitones
 const PITCH_OFFSET_SCALE = 12; // semitones
 const NOTE_TIMING_SCALE = 0.5; // mean |ln ratio| of note length and spacing at which the note pattern falls to 1/e
-const NOTE_BREAK_SCALE = 4; // mel bands of difference in a note's high-to-low break at which it falls to 1/e
+export const NOTE_BREAK_SCALE = 4; // mel bands of difference in a note's high-to-low break at which it falls to 1/e
 
 const clamp100 = (v: number) => (Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0);
 

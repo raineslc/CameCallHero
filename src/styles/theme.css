@@ -209,6 +209,16 @@ h3 { margin: 24px 0 8px; font-size: 1.1rem; }
 .key { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
 .key.ref { background: var(--text-muted); }
 .key.you { background: var(--accent); margin-left: 10px; }
-.tip { padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.tips { margin: 0; padding: 12px 16px 12px 32px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.tips li + li { margin-top: 8px; }
+.target { margin: 8px 0; font-weight: 600; }
+.help { margin-top: 16px; padding: 4px 16px 8px; background: var(--surface); border-radius: var(--radius); }
+.help h3 { margin-top: 8px; }
+.help ul { margin: 0; padding-left: 20px; }
+.help-legend { gap: 6px 14px; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.key.now { background: var(--text-muted); outline: 3px solid var(--accent); outline-offset: -1px; }
+.key.line { height: 3px; background: var(--text); border-radius: 0; }
+.key.trail { height: 5px; background: var(--accent); }
 .beat { margin: 8px 0 0; font-size: 2rem; line-height: 1; letter-spacing: 0.2em; color: var(--accent); }
 .btn.tap { min-height: 72px; min-width: 160px; font-size: 1.25rem; }

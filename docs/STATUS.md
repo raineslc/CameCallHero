@@ -35,6 +35,27 @@ All six phases are done. Nothing more is planned; the next work depends on your 
 - No offline mode (no service worker). Other browsers and iPhone untested.
 - Feedback needs a GitHub account; there is no in-app form (no backend by design).
 
+## Issue #11 fix: plain practice help (tester feedback, 2026-11-12)
+
+- Results: one line per part with a verdict and one thing to do, in plain words; sub-scores
+  renamed **Timing & notes** (rhythm), **High/low** (pitch), **Sound** (tone); the numbers are unchanged.
+  Lines state only measurements: note count and call length vs. the closest reference; "higher" /
+  "deeper" when the median dominant frequency differs by 2+ semitones; each note's drop from high
+  to low (the Phase 2b note break) when it differs by 2+ mel bands. Sound gives no direction (the
+  tone measure has none).
+- Verdicts: **Good** = at least the lowest leave-one-out sub-score of the call's references against
+  each other (computed in the app from the same clips); **Close** = up to 15 below that;
+  **Needs work** = lower. shortcut: 15 is the calibration margin reused, not tuned. Real yelps score
+  low on Sound and High/low against each other (levels 29 and 32), so a gobble-like take can get
+  "Sound: Good" as a yelp; revisit when yelps from other birds are added.
+- Goal before the count-in and above the lane: "Make N notes in about X seconds" (shown reference).
+  While recording: "Notes so far: n of N", counted with the scorer's own segmentation on each mic
+  chunk (no per-frame allocation); the final count equals the scored count (unit test on every
+  reference and the phone take; e2e checks it). It can change mid-take: a louder note raises the
+  threshold for all notes.
+- "How it works" box with a colour legend on the practice screen, checked against `src/ui/lane.ts`.
+- Not verified: whether the owner finds the new wording clear; anything on a real phone.
+
 ## Phase 6 notes
 
 - README: what it is, link, current limits, Android test steps, recording contributions,

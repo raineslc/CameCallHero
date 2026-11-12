@@ -87,3 +87,13 @@ export function pitchX(hz: number, loHz: number, hiHz: number): number {
 
 /** Vertical position of timeline time `t` when the lane shows time `now` at the hit line. */
 export const laneY = (t: number, now: number, hitY: number, pxPerSec: number): number => hitY - (t - now) * pxPerSec;
+
+/** What the user is asked to make: the shown reference's note count and call length (s). */
+export function noteTarget(f: Features): { notes: number; seconds: number } {
+  return { notes: notesOf(f).length, seconds: spanSeconds(f) };
+}
+
+export const targetText = (t: { notes: number; seconds: number }): string =>
+  t.notes === 1
+    ? `Make 1 note lasting about ${t.seconds.toFixed(1)} seconds.`
+    : `Make ${t.notes} notes in about ${t.seconds.toFixed(1)} seconds.`;

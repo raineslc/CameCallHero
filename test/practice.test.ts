@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { extractFeatures, HOP_SEC, MAX_HZ, MIN_HZ, type Features } from '../src/audio/features';
+import { countNotes, extractFeatures, findNotes, HOP_SEC, LiveNoteCounter, MAX_HZ, MIN_HZ, type Features } from '../src/audio/features';
+import { scoreTake, type SubScores } from '../src/audio/score';
 import { LivePitch } from '../src/audio/pitch';
 import { callById } from '../src/calls/turkey';
 import { CLICK_INTERVAL_SEC, latencyFromTaps, MATCH_WINDOW_MS } from '../src/practice/latency';
-import { COUNT_IN_SEC, LEAD_SEC, TAIL_SEC, laneY, makePlan, notesOf, pitchRange, pitchX, spanSeconds } from '../src/practice/plan';
+import { COUNT_IN_SEC, LEAD_SEC, TAIL_SEC, laneY, makePlan, noteTarget, notesOf, pitchRange, pitchX, spanSeconds, targetText } from '../src/practice/plan';
 import { loadBest, loadLatency, saveBest, saveLatency } from '../src/practice/storage';
-import { tipFor, weakestPart } from '../src/practice/tips';
+import { CLOSE_BAND, PART_LABELS, referenceLevels, tipsFor, verdictFor, type Verdict } from '../src/practice/tips';
 import { takeNotes } from '../src/ui/overlay';
 import { readWav } from './wav';
 
@@ -187,33 +188,155 @@ describe('storage', () => {
   });
 });
 
+/** Quiet background with gliding tone bursts [start, end, fromHz, toHz] (seconds, Hz). */
+function glides(total: number, notes: [number, number, number, number][]): Float32Array {
+  const x = bursts(total, []);
+  for (const [a, b, f0, f1] of notes) {
+    let phase = 0;
+    for (let i = Math.round(a * SR); i < Math.round(b * SR); i++) {
+      const k = (i / SR - a) / (b - a);
+      phase += (2 * Math.PI * (f0 + (f1 - f0) * k)) / SR;
+      x[i] += 0.5 * Math.sin(phase);
+    }
+  }
+  return x;
+}
+const phoneYelp = extractFeatures(readWav(new URL('./fixtures/phone/yelp-mouth-1.wav', import.meta.url)));
+const yelp = callById('yelp');
+const yelpRefs = yelp.references.map((p) => extractFeatures(readWav(new URL(`../public/${p}`, import.meta.url))));
+const levels: SubScores = { rhythm: 50, pitch: 50, tone: 50 };
+const at = (v: Verdict): SubScores => {
+  const x = v === 'Good' ? 60 : v === 'Close' ? 40 : 10;
+  return { rhythm: x, pitch: x, tone: x };
+};
+const line = (t: ReturnType<typeof tipsFor>, part: 'rhythm' | 'pitch' | 'tone') => t.find((x) => x.part === part)!;
+
 describe('tips', () => {
-  const take1 = feats(bursts(3, [[0.5, 0.8, 800]]));
-  const ref1 = feats(bursts(3, [[0.5, 0.8, 800]]));
-  it('picks the lowest sub-score, ties in rhythm, pitch, tone order', () => {
-    expect(weakestPart({ rhythm: 50, pitch: 40, tone: 60 })).toBe('pitch');
-    expect(weakestPart({ rhythm: 50, pitch: 50, tone: 50 })).toBe('rhythm');
-    expect(weakestPart({ rhythm: 90, pitch: 70, tone: 20 })).toBe('tone');
+  const one = feats(bursts(3, [[0.5, 0.8, 800]]));
+  const long = feats(bursts(4, [[0.5, 2.0, 800]]));
+  const two = feats(bursts(3, [[0.5, 0.62, 800], [0.68, 0.8, 800]]));
+  const high = feats(bursts(3, [[0.5, 0.8, 1600]]));
+  const low = feats(bursts(3, [[0.5, 0.8, 400]]));
+  const falling = feats(glides(3, [[0.5, 0.8, 3000, 800], [1.1, 1.4, 3000, 800]]));
+  const level = feats(glides(3, [[0.5, 0.8, 1500, 1500], [1.1, 1.4, 1500, 1500]]));
+
+  it('verdicts: Good at the reference level, Close within CLOSE_BAND below, Needs work under that', () => {
+    expect(verdictFor(50, 50)).toBe('Good');
+    expect(verdictFor(80, 50)).toBe('Good');
+    expect(verdictFor(49.9, 50)).toBe('Close');
+    expect(verdictFor(50 - CLOSE_BAND, 50)).toBe('Close');
+    expect(verdictFor(50 - CLOSE_BAND - 0.1, 50)).toBe('Needs work');
   });
-  it('rhythm tip states measured lengths and asks for a shorter or longer call', () => {
-    const long = feats(bursts(4, [[0.5, 2.0, 800]]));
-    const t = tipFor({ rhythm: 10, pitch: 90, tone: 90 }, long, ref1);
-    expect(t.part).toBe('rhythm');
-    expect(t.text).toMatch(/Yours: 1 note over 1\.5\d s/);
-    expect(t.text).toMatch(/Closest reference: 1 note over 0\.3\d s/);
-    expect(t.text).toContain('shorter');
-    expect(tipFor({ rhythm: 10, pitch: 90, tone: 90 }, ref1, long).text).toContain('longer');
-    const two = feats(bursts(3, [[0.5, 0.62, 800], [0.68, 0.8, 800]]));
-    expect(tipFor({ rhythm: 10, pitch: 90, tone: 90 }, two, ref1).text).toContain('number of notes');
+
+  it('reference levels are the lowest leave-one-out sub-scores; null with one reference', () => {
+    const lv = referenceLevels(yelpRefs, yelp.weights)!;
+    const loo = yelpRefs.map((f, i) => scoreTake(f, yelpRefs.filter((_, j) => j !== i), yelp.weights));
+    for (const p of ['rhythm', 'pitch', 'tone'] as const) expect(lv[p]).toBeCloseTo(Math.min(...loo.map((r) => r[p])), 10);
+    expect(referenceLevels(yelpRefs.slice(0, 1), yelp.weights)).toBeNull();
   });
-  it('pitch tip gives the direction when the call is off by 2+ semitones', () => {
-    const high = feats(bursts(3, [[0.5, 0.8, 1600]]));
-    const t = tipFor({ rhythm: 90, pitch: 10, tone: 90 }, high, ref1);
-    expect(t.text).toContain('12 semitones higher');
-    expect(t.text).toContain('aim lower');
-    expect(tipFor({ rhythm: 90, pitch: 10, tone: 90 }, take1, ref1).text).toContain('rises and falls');
+
+  it('one line per part with plain labels, in order', () => {
+    const t = tipsFor(at('Close'), one, one, levels);
+    expect(t.map((x) => x.label)).toEqual(['Timing & notes', 'High/low', 'Sound']);
+    expect(PART_LABELS).toEqual({ rhythm: 'Timing & notes', pitch: 'High/low', tone: 'Sound' });
+    for (const v of ['Good', 'Close', 'Needs work'] as const) expect(tipsFor(at(v), one, one, levels).map((x) => x.verdict)).toEqual([v, v, v]);
+    expect(tipsFor(at('Good'), one, one, null).map((x) => x.verdict)).toEqual([null, null, null]);
   });
-  it('tone tip', () => {
-    expect(tipFor({ rhythm: 90, pitch: 90, tone: 10 }, take1, ref1).part).toBe('tone');
+
+  it('timing: states measured note counts and lengths, then what to change', () => {
+    let t = line(tipsFor(at('Needs work'), long, one, levels), 'rhythm').text;
+    expect(t).toMatch(/^You made 1 note lasting 1\.5 seconds\. The closest turkey recording has 1 note lasting 0\.3 seconds\./);
+    expect(t).toContain('Make the whole call shorter.');
+    expect(line(tipsFor(at('Needs work'), one, long, levels), 'rhythm').text).toContain('Make the whole call longer.');
+    t = line(tipsFor(at('Close'), two, one, levels), 'rhythm').text;
+    expect(t).toContain('You made 2 notes in 0.3 seconds');
+    expect(t).toContain('Make 1 fewer note.');
+    expect(line(tipsFor(at('Close'), one, two, levels), 'rhythm').text).toContain('Make 1 more note.');
+    expect(line(tipsFor(at('Close'), one, one, levels), 'rhythm').text).toContain('copy when each note starts');
+    expect(line(tipsFor(at('Good'), one, one, levels), 'rhythm').text).toContain('Keep it up.');
+    expect(line(tipsFor(at('Good'), two, one, levels), 'rhythm').text).toContain('To get even closer: make 1 fewer note.');
+  });
+
+  it('high/low: says higher or deeper only when measured 2+ semitones apart', () => {
+    expect(line(tipsFor(at('Close'), high, one, levels), 'pitch').text).toContain("Your call was higher than the turkey's. Make it deeper.");
+    expect(line(tipsFor(at('Close'), low, one, levels), 'pitch').text).toContain("Your call was deeper than the turkey's. Make it higher.");
+    expect(line(tipsFor(at('Close'), one, one, levels), 'pitch').text).toBe("Listen again and follow where the turkey's call goes higher and lower.");
+    expect(line(tipsFor(at('Good'), one, one, levels), 'pitch').text).toBe('Keep it up.');
+  });
+
+  it('high/low: per-note drop from high to low, both directions', () => {
+    expect(line(tipsFor(at('Close'), level, falling, levels), 'pitch').text).toContain(
+      'Each turkey note starts high and drops lower. Yours did not drop. Let each note break downward.',
+    );
+    expect(line(tipsFor(at('Close'), falling, level, levels), 'pitch').text).toContain("Your notes drop from high to low more than the turkey's.");
+    // Owner's phone yelp (mouth call) against the closest yelp reference: measured flat, references break downward.
+    const r = scoreTake(phoneYelp, yelpRefs, yelp.weights);
+    const t = line(tipsFor(r, phoneYelp, yelpRefs[r.bestReference], referenceLevels(yelpRefs, yelp.weights)), 'pitch').text;
+    expect(t).toContain('Each turkey note starts high and drops lower. Yours did not drop.');
+  });
+
+  it('sound: no direction is claimed (the measure has none)', () => {
+    expect(line(tipsFor(at('Needs work'), one, one, levels), 'tone').text).toBe('Listen again and copy the sound of the turkey, not just the timing.');
+    expect(line(tipsFor(at('Good'), one, one, levels), 'tone').text).toBe('Keep it up.');
+  });
+
+  it('no jargon in any tip', () => {
+    const takes = [one, long, two, high, low, falling, level, phoneYelp, ...yelpRefs, ...refs];
+    const texts: string[] = [];
+    for (const take of takes)
+      for (const ref of [one, falling, level, ...yelpRefs, refs[0]])
+        for (const v of ['Good', 'Close', 'Needs work'] as const)
+          for (const lv of [levels, null]) for (const t of tipsFor(at(v), take, ref, lv)) texts.push(`${t.label} ${t.text}`);
+    for (const text of texts) {
+      expect(text).not.toMatch(/semitone|spectral|centroid/i);
+      expect(text).not.toMatch(/pitch|tone\b|rhythm|frequenc|\bhz\b|dominant|\bmel\b|decibel|\bdb\b/i);
+    }
+  });
+});
+
+describe('note target', () => {
+  it('states the shown reference note count and length', () => {
+    const t = noteTarget(yelpRefs[0]);
+    expect(t.notes).toBe(yelpRefs[0].notes.length);
+    expect(t.seconds).toBeCloseTo(spanSeconds(yelpRefs[0]), 10);
+    expect(targetText({ notes: 10, seconds: 3.004 })).toBe('Make 10 notes in about 3.0 seconds.');
+    expect(targetText({ notes: 1, seconds: 0.95 })).toMatch(/^Make 1 note lasting about (0\.9|1\.0) seconds\.$/);
+  });
+});
+
+describe('live note count', () => {
+  const clips = [
+    ...gobble.references.map((p) => readWav(new URL(`../public/${p}`, import.meta.url))),
+    ...yelp.references.map((p) => readWav(new URL(`../public/${p}`, import.meta.url))),
+    readWav(new URL('./fixtures/phone/yelp-mouth-1.wav', import.meta.url)),
+    ...['claps', 'tone-sweep', 'white-noise', 'silence'].map((n) => readWav(new URL(`./fixtures/junk/${n}.wav`, import.meta.url))),
+  ];
+
+  it('countNotes matches findNotes on every prefix', () => {
+    for (const c of clips) {
+      const f = extractFeatures(c);
+      for (let n = 0; n <= f.frameCount; n += 7) {
+        const prefix = f.rmsDb.subarray(0, n);
+        const peak = n ? Math.max(...prefix) : -120;
+        expect(countNotes(f.rmsDb, n, f.noiseFloorDb, peak)).toBe(findNotes(prefix, f.noiseFloorDb, peak).length);
+      }
+    }
+  });
+
+  it('after the last chunk, equals the note count the scorer sees (same floor, same take start)', () => {
+    for (const c of clips)
+      for (const chunk of [128, 2048]) {
+        const floor = extractFeatures(c).noiseFloorDb + 3;
+        const lead = 4321; // samples before the take (the count-in), not counted
+        const buf = new Float32Array(lead + c.samples.length);
+        buf.set(c.samples, lead);
+        const counter = new LiveNoteCounter(c.sampleRate, c.samples.length, floor);
+        let n = 0;
+        for (let end = lead; end < buf.length; ) {
+          end = Math.min(buf.length, end + chunk);
+          n = counter.update(buf, lead, end);
+        }
+        expect(n).toBe(extractFeatures({ samples: buf.slice(lead), sampleRate: c.sampleRate }, { noiseFloorDb: floor }).notes.length);
+      }
   });
 });
