@@ -4,7 +4,7 @@
 
 - Settings table: echo cancellation, noise suppression and auto gain all **off** as
   requested; 1 channel; track and AudioContext both 48000 Hz. The phone honoured every request.
-- One 5 s take, a yelp made by mouth (owner's words); not committed to the repo.
+- One 5 s take, a yelp made by mouth (owner's words): `test/fixtures/phone/yelp-mouth-1.wav`, CC0 (owner decision).
   Measured with `extractFeatures`: peak -10.6 dBFS (74% of full scale, no clipping),
   noise floor -39.4 dBFS, 12 notes over 3.51 s: one 0.29 s note, then ten notes of
   0.08-0.10 s about 0.3 s apart. Scorer accepts it (about 29 dB above the floor).

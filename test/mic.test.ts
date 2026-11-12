@@ -113,6 +113,13 @@ describe('analyzeTake', () => {
     expect(analyzeTake(g.samples, g.sampleRate).rejection).toBeNull();
     expect(analyzeTake(new Float32Array(5 * SR), SR).rejection?.reason).toBe('too-quiet');
   });
+  it('accepts a real phone take (owner, Android, 48 kHz)', () => {
+    const t = readWav(new URL('./fixtures/phone/yelp-mouth-1.wav', import.meta.url));
+    expect(t.sampleRate).toBe(48000);
+    const { features, rejection } = analyzeTake(t.samples, t.sampleRate);
+    expect(rejection).toBeNull();
+    expect(features.notes.length).toBeGreaterThan(0);
+  });
 });
 
 describe('encodeWav', () => {

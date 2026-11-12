@@ -1,0 +1,15 @@
+{
+  "about": "Real phone takes recorded with the Mic check screen (#/mic) and downloaded as WAV. Kept at the phone's own sample rate, unprocessed. Practice takes by a person, not wild-turkey references; test-only, not shipped in the app.",
+  "clips": [
+    {
+      "file": "yelp-mouth-1.wav",
+      "kind": "yelp (human, mouth call)",
+      "notes": "5 s take on an Android phone in Chrome, 2026-11-12. Phone honoured echo cancellation, noise suppression and auto gain off; 1 channel; 48 kHz. Peak -10.6 dBFS (74% of full scale), noise floor -39.4 dBFS, 12 notes over 3.51 s. Unedited download from the Mic check screen.",
+      "source": "owner recording",
+      "sourceUrl": "Mic check screen (#/mic), downloaded WAV",
+      "author": "CameCallHero project owner",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  ]
+}
