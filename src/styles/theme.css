@@ -1,0 +1,58 @@
+/* Hunting theme. Use these tokens; do not hard-code colours elsewhere. */
+:root {
+  color-scheme: dark;
+  --bg: #121212;          /* near-black */
+  --surface: #1e1f1c;     /* dark grey with a hint of olive */
+  --surface-2: #2a2c27;
+  --text: #ecebe4;        /* ~15:1 on --bg */
+  --text-muted: #a9a89c;  /* ~7.8:1 on --bg */
+  --accent: #ff6a13;      /* hunter / blaze orange, ~6.5:1 on --bg */
+  --on-accent: #121212;
+  --camo-1: #2b3221;      /* woodland: dark green */
+  --camo-2: #4a5233;      /* olive */
+  --camo-3: #5b4630;      /* brown */
+  --camo-4: #1a1c15;      /* black */
+  --radius: 10px;
+  --tap: 44px;            /* minimum touch target */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, sans-serif;
+}
+
+/* Decorative band only; never put body text over this. */
+.camo {
+  background-color: var(--camo-1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath fill='%234a5233' d='M10 20c20-15 45-5 50 10s-20 30-40 25S-5 35 10 20z'/%3E%3Cpath fill='%235b4630' d='M90 10c25-5 50 15 45 35s-30 20-45 10-25-40 0-45z'/%3E%3Cpath fill='%231a1c15' d='M60 70c15-10 40 0 35 20s-35 25-45 10 0-25 10-30z'/%3E%3Cpath fill='%234a5233' d='M120 100c20-5 40 10 35 30s-30 25-45 15-10-40 10-45z'/%3E%3Cpath fill='%235b4630' d='M5 110c15-10 40-5 40 15s-25 35-40 25S-10 120 5 110z'/%3E%3Cpath fill='%231a1c15' d='M130 55c10-5 25 0 25 12s-15 18-25 12-10-20 0-24z'/%3E%3C/svg%3E");
+  border-bottom: 3px solid var(--accent);
+}
+
+header { padding: 16px; }
+header h1 {
+  margin: 0;
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--bg); /* solid plate keeps the title readable over camo */
+  border-radius: var(--radius);
+  font-size: 1.5rem;
+}
+
+main { padding: 16px; max-width: 640px; margin: 0 auto; }
+.accent { color: var(--accent); }
+.muted { color: var(--text-muted); }
+
+.calls { list-style: none; padding: 0; display: grid; gap: 8px; }
+.calls li {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+}
