@@ -1,5 +1,62 @@
 # Status
 
+## Owner: next steps (Phase 6, feedback release, 2026-11-12)
+
+All six phases are done. Nothing more is planned; the next work depends on your decisions.
+
+1. **Check the release on your phone** (not verified by any test): open
+   https://raineslc.github.io/CameCallHero/ in Chrome, ⋮ → Add to Home screen / Install app,
+   confirm the orange turkey-track icon appears and the app opens full screen. Do one gobble
+   practice take.
+2. **Share the link** with testers: https://raineslc.github.io/CameCallHero/ (or the README:
+   https://github.com/raineslc/CameCallHero#readme, which has the test steps). Tell them only
+   gobble can be practiced and that feedback needs a GitHub account.
+3. **Collect issues**: feedback arrives through the "Tester feedback" form
+   (`.github/ISSUE_TEMPLATE/feedback.yml`, linked from the README and the app footer); recording
+   offers through "Contribute a turkey recording" (`recording.yml`, CC0 or CC BY 4.0 only).
+   The forms apply the labels `feedback` and `recording` (both created). Before using a contributed recording: check it is a
+   wild bird, classify the call, and add it to `ATTRIBUTION.md` and the manifest.
+4. **Decide on Google Play** (not started). Before any app-store release, write to each NC
+   recordist (AGENTS.md hard rule). Play also needs a developer account and a privacy
+   policy URL. Wrapping the web app (Trusted Web Activity) needs Digital Asset Links and
+   probably an offline page (service worker). Not researched in detail.
+5. **Open decisions from earlier phases** (below): scoring phase for yelp / kee kee run; cut and
+   purr recordings; listening check of the yelp and kee kee run clips.
+
+### Known limits (testers will hit these)
+
+- Only gobble is practicable; references are 6 clips, 2 sessions, 1 recordist.
+- Yelp, kee kee run: locked (scorer cannot separate them yet). Cut, purr: no recordings.
+- Tested only in Chromium with a simulated mic; on a real phone only the Phase 3 mic check
+  was run (owner, Android Chrome). Practice, lane frame rate, tap test and scores of real calls
+  on a phone: not verified.
+- Noise floor on the owner's phone was high (-39 dBFS); cause unknown.
+- Rhythm score ignores per-note spacing (Phase 2 open issue).
+- No offline mode (no service worker). Other browsers and iPhone untested.
+- Feedback needs a GitHub account; there is no in-app form (no backend by design).
+
+## Phase 6 notes
+
+- README: what it is, link, current limits, Android test steps, recording contributions,
+  privacy, developer commands, license and attribution.
+- Issue forms: `feedback.yml` (phone, browser, call device, call, score, fair?, notes) and
+  `recording.yml` (call, bird, place and month, equipment, license CC0 / CC BY 4.0, credit,
+  file, confirmation). Footer "Send feedback" link opens the feedback form.
+- Web app manifest (`public/manifest.webmanifest`, standalone, start URL and scope the Pages
+  path) and icons 192 / 512 PNG (also maskable; the track stays inside the safe circle), SVG,
+  180 px Apple touch icon. Icons drawn by `scripts/make-icons.mjs` from the theme tokens. The
+  manifest repeats `--bg` as a literal colour (JSON cannot read CSS tokens).
+- `e2e/manifest.e2e.ts`: manifest and every icon load, PNG sizes match, Chromium parses the
+  manifest without errors. shortcut: headless Chromium's installability check returns no errors
+  even with no manifest, so install itself is not tested; check it on a phone.
+- `e2e/a11y.e2e.ts` design pass at 360 px on home, mic check (idle, live, after a take), all five
+  call pages, all five practice pages and gobble practice results: text contrast >= 4.5:1
+  against the nearest opaque background, no text whose nearest opaque background is `.camo`,
+  every link and button >= 44 px tall, no horizontal scroll. A self-test injects bad elements
+  to prove the check catches them. Found nothing to fix. Limits: text drawn on canvases (lane,
+  spectrograms) and disabled buttons are not checked.
+- Playwright: 37 tests, run 3x in a row (1 worker) and 2x with 4 workers: no failures.
+
 ## Phase 3 phone result (owner, Android, Chrome, 2026-11-12)
 
 - Settings table: echo cancellation, noise suppression and auto gain all **off** as
@@ -76,7 +133,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
 | 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/CameCallHero/pull/8) |
-| 6 | Feedback release | | |
+| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | PR_LINK |
 
 ## Phase 1 search log (2026-11-12)
 

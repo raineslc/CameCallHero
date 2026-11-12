@@ -40,6 +40,10 @@ test('home lists all five calls, spectrograms for calls with clips, mic check re
     else await expect.poll(() => card.locator('canvas').evaluate((el) => (el as HTMLCanvasElement).width)).toBeGreaterThan(1);
   }
   await expect(page.locator('footer')).toContainText("Check your state's rules on electronic calls.");
+  await expect(page.locator('footer').getByRole('link', { name: 'Send feedback' })).toHaveAttribute(
+    'href',
+    'https://github.com/raineslc/CameCallHero/issues/new?template=feedback.yml',
+  );
   await noHorizontalScroll(page);
   await page.locator('main').getByRole('link', { name: 'Mic check' }).click();
   await expect(page.getByRole('heading', { name: 'Mic check' })).toBeVisible();
