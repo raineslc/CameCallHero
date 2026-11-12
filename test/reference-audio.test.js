@@ -24,6 +24,8 @@ const sets = [
   { dir: 'public/audio/turkey', needsCall: true, trimmed: true },
   { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
   { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
+  // Real phone takes stay at the phone's own rate (48 kHz), unconverted.
+  { dir: 'test/fixtures/phone', needsCall: false, trimmed: false, sampleRate: 48000 },
 ];
 
 function wavFormat(path) {
@@ -37,7 +39,7 @@ function wavFormat(path) {
   };
 }
 
-for (const { dir, needsCall, trimmed } of sets) {
+for (const { dir, needsCall, trimmed, sampleRate = 44100 } of sets) {
   describe(`${dir}/manifest.json`, () => {
     const abs = join(root, dir);
     const manifest = JSON.parse(readFileSync(join(abs, 'manifest.json'), 'utf8'));
@@ -68,12 +70,12 @@ for (const { dir, needsCall, trimmed } of sets) {
       }
     });
 
-    it.each(wavs)('%s is mono 44.1 kHz 16-bit PCM', (f) => {
+    it.each(wavs)(`%s is mono ${sampleRate / 1000} kHz 16-bit PCM`, (f) => {
       expect(wavFormat(join(abs, f))).toEqual({
         riff: 'RIFFWAVE',
         format: 1,
         channels: 1,
-        sampleRate: 44100,
+        sampleRate,
         bits: 16,
       });
     });

@@ -1,8 +1,8 @@
 # Attribution
 
 Audio used in CameCallHero. Machine-readable source of truth:
-`public/audio/turkey/manifest.json` (trim times, quality notes) and
-`test/fixtures/junk/manifest.json`.
+`public/audio/turkey/manifest.json` (trim times, quality notes),
+`test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings
 
@@ -57,3 +57,13 @@ the same license as the original. Details: `test/fixtures/turkey-other/manifest.
 
 Citation form requested by xeno-canto: "Jonathon Jongsma, XC104532. Accessible at
 www.xeno-canto.org/104532." (same for the other numbers).
+
+`test/fixtures/phone/*.wav` are real phone takes by the project owner, recorded with the
+Mic check screen and committed unedited (mono 48 kHz 16-bit). Human practice calls, not
+turkey recordings; test-only, not shipped in the app. Released under
+[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+Details: `test/fixtures/phone/manifest.json`.
+
+| File | What | Recorded by | License |
+|---|---|---|---|
+| `test/fixtures/phone/yelp-mouth-1.wav` | yelp, mouth call, Android phone, 2026-11-12 | project owner | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
