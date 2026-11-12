@@ -1,6 +1,6 @@
 # Status
 
-## Practice and mic check redesign (owner request, 2026-11-12, branch `practice-redesign`)
+## Practice and mic check redesign (owner request, 2026-11-12, [#14](https://github.com/raineslc/GameCallHero/pull/14))
 
 Owner's question: how can the sound measuring interface look better and help make better calls.
 All six approved items are built on the practice and mic check screens.
