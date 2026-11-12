@@ -1,5 +1,62 @@
 # Status
 
+## Owner: next steps (Phase 6, feedback release, 2026-11-12)
+
+All six phases are done. Nothing more is planned; the next work depends on your decisions.
+
+1. **Check the release on your phone** (not verified by any test): open
+   https://raineslc.github.io/CameCallHero/ in Chrome, ⋮ → Add to Home screen / Install app,
+   confirm the orange turkey-track icon appears and the app opens full screen. Do one gobble
+   practice take.
+2. **Share the link** with testers: https://raineslc.github.io/CameCallHero/ (or the README:
+   https://github.com/raineslc/CameCallHero#readme, which has the test steps). Tell them only
+   gobble can be practiced and that feedback needs a GitHub account.
+3. **Collect issues**: feedback arrives through the "Tester feedback" form
+   (`.github/ISSUE_TEMPLATE/feedback.yml`, linked from the README and the app footer); recording
+   offers through "Contribute a turkey recording" (`recording.yml`, CC0 or CC BY 4.0 only).
+   The forms apply the labels `feedback` and `recording` (both created). Before using a contributed recording: check it is a
+   wild bird, classify the call, and add it to `ATTRIBUTION.md` and the manifest.
+4. **Decide on Google Play** (not started). Before any app-store release, write to each NC
+   recordist (AGENTS.md hard rule). Play also needs a developer account and a privacy
+   policy URL. Wrapping the web app (Trusted Web Activity) needs Digital Asset Links and
+   probably an offline page (service worker). Not researched in detail.
+5. **Open decisions from earlier phases** (below): scoring phase for yelp / kee kee run; cut and
+   purr recordings; listening check of the yelp and kee kee run clips.
+
+### Known limits (testers will hit these)
+
+- Only gobble is practicable; references are 6 clips, 2 sessions, 1 recordist.
+- Yelp, kee kee run: locked (scorer cannot separate them yet). Cut, purr: no recordings.
+- Tested only in Chromium with a simulated mic; on a real phone only the Phase 3 mic check
+  was run (owner, Android Chrome). Practice, lane frame rate, tap test and scores of real calls
+  on a phone: not verified.
+- Noise floor on the owner's phone was high (-39 dBFS); cause unknown.
+- Rhythm score ignores per-note spacing (Phase 2 open issue).
+- No offline mode (no service worker). Other browsers and iPhone untested.
+- Feedback needs a GitHub account; there is no in-app form (no backend by design).
+
+## Phase 6 notes
+
+- README: what it is, link, current limits, Android test steps, recording contributions,
+  privacy, developer commands, license and attribution.
+- Issue forms: `feedback.yml` (phone, browser, call device, call, score, fair?, notes) and
+  `recording.yml` (call, bird, place and month, equipment, license CC0 / CC BY 4.0, credit,
+  file, confirmation). Footer "Send feedback" link opens the feedback form.
+- Web app manifest (`public/manifest.webmanifest`, standalone, start URL and scope the Pages
+  path) and icons 192 / 512 PNG (also maskable; the track stays inside the safe circle), SVG,
+  180 px Apple touch icon. Icons drawn by `scripts/make-icons.mjs` from the theme tokens. The
+  manifest repeats `--bg` as a literal colour (JSON cannot read CSS tokens).
+- `e2e/manifest.e2e.ts`: manifest and every icon load, PNG sizes match, Chromium parses the
+  manifest without errors. shortcut: headless Chromium's installability check returns no errors
+  even with no manifest, so install itself is not tested; check it on a phone.
+- `e2e/a11y.e2e.ts` design pass at 360 px on home, mic check (idle, live, after a take), all five
+  call pages, all five practice pages and gobble practice results: text contrast >= 4.5:1
+  against the nearest opaque background, no text whose nearest opaque background is `.camo`,
+  every link and button >= 44 px tall, no horizontal scroll. A self-test injects bad elements
+  to prove the check catches them. Found nothing to fix. Limits: text drawn on canvases (lane,
+  spectrograms) and disabled buttons are not checked.
+- Playwright: 37 tests, run 3x in a row (1 worker) and 2x with 4 workers: no failures.
+
 ## Phase 3 phone result (owner, Android, Chrome, 2026-11-12)
 
 - Settings table: echo cancellation, noise suppression and auto gain all **off** as
@@ -77,8 +134,8 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | [#10](https://github.com/raineslc/CameCallHero/pull/10) |
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
-| 5 | Practice | | |
-| 6 | Feedback release | | |
+| 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/CameCallHero/pull/8) |
+| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | [#9](https://github.com/raineslc/CameCallHero/pull/9) |
 
 ## Phase 1 search log (2026-11-12)
 
@@ -148,6 +205,37 @@ Open issues (from Codex review of #2, P2):
 - Playwright at 360 px: every call page loads, every gobble clip plays with no HTTP error,
   attribution shown, no horizontal scroll, audio paused and source dropped on leaving.
 - Not verified: playback on a real phone.
+
+## Phase 5 notes
+
+- Practice at `#/practice/<id>`: Listen (reference clip 1, with spectrogram) → **I'm ready** →
+  3-2-1 count-in (noise floor measured, passed to the scorer) → perform against a silent lane →
+  Results. The timeline runs on the mic's own sample count; the mic opens per take and is
+  released as soon as the take ends (and on Cancel / leaving the screen).
+- Lane: reference notes (grey, orange outline while active) scroll down to the hit line; pitch
+  on a log axis from the references' own 10th–90th percentile dominant frequency, widened by an
+  octave each side; the live dominant frequency (same measure as the scorer's) is the orange
+  trail, drawn only when the chunk is 10 dB above the count-in floor. `Lane.draw` allocates
+  nothing (preallocated trail buffers, colours read once). Checked by reading the code, not by
+  a profiler.
+- Take length: 0.5 s lead + longest reference call + 1.5 s tail (about 3.2 s for gobble).
+- Results: score, rhythm / pitch / tone, overlay of your notes vs. the closest reference's
+  notes, one tip from the weakest sub-score (states measured lengths / note counts / semitone
+  offset only), Try again, Listen again. Rejected takes show the scorer's reason, no score.
+- Best score per call in `localStorage` (`camecallhero.best.<id>`), shown on home cards.
+- Tap test (4 clicks, 1 s apart) stores `camecallhero.latencyMs`; used only to shift the
+  trail and the overlay. shortcut: it measures speaker + touch delay, not mic input delay;
+  scoring does not use it.
+- Playwright (fake mic): files built at test time from `gobble-1.wav` and `putt-3.wav`
+  (count-in background noise at the clip's own noise floor + clip + tail; written to the
+  git-ignored `e2e/.fake-mic/`, not shipped). Gobble take scored 95.6–96.6 (it is one of the
+  six references, so this checks the plumbing, not calibration); same-call level (lowest
+  leave-one-out, computed in the test) 73.4; putt take 46.5. Also: mic released after the
+  take, on Cancel and when leaving during the count-in; locked call never opens the mic;
+  permission denied message; tap test stores a latency; 360 px, no horizontal scroll, 44 px
+  targets.
+- Not verified: anything on a real phone (lane frame rate, trail offset, tap-test values,
+  whether a real gobble call from a person or a box call scores like the references).
 
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).

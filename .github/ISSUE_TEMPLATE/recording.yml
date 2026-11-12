@@ -1,0 +1,85 @@
+name: Contribute a turkey recording
+description: Offer a recording of a live wild turkey (hen, poult or gobbler) that you made.
+title: "Recording: "
+labels: [recording]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Yelp, cut, purr and kee kee run cannot be practiced yet because the app has no
+        free-licensed recordings of real turkeys making them. If you recorded a **live wild
+        turkey** yourself, you can offer it here.
+
+        - Only real birds: no hunters' calls, no playback, no domestic or pen-raised birds.
+        - Only your own recording, released as **CC0** or **CC BY 4.0** (you are credited by name).
+        - Uncompressed WAV is best; the original file from your recorder or phone is fine.
+        - GitHub issues are public: the file and everything you write here can be seen by anyone.
+
+        Attach the file (zip it if GitHub refuses the file type) or give a download link.
+        A maintainer checks each recording before it is used; not every recording can be used.
+  - type: dropdown
+    id: call
+    attributes:
+      label: Which call is in the recording?
+      multiple: true
+      options:
+        - Yelp
+        - Cut
+        - Purr
+        - Kee kee run
+        - Gobble
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: bird
+    attributes:
+      label: Bird
+      options:
+        - Hen
+        - Poult (young bird)
+        - Gobbler (tom or jake)
+        - Flock / not sure
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where and when
+      description: State or province and month/year are enough. No exact locations needed.
+      placeholder: e.g. Missouri, April 2026
+    validations:
+      required: true
+  - type: input
+    id: equipment
+    attributes:
+      label: Recorded with
+      placeholder: e.g. phone voice recorder app, Zoom H1n
+  - type: dropdown
+    id: license
+    attributes:
+      label: License
+      options:
+        - CC0 (public domain, no credit required)
+        - CC BY 4.0 (credit me by name)
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Name to credit
+      description: For CC BY. Leave empty for CC0 if you prefer not to be named.
+  - type: textarea
+    id: file
+    attributes:
+      label: File
+      description: Attach the file or paste a download link. Say where in the file the call is (e.g. 0:12 to 0:15) if it is long.
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Confirmation
+      options:
+        - label: I made this recording of a live wild turkey, and I release it under the license chosen above.
+          required: true

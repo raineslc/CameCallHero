@@ -8,3 +8,7 @@ declare module 'node:fs' {
 declare module 'node:url' {
   export function fileURLToPath(url: string | URL): string;
 }
+declare module 'node:fs' {
+  export function writeFileSync(path: string | URL, data: Uint8Array): void;
+  export function mkdirSync(path: string | URL, options?: { recursive?: boolean }): void;
+}

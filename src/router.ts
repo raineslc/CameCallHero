@@ -1,4 +1,4 @@
-// Hash routing: #/ home, #/mic mic check, #/call/<id> call detail. The first path segment
+// Hash routing: #/ home, #/mic mic check, #/call/<id> call detail, #/practice/<id> practice. The first path segment
 // picks the route; the rest is passed to the screen as `param` ('' if none). A screen renders
 // into `root` and may return a cleanup function, called when the user leaves the screen
 // (releases mic, audio, timers, URLs).

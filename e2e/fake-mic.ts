@@ -1,0 +1,44 @@
+// Fake-mic input files for the practice e2e test. Chromium's fake mic loops a WAV from the
+// moment the mic opens, so each file is: background noise for the 3 s count-in (at the clip's
+// own noise floor), then the clip, then more background, long enough that the loop does not
+// restart inside the take. Built from the repo's clips at test time; nothing is committed.
+
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { extractFeatures } from '../src/audio/features';
+import { encodeWav } from '../src/audio/wav';
+import { readWav } from '../test/wav';
+
+/** Background before the clip. The clip's own first note starts ~0.5 s in, so the call lands
+ *  ~0.5–1 s after the count-in ends, inside the take even if the app drops the first few
+ *  hundred ms the fake device plays before the AudioWorklet is connected. */
+const LEAD_SEC = 3.2;
+const TAIL_SEC = 4;
+
+const root = new URL('..', import.meta.url);
+const outDir = new URL('e2e/.fake-mic/', root);
+
+export function paddedClip(source: string, name: string): string {
+  const clip = readWav(new URL(source, root));
+  const sr = clip.sampleRate;
+  const rms = 10 ** (extractFeatures(clip).noiseFloorDb / 20);
+  const amp = rms * Math.sqrt(3); // uniform noise in [-a, a] has RMS a / sqrt(3)
+  let seed = 1;
+  const noise = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return amp * (2 * (seed / 0x7fffffff) - 1);
+  };
+  const lead = Math.round(LEAD_SEC * sr);
+  const out = new Float32Array(lead + clip.samples.length + Math.round(TAIL_SEC * sr));
+  for (let i = 0; i < out.length; i++) out[i] = i >= lead && i < lead + clip.samples.length ? clip.samples[i - lead] : noise();
+  mkdirSync(outDir, { recursive: true });
+  const file = new URL(name, outDir);
+  writeFileSync(file, encodeWav(out, sr));
+  return fileURLToPath(file);
+}
+
+export const fakeMicArgs = (wavPath: string) => [
+  '--use-fake-ui-for-media-stream',
+  '--use-fake-device-for-media-stream',
+  `--use-file-for-fake-audio-capture=${wavPath}`,
+];
