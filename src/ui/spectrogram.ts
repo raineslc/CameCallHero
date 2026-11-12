@@ -36,3 +36,17 @@ export function drawSpectrogram(canvas: HTMLCanvasElement, f: Features): void {
   }
   ctx.putImageData(img, 0, 0);
 }
+
+/** Renders into a new off-screen canvas (for caching). */
+export function renderSpectrogram(f: Features): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  drawSpectrogram(canvas, f);
+  return canvas;
+}
+
+/** Shows a cached spectrogram on a visible canvas. */
+export function showSpectrogram(target: HTMLCanvasElement, image: HTMLCanvasElement): void {
+  target.width = image.width;
+  target.height = image.height;
+  target.getContext('2d')?.drawImage(image, 0, 0);
+}

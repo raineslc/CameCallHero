@@ -1,10 +1,18 @@
 # Status
 
-## Owner action (Phase 3, not blocking)
+## Phase 3 phone result (owner, Android, Chrome, 2026-11-12)
 
-Open the Pages link on your Android phone → **Mic check** → tap **Start mic** → send a
-screenshot of the "Phone audio processing" table and one WAV (Record 5 s → Download WAV)
-of each call you can make.
+- Settings table: echo cancellation, noise suppression and auto gain all **off** as
+  requested; 1 channel; track and AudioContext both 48000 Hz. The phone honoured every request.
+- One 5 s take, a yelp made by mouth (owner's words); not committed to the repo.
+  Measured with `extractFeatures`: peak -10.6 dBFS (74% of full scale, no clipping),
+  noise floor -39.4 dBFS, 12 notes over 3.51 s: one 0.29 s note, then ten notes of
+  0.08-0.10 s about 0.3 s apart. Scorer accepts it (about 29 dB above the floor).
+  Yelp is still locked (no free-licensed references), so it cannot be scored yet.
+- Open: the noise floor is high (CI fake-mic take: -62 dBFS). With auto gain off this is
+  real background or mic noise; the cause is not known.
+- Still wanted from the owner: one WAV of each other call they can make, named by call.
+  Owner recordings are practice takes for tuning, not references (references are wild-turkey recordings, see `docs/PLAN.md`).
 
 ## Phase 1 re-run with NC licenses (2026-11-12) — cut and purr still missing
 
@@ -66,7 +74,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 1 | Reference audio | partial — gobble, yelp, kee kee run; cut and purr missing | [#1](https://github.com/raineslc/CameCallHero/pull/1), re-run: [#5](https://github.com/raineslc/CameCallHero/pull/5) |
 | 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
-| 4 | Library | | |
+| 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
 | 5 | Practice | | |
 | 6 | Feedback release | | |
 
@@ -119,6 +127,27 @@ Open issues (from Codex review of #2, P2):
   owner's screenshot.
 - Not verified: anything on a real phone (voice processing actually off, sample rate,
   level of a real call, behaviour when another app holds the mic).
+
+## Phase 4 notes
+
+- Home (`#/`) lists the five calls as cards: name, one-line meaning, small spectrogram
+  (gobble) or a "Recordings needed" badge (yelp, cut, purr, kee kee run). Mic check stays in
+  the nav and as a button on home.
+- Call detail (`#/call/<id>`): meaning, when turkeys use it, source links, measured length,
+  large spectrogram with playhead, one play button and attribution line per clip (from
+  `manifest.json`), Practice button (`#/practice/<id>`, placeholder until Phase 5). Locked
+  calls: no play buttons, no measurements, Practice disabled.
+- Descriptions cite South Carolina DNR "Wild Turkey sounds" and Oklahoma ODWC "Wild Turkey
+  Sounds" (comments in `src/calls/turkey.ts`). Both hosts are blocked from this build
+  environment, so the page text was read through web-search excerpts, not loaded directly.
+  Owner may want to skim both pages against the wording in the app.
+- Gobble length is the scorer's own measurement: 1–2 notes, 0.63–1.15 s over 6 clips.
+  The manifest notes describe each clip as one ~0.95 s burst; segmentation splits gobble-3
+  in two and measures gobble-2 at 0.63 s. Revisit with the per-note rhythm fix above.
+- Spectrograms and features are computed once per clip and kept in memory for the visit.
+- Playwright at 360 px: every call page loads, every gobble clip plays with no HTTP error,
+  attribution shown, no horizontal scroll, audio paused and source dropped on leaving.
+- Not verified: playback on a real phone.
 
 ## Notes
 - Live site: https://raineslc.github.io/CameCallHero/ (Pages deploy from `main` works; owner confirmed it loads on their phone).
