@@ -35,6 +35,10 @@ export interface Features {
   peakSample: number;
   /** Longest run of consecutive samples at or above CLIP_LEVEL. */
   longestClipRun: number;
+  /** Number of samples at or above CLIP_LEVEL. */
+  clipSamples: number;
+  /** Number of analyzed samples. */
+  sampleCount: number;
   notes: Note[];
   /** First note start to last note end, or null if no notes. */
   span: Note | null;
@@ -127,13 +131,20 @@ export function findNotes(rmsDb: Float32Array, noiseFloorDb: number, peakDb: num
   return long.filter((n) => notePeak(n) >= loudest - NOTE_MIN_REL_DB);
 }
 
-export function extractFeatures(clip: AudioClip): Features {
+export interface FeatureOptions {
+  /** Noise floor measured during the count-in (dBFS). Used instead of the take's own estimate,
+   *  which reads the call itself when the take has little background. */
+  noiseFloorDb?: number;
+}
+
+export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Features {
   const sampleRate = Number.isFinite(clip.sampleRate) && clip.sampleRate >= 4000 ? clip.sampleRate : 0;
   const maxLen = Math.floor(MAX_SECONDS * sampleRate);
   const x = new Float64Array(Math.min(clip.samples.length, maxLen));
   let peakSample = 0;
   let run = 0;
   let longestClipRun = 0;
+  let clipSamples = 0;
   for (let i = 0; i < x.length; i++) {
     const v = clip.samples[i];
     x[i] = Number.isFinite(v) ? Math.max(-1, Math.min(1, v)) : 0;
@@ -141,6 +152,7 @@ export function extractFeatures(clip: AudioClip): Features {
     if (a > peakSample) peakSample = a;
     run = a >= CLIP_LEVEL ? run + 1 : 0;
     if (run > longestClipRun) longestClipRun = run;
+    if (a >= CLIP_LEVEL) clipSamples++;
   }
 
   const hop = Math.max(1, Math.round(HOP_SEC * sampleRate));
@@ -180,7 +192,8 @@ export function extractFeatures(clip: AudioClip): Features {
     peakBin[f] = best;
   }
 
-  const noiseFloorDb = percentile(rmsDb, 0.1);
+  const noiseFloorDb =
+    opts.noiseFloorDb !== undefined && Number.isFinite(opts.noiseFloorDb) ? opts.noiseFloorDb : percentile(rmsDb, 0.1);
   const peakDb = frameCount ? Math.max(...rmsDb) : SILENT_DB;
   const notes = frameCount ? findNotes(rmsDb, noiseFloorDb, peakDb) : [];
 
@@ -218,6 +231,8 @@ export function extractFeatures(clip: AudioClip): Features {
     peakDb,
     peakSample,
     longestClipRun,
+    clipSamples,
+    sampleCount: x.length,
     notes,
     span: notes.length ? { start: notes[0].start, end: notes[notes.length - 1].end } : null,
   };

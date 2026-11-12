@@ -95,6 +95,24 @@ describe('take gates', () => {
     expect(s.score).toBe(0);
   });
 
+  it('rejects a high note clipped in short flattened peaks (no 3-sample run)', () => {
+    const sr = 44100;
+    const samples = new Float32Array(3 * sr);
+    for (let i = 0; i < sr; i++) samples[sr + i] = Math.max(-1, Math.min(1, 1.1 * Math.sin((2 * Math.PI * 4000 * i) / sr)));
+    const f = extractFeatures({ samples, sampleRate: sr });
+    expect(f.longestClipRun).toBeLessThan(3);
+    expect(scoreTake({ samples, sampleRate: sr }, refs, gobble.weights).rejected?.reason).toBe('clipped');
+  });
+
+  it('accepts a sustained call with almost no background when the count-in floor is given', () => {
+    const sr = 44100;
+    const pad = Math.round(0.05 * sr);
+    const samples = new Float32Array(sr + 2 * pad);
+    for (let i = 0; i < sr; i++) samples[pad + i] = 0.3 * Math.sin((2 * Math.PI * 1000 * i) / sr);
+    const s = scoreTake({ samples, sampleRate: sr }, refs, gobble.weights, { noiseFloorDb: -90 });
+    expect(s.rejected).toBeNull();
+  });
+
   it('rejects a too-quiet take', () => {
     expect(scoreTake(scaled(take, 0.0005), refs, gobble.weights).rejected?.reason).toBe('too-quiet');
   });

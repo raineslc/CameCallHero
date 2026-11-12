@@ -40,6 +40,8 @@ export const GATES = {
   minSnrDb: 15,
   /** A run of this many samples at full scale (|x| >= 0.99) counts as clipped. */
   clipRunSamples: 3,
+  /** So does this fraction of all samples at full scale (catches short flattened peaks of high notes). */
+  clipFraction: 0.001,
 };
 
 /** Distance-to-score mapping. Set once before calibration and not tuned; they only stretch the 0-100 scale. */
@@ -50,11 +52,11 @@ const PITCH_OFFSET_SCALE = 12; // semitones
 const clamp100 = (v: number) => (Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0);
 
 export function checkTake(f: Features, noiseFloorDb?: number): Rejection | null {
-  if (f.longestClipRun >= GATES.clipRunSamples)
+  if (f.longestClipRun >= GATES.clipRunSamples || f.clipSamples > GATES.clipFraction * f.sampleCount)
     return { reason: 'clipped', message: 'Too loud: the recording clipped. Back off the mic and try again.' };
   if (f.frameCount === 0 || f.peakDb < GATES.minPeakDb)
     return { reason: 'too-quiet', message: 'Too quiet: no call was heard. Call closer to the phone.' };
-  const floor = noiseFloorDb !== undefined && Number.isFinite(noiseFloorDb) ? Math.max(noiseFloorDb, f.noiseFloorDb) : f.noiseFloorDb;
+  const floor = noiseFloorDb !== undefined && Number.isFinite(noiseFloorDb) ? noiseFloorDb : f.noiseFloorDb;
   if (f.peakDb - floor < GATES.minSnrDb)
     return { reason: 'too-noisy', message: 'Too noisy: the call is not clearly louder than the background.' };
   if (!f.span) return { reason: 'no-call', message: 'No call found in the recording.' };
@@ -177,7 +179,7 @@ export interface ScoreOptions {
 
 /** Scores a take against analyzed references; the best-matching reference counts. */
 export function scoreTake(take: AudioClip | Features, references: Features[], weights: Weights, opts: ScoreOptions = {}): ScoreResult {
-  const f = 'samples' in take ? extractFeatures(take) : take;
+  const f = 'samples' in take ? extractFeatures(take, { noiseFloorDb: opts.noiseFloorDb }) : take;
   const zero = { score: 0, rhythm: 0, pitch: 0, tone: 0, bestReference: -1 };
   if (references.length === 0)
     return { ...zero, rejected: { reason: 'no-reference', message: 'No reference recordings for this call yet.' } };
