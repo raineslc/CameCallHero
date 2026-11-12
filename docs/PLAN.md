@@ -1,4 +1,4 @@
-# CameCallHero — Plan
+# Game Call Hero — Plan
 
 A phone app that teaches hunting game calls the way a rhythm game teaches songs.
 Browse an animal's sounds (like Merlin), then practice each one: the app records
@@ -15,7 +15,7 @@ Other species (elk, deer, ducks, owls) come after the turkey version is proven.
 | Test device | Android, Chrome. |
 | Reference audio | Free-licensed recordings only (CC0, CC-BY, CC-BY-SA, CC-BY-NC, CC-BY-NC-SA, US-government public domain). NC allowed since 2026-11-12 because the app stays free; ND never. |
 | Money | The app is free and open source: no ads, no purchases, no donations. Code: MIT (`LICENSE`); audio keeps each file's own license (`ATTRIBUTION.md`). |
-| Repo | https://github.com/raineslc/CameCallHero — all work goes through it. |
+| Repo | https://github.com/raineslc/GameCallHero — all work goes through it. |
 | Review | Codex reviews every PR. Claude agents build and fix. See `AGENTS.md`. |
 | Sessions | One phase = one new agent session, to keep context small. |
 | Look | Near-black/dark grey base, woodland camo texture, hunter orange accents. |

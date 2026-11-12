@@ -4,6 +4,7 @@
 
 type Store = Pick<Storage, 'getItem' | 'setItem'>;
 
+// Keeps the app's old name so best scores saved before the rename are still found.
 const PREFIX = 'camecallhero.';
 const bestKey = (callId: string) => `${PREFIX}best.${callId}`;
 const LATENCY_KEY = `${PREFIX}latencyMs`;

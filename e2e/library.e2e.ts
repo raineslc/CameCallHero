@@ -38,11 +38,14 @@ test('home lists all five calls, spectrograms for calls with clips, mic check re
     await expect(card).toContainText(c.description.meaning);
     if (c.locked) await expect(card).toContainText('Recordings needed');
     else await expect.poll(() => card.locator('canvas').evaluate((el) => (el as HTMLCanvasElement).width)).toBeGreaterThan(1);
+    // Compact rows: every call fits on the first 360 x 740 screen.
+    await expect(card).toBeInViewport({ ratio: 1 });
   }
+  await expect(page.getByRole('link', { name: 'Back', exact: true })).toBeHidden();
   await expect(page.locator('footer')).toContainText("Check your state's rules on electronic calls.");
   await expect(page.locator('footer').getByRole('link', { name: 'Send feedback' })).toHaveAttribute(
     'href',
-    'https://github.com/raineslc/CameCallHero/issues/new?template=feedback.yml',
+    'https://github.com/raineslc/GameCallHero/issues/new?template=feedback.yml',
   );
   await noHorizontalScroll(page);
   await page.locator('main').getByRole('link', { name: 'Mic check' }).click();
@@ -55,6 +58,11 @@ for (const c of TURKEY_CALLS) {
     const bad = noHttpErrors(page);
     await page.goto(`#/call/${c.id}`);
     await expect(page.getByRole('heading', { name: c.name, level: 2 })).toBeVisible();
+    // Back button in the header returns to the call list.
+    await expect(page.getByRole('link', { name: 'Back', exact: true })).toHaveAttribute('href', '#/');
+    // "When turkeys use it" is collapsed until tapped.
+    await expect(page.getByText(c.description.when)).toBeHidden();
+    await page.getByText('When turkeys use it').click();
     await expect(page.getByText(c.description.when)).toBeVisible();
     for (const s of c.sources) await expect(page.getByRole('link', { name: s.title })).toHaveAttribute('href', s.url);
 
@@ -70,17 +78,29 @@ for (const c of TURKEY_CALLS) {
     }
 
     await expect(page.locator('#call-measure')).toHaveText(/^\d+(–\d+)? notes?, .* s long/);
+    // Play and Practice are on the first screen (360 x 740) without scrolling.
+    await expect(page.locator('#call-play')).toBeInViewport({ ratio: 1 });
+    await expect(page.getByRole('link', { name: 'Practice' })).toBeInViewport({ ratio: 1 });
+    // The main Play button plays clip 1 and turns into Stop.
+    await page.locator('#call-play').click();
+    await expect(page.locator('#call-play')).toHaveText('Stop');
+    await page.locator('#call-play').click();
+    await expect(page.locator('#call-play')).toHaveText('Play');
+    // Clip list with attribution is collapsed until tapped.
+    await page.getByText('Reference clips and licenses').click();
     const clips = page.locator('.clip');
     await expect(clips).toHaveCount(c.references.length);
     for (let i = 0; i < c.references.length; i++) {
       const clip = clips.nth(i);
       await expect(clip.locator('.attribution')).toContainText(/xeno-canto XC\d+/);
       await expect(clip.locator('.attribution')).toContainText(/CC BY(-NC)?(-SA)? \d/);
-      const clipResponse = page.waitForResponse((r) => r.url().endsWith(c.references[i]));
       await clip.getByRole('button', { name: `Play clip ${i + 1}` }).click();
-      expect((await clipResponse).status()).toBeLessThan(400);
+      // HTTP errors are caught by noHttpErrors (clip 1 may come from the cache after Play).
       await expect
-        .poll(() => page.locator('#clip-audio').evaluate((a: HTMLAudioElement) => a.currentTime > 0 && a.error === null), { timeout: 10_000 })
+        .poll(
+          () => page.locator('#clip-audio').evaluate((a: HTMLAudioElement, path) => a.src.endsWith(path) && a.currentTime > 0 && a.error === null, c.references[i]),
+          { timeout: 10_000 },
+        )
         .toBe(true);
       await expect(page.getByRole('alert')).toBeHidden();
     }

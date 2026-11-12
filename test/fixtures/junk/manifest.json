@@ -7,7 +7,7 @@
       "notes": "2 s of digital zero.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -17,7 +17,7 @@
       "notes": "2 s uniform white noise, RMS about -25 dBFS.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -27,7 +27,7 @@
       "notes": "3 s low-pass filtered noise with slow gusts, RMS about -17 dBFS. Imitation of wind, not a recording.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -37,7 +37,7 @@
       "notes": "Three 80 ms noise bursts with ~8 ms decay, 0.5 s apart. Imitation of claps, not a recording.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -47,7 +47,7 @@
       "notes": "2 s steady pink noise (Kellet filter), RMS about -21 dBFS.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
@@ -57,7 +57,7 @@
       "notes": "0.5 s quiet, then a 1.2 s exponential sine sweep 300 Hz to 3 kHz at 0.3 amplitude, 20 ms fades.",
       "source": "synthesized",
       "sourceUrl": "scripts/make-junk-clips.mjs",
-      "author": "CameCallHero contributors",
+      "author": "Game Call Hero contributors",
       "license": "CC0 1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     }

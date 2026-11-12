@@ -1,6 +1,7 @@
-// Call detail: what the call means (cited), how many notes and how long (measured from the
-// reference clips), large spectrogram with a playhead, a play button and attribution per
-// clip, and the Practice button. Locked calls (no references) show "Recordings needed".
+// Call detail, compact: what the call means, how many notes and how long (measured from the
+// reference clips), spectrogram with a playhead, then Play and Practice within the first
+// screen. When turkeys use it (cited) and the clip list with attribution are collapsible.
+// Locked calls (no references) show "Recordings needed".
 
 import type { Features } from '../audio/features';
 import { TURKEY_CALLS, type CallDef } from '../calls/turkey';
@@ -51,14 +52,17 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
   const call = TURKEY_CALLS.find((c) => c.id === id);
   if (!call) return notFound(root);
 
-  root.replaceChildren(
-    el('a', { className: 'back', href: '#/', textContent: '← All calls' }),
-    el('h2', { textContent: call.name }),
-    ...(call.locked ? [el('span', { className: 'badge', textContent: 'Recordings needed' })] : []),
-    el('p', { className: 'lead', textContent: call.description.meaning }),
-    el('h3', { textContent: 'When turkeys use it' }),
+  const when = el(
+    'details',
+    { className: 'more' },
+    el('summary', { textContent: 'When turkeys use it' }),
     el('p', { textContent: call.description.when }),
     sourcesLine(call),
+  );
+
+  root.replaceChildren(
+    el('div', { className: 'title-row' }, el('h2', { textContent: call.name }), ...(call.locked ? [el('span', { className: 'badge', textContent: 'Recordings needed' })] : [])),
+    el('p', { className: 'lead', textContent: call.description.meaning }),
   );
 
   if (call.locked) {
@@ -67,12 +71,13 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
         className: 'notice',
         textContent: 'Recordings needed: there are no reference recordings with an allowed license for this call yet, so it cannot be played or practiced.',
       }),
-      el('button', { type: 'button', className: 'btn primary', disabled: true, textContent: 'Practice' }),
+      el('div', { className: 'actions' }, el('button', { type: 'button', className: 'btn primary', disabled: true, textContent: 'Practice' })),
+      when,
     );
     return;
   }
 
-  const measureEl = el('p', { id: 'call-measure', textContent: 'Measuring reference clips…' });
+  const measureEl = el('p', { id: 'call-measure', className: 'facts', textContent: 'Measuring reference clips…' });
   const canvas = el('canvas', { className: 'spectrogram large', id: 'call-spectrogram' });
   canvas.setAttribute('role', 'img');
   const playhead = el('div', { className: 'playhead', hidden: true });
@@ -80,17 +85,16 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
   const errorEl = el('p', { className: 'error', hidden: true });
   errorEl.setAttribute('role', 'alert');
   const list = el('ol', { className: 'clips' });
+  const playMain = el('button', { type: 'button', className: 'btn', id: 'call-play', textContent: 'Play' });
   root.append(
-    el('h3', { textContent: 'Length' }),
     measureEl,
-    el('h3', { textContent: 'Spectrogram' }),
     el('div', { className: 'spectrogram-wrap' }, canvas, playhead),
-    el('p', { className: 'muted', textContent: 'Low pitch at the bottom, time left to right. Bright orange is the loudest sound.' }),
+    el('p', { className: 'caption muted', textContent: 'Low pitch at the bottom, time left to right. Bright orange is the loudest sound.' }),
     audio,
-    el('h3', { textContent: 'Reference clips' }),
     errorEl,
-    list,
-    el('a', { className: 'btn primary', href: `#/practice/${call.id}`, textContent: 'Practice' }),
+    el('div', { className: 'actions' }, playMain, el('a', { className: 'btn primary', href: `#/practice/${call.id}`, textContent: 'Practice' })),
+    when,
+    el('details', { className: 'more' }, el('summary', { textContent: `Reference clips and licenses (${call.references.length})` }), list),
   );
 
   let alive = true;
@@ -121,6 +125,7 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
     cancelAnimationFrame(raf);
     playhead.hidden = true;
     buttons.forEach((b, i) => (b.textContent = `Play clip ${i + 1}`));
+    playMain.textContent = 'Play';
   };
   audio.addEventListener('pause', stopped);
   audio.addEventListener('ended', stopped);
@@ -133,6 +138,31 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
     if (alive && audio.getAttribute('src')) showError(`Could not play clip ${current + 1}.`);
   });
 
+  /** Starts clip i, or stops it if it is the one playing. */
+  const toggle = (i: number) => {
+    if (current === i && !audio.paused) {
+      audio.pause();
+      return;
+    }
+    errorEl.hidden = true;
+    audio.pause();
+    current = i;
+    select(i);
+    audio.src = assetUrl(call.references[i]);
+    audio.play().then(
+      () => {
+        if (!alive || current !== i) return;
+        buttons[i].textContent = `Stop clip ${i + 1}`;
+        playMain.textContent = 'Stop';
+      },
+      (err: unknown) => {
+        // A newer click replaced this clip before it started: not an error.
+        if (alive && current === i && !(err instanceof DOMException && err.name === 'AbortError')) showError(`Could not play clip ${i + 1}.`);
+      },
+    );
+  };
+  playMain.addEventListener('click', () => toggle(Math.max(current, 0)));
+
   call.references.forEach((path, i) => {
     const btn = el('button', { type: 'button', className: 'btn', textContent: `Play clip ${i + 1}` });
     btn.dataset.clip = String(i);
@@ -140,24 +170,7 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
     const item = el('li', { className: 'clip' }, btn);
     item.dataset.file = path;
     list.append(item);
-    btn.addEventListener('click', () => {
-      if (current === i && !audio.paused) {
-        audio.pause();
-        return;
-      }
-      errorEl.hidden = true;
-      audio.pause();
-      current = i;
-      select(i);
-      audio.src = assetUrl(path);
-      audio.play().then(
-        () => alive && current === i && (btn.textContent = `Stop clip ${i + 1}`),
-        (err: unknown) => {
-          // A newer click replaced this clip before it started: not an error.
-          if (alive && current === i && !(err instanceof DOMException && err.name === 'AbortError')) showError(`Could not play clip ${i + 1}.`);
-        },
-      );
-    });
+    btn.addEventListener('click', () => toggle(i));
   });
 
   current = 0;
