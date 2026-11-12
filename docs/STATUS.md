@@ -49,7 +49,7 @@ or Phase 2 (option 3).
 | # | Phase | State | PR |
 |---|---|---|---|
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
-| 1 | Reference audio | partial — gate failed (gobble only) | PR_LINK |
+| 1 | Reference audio | partial — gate failed (gobble only) | [#1](https://github.com/raineslc/CameCallHero/pull/1) |
 | 2 | Scoring engine | blocked on owner decision | |
 | 3 | Mic check | | |
 | 4 | Library | | |
