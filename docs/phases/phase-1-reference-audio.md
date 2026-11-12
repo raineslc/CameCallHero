@@ -8,7 +8,8 @@ Real wild turkey recordings for the five calls, legally usable in the app.
    xeno-canto.org (API v3; species *Meleagris gallopavo*), Wikimedia Commons,
    Freesound, NPS sound gallery (www.nps.gov), USFWS digital media (digitalmedia.fws.gov).
 2. Check every file's license on its own page. Allowed: CC0, CC-BY, CC-BY-SA,
-   US-government public domain. Reject NC, ND, "all rights reserved", unknown.
+   CC-BY-NC, CC-BY-NC-SA, US-government public domain. Reject ND,
+   "all rights reserved", unknown. (NC allowed since 2026-11-12; see AGENTS.md.)
 3. Prefer real birds. Recordings of a human using a call are **not** references —
    reject them unless the page clearly says it is a live bird.
 4. Listen-check by analysis: trim to the call, cut long silence, keep ≥ 0.3 s

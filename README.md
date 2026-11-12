@@ -9,4 +9,12 @@ Status: under construction — see [docs/STATUS.md](docs/STATUS.md) and the plan
 
 Live site (Android Chrome): https://raineslc.github.io/CameCallHero/
 
-Audio never leaves your phone.
+Audio never leaves your phone. The app is free: no ads, no purchases, no accounts.
+
+## License
+
+- **Code:** MIT, see [LICENSE](LICENSE).
+- **Audio** (`public/audio/`, `test/fixtures/`): **not** covered by the MIT license.
+  Each file keeps its own license (CC BY-SA, CC BY-NC-SA, CC0, ...), listed with its
+  recordist in [ATTRIBUTION.md](ATTRIBUTION.md). Some clips are NonCommercial: if you
+  reuse this project commercially, replace those clips.

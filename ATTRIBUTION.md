@@ -7,8 +7,10 @@ Audio used in CameCallHero. Machine-readable source of truth:
 ## Wild turkey reference recordings
 
 All clips were trimmed from the original and converted to mono 44.1 kHz 16-bit
-WAV. No filtering or gain change. Clips are shared under the same license as the
-original (CC BY-SA requires this).
+WAV (the stereo XC779658 and XC779655 originals: channels averaged). No filtering or gain change. Clips are
+shared under the same license as the original (CC BY-SA and CC BY-NC-SA require this).
+NonCommercial (NC) clips may only be used non-commercially; CameCallHero is free, with
+no ads, purchases or donations.
 
 | File | Call | Original | Recordist | License |
 |---|---|---|---|---|
@@ -18,9 +20,21 @@ original (CC BY-SA requires this).
 | `public/audio/turkey/gobble-4.wav` | gobble | [XC134155](https://xeno-canto.org/134155), 185.16–187.21 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 | `public/audio/turkey/gobble-5.wav` | gobble | [XC134155](https://xeno-canto.org/134155), 220.73–222.78 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 | `public/audio/turkey/gobble-6.wav` | gobble | [XC134155](https://xeno-canto.org/134155), 250.73–252.73 s | Jonathon Jongsma | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| `public/audio/turkey/yelp-1.wav` | yelp | [XC779658](https://xeno-canto.org/779658), 63.03–66.55 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/yelp-2.wav` | yelp | [XC779658](https://xeno-canto.org/779658), 14.10–17.45 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/yelp-3.wav` | yelp | [XC779658](https://xeno-canto.org/779658), 0.35–3.25 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/kee-kee-run-1.wav` | kee kee run | [XC614092](https://xeno-canto.org/614092), 62.15–67.08 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/kee-kee-run-2.wav` | kee kee run | [XC614092](https://xeno-canto.org/614092), 96.95–101.28 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/kee-kee-run-3.wav` | kee kee run | [XC779655](https://xeno-canto.org/779655), 70.05–75.62 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/turkey/kee-kee-run-4.wav` | kee kee run | [XC779655](https://xeno-canto.org/779655), 85.70–89.85 s | Richard E. Webster | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
 Citation form requested by xeno-canto: "Jonathon Jongsma, XC136045. Accessible at
 www.xeno-canto.org/136045." (same for XC134155).
+Same form for the others, e.g. "Richard E. Webster, XC779658. Accessible at
+www.xeno-canto.org/779658." (also XC779655, XC614092).
+
+Yelp and kee kee run were classified by measurement (notes in the manifest), not
+confirmed by the recordists or an expert.
 
 ## Test fixtures
 

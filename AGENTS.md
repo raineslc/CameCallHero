@@ -57,9 +57,13 @@ Your phase brief: `docs/phases/phase-N-*.md`.
 
 ## Hard rules
 
-- Reference audio: only CC0, CC-BY, CC-BY-SA or US-government public domain,
-  checked on each file's own page. Never NC/ND licenses, never Macaulay Library
-  (needs a paid license for apps). Every file listed in `ATTRIBUTION.md`.
+- Reference audio: only CC0, CC-BY, CC-BY-SA, CC-BY-NC, CC-BY-NC-SA or
+  US-government public domain, checked on each file's own page. Never ND
+  (NoDerivatives: clips are trimmed), never Macaulay Library (needs a paid license
+  for apps). Every file listed in `ATTRIBUTION.md`.
+- The app stays free and non-commercial (NC audio depends on it): no ads, no paid
+  features or versions, no donation or sponsor links in the app or repo. Before any
+  app-store release, write to each NC recordist (owner decision, 2026-11-12).
 - No audio leaves the device. No analytics, no backend, no accounts.
 - Do not add a dependency for something under ~30 lines of code.
 - Do not put model names, API keys or personal emails in the repo.
@@ -93,7 +97,8 @@ For Codex. Report P0/P1 issues; suggestions for clear improvements are welcome
 as lower priority.
 
 - **P0** Audio sent off the device; secrets or personal data committed; reference
-  audio with a missing or non-allowed license; code that crashes on load.
+  audio with a missing or non-allowed license (ND, Macaulay, unknown); anything that
+  makes money from the app (ads, purchases, donation links); code that crashes on load.
 - **P1** Microphone stream or AudioContext not released when leaving a screen;
   scoring that can be NaN, negative or above 100; scoring on absolute loudness;
   playback while recording; clipping or noise-floor checks bypassed;
