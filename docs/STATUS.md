@@ -133,7 +133,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
 | 5 | Practice | done — gobble playable; locked calls keep Practice disabled; real phone not tested | [#8](https://github.com/raineslc/CameCallHero/pull/8) |
-| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | PR_LINK |
+| 6 | Feedback release | done — README, issue forms, manifest + icons, design pass; install not verified on a phone | [#9](https://github.com/raineslc/CameCallHero/pull/9) |
 
 ## Phase 1 search log (2026-11-12)
 
