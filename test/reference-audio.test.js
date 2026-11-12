@@ -1,5 +1,6 @@
 // Checks the reference-audio manifests: every WAV is listed, every entry has an
-// allowed license and proof URL, files are mono 44.1 kHz 16-bit, total size < 15 MB.
+// allowed license and proof URL, files are mono 44.1 kHz 16-bit, each species folder < 15 MB, and
+// every barred owl call definition cites a source.
 // Plain JS (not TS): the project has no @types/node and this test needs node:fs.
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -22,6 +23,8 @@ const ALLOWED = [
 
 const sets = [
   { dir: 'public/audio/turkey', needsCall: true, trimmed: true },
+  // Wild birds only: every barred owl entry must say the recording used no playback.
+  { dir: 'public/audio/barred-owl', needsCall: true, trimmed: true, noPlayback: true },
   { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
   { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
   // Real phone takes stay at the phone's own rate (48 kHz), unconverted.
@@ -39,7 +42,7 @@ function wavFormat(path) {
   };
 }
 
-for (const { dir, needsCall, trimmed, sampleRate = 44100 } of sets) {
+for (const { dir, needsCall, trimmed, noPlayback = false, sampleRate = 44100 } of sets) {
   describe(`${dir}/manifest.json`, () => {
     const abs = join(root, dir);
     const manifest = JSON.parse(readFileSync(join(abs, 'manifest.json'), 'utf8'));
@@ -63,6 +66,7 @@ for (const { dir, needsCall, trimmed, sampleRate = 44100 } of sets) {
         expect(manifest.calls).toContain(c.call);
         expect(c.file).toMatch(new RegExp(`^${c.call}-\\d+\\.wav$`));
       }
+      if (noPlayback) expect(c.playbackUsed).toBe(false);
       if (trimmed) {
         expect(c.sourceUrl).toMatch(/^https:\/\//);
         expect(c.trimStartSec).toBeGreaterThanOrEqual(0);
@@ -82,8 +86,23 @@ for (const { dir, needsCall, trimmed, sampleRate = 44100 } of sets) {
   });
 }
 
-it('total reference audio is under 15 MB', () => {
-  const dir = join(root, 'public/audio/turkey');
+it.each(['public/audio/turkey', 'public/audio/barred-owl'])('%s is under 15 MB', (d) => {
+  const dir = join(root, d);
   const total = readdirSync(dir).reduce((sum, f) => sum + statSync(join(dir, f)).size, 0);
   expect(total).toBeLessThan(15 * 1024 * 1024);
+});
+
+describe('public/audio/barred-owl call definitions', () => {
+  const m = JSON.parse(readFileSync(join(root, 'public/audio/barred-owl/manifest.json'), 'utf8'));
+  const defs = m.callDefinitions;
+
+  it('defines exactly the listed calls', () => {
+    expect(defs.calls.map((c) => c.id).sort()).toEqual([...m.calls].sort());
+  });
+
+  it.each(defs.calls.map((c) => [c.id, c]))('%s cites at least one known source', (_id, c) => {
+    expect(c.definition).toBeTruthy();
+    expect(c.sources.length).toBeGreaterThan(0);
+    for (const s of c.sources) expect(defs.sources[s]?.url).toMatch(/^https:\/\//);
+  });
 });
