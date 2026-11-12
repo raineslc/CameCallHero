@@ -4,16 +4,16 @@
 // with timers. The mic is opened per take and released as soon as the take ends.
 
 import { classifyMicError, startCapture, type Capture } from '../audio/capture';
-import { extractFeatures, type Features } from '../audio/features';
+import { extractFeatures, LiveNoteCounter, type Features } from '../audio/features';
 import { chunkLevel, TakeRecorder } from '../audio/monitor';
 import { LivePitch } from '../audio/pitch';
-import { scoreTake, type ScoreResult } from '../audio/score';
+import { scoreTake, type ScoreResult, type SubScores } from '../audio/score';
 import { TURKEY_CALLS, type CallDef } from '../calls/turkey';
 import { assetUrl, loadFeatures, loadSpectrogram } from '../library/references';
 import { CLICK_INTERVAL_SEC, CLICKS, FIRST_CLICK_SEC, latencyFromTaps, MATCH_WINDOW_MS } from '../practice/latency';
-import { makePlan, type PracticePlan } from '../practice/plan';
+import { makePlan, noteTarget, targetText, type PracticePlan } from '../practice/plan';
 import { loadBest, loadLatency, saveBest, saveLatency } from '../practice/storage';
-import { tipFor } from '../practice/tips';
+import { PART_LABELS, PARTS, referenceLevels, tipsFor } from '../practice/tips';
 import { Lane } from '../ui/lane';
 import { drawOverlay } from '../ui/overlay';
 import { showSpectrogram } from '../ui/spectrogram';
@@ -29,8 +29,6 @@ const MAX_EXTRAPOLATE_SEC = 0.1;
 const COUNT_TEXT = ['Call now', '1', '2', '3'];
 const CLICK_HZ = 1000;
 const CLICK_SEC = 0.03;
-
-const SUB_LABELS = { rhythm: 'Rhythm', pitch: 'Pitch', tone: 'Tone' } as const;
 
 function notFound(root: HTMLElement): void {
   root.innerHTML = `<h2>Call not found</h2><a class="btn" href="#/">Back to calls</a>`;
@@ -59,6 +57,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     <section id="practice-intro">
       <p>1. Listen to the call. 2. Tap <strong>I'm ready</strong> and stay quiet during the 3-2-1.
         3. Call when the notes reach the line. Nothing plays while you record.</p>
+      <p class="target" id="practice-target" hidden></p>
       <canvas class="spectrogram" id="practice-spectrogram" role="img" aria-label="Spectrogram of the reference ${call.name.toLowerCase()}"></canvas>
       <div class="actions">
         <button type="button" class="btn" id="practice-listen">Listen</button>
@@ -77,8 +76,9 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     </section>
 
     <section id="practice-run" hidden>
+      <p class="target" id="practice-notes"></p>
       <div class="lane-wrap">
-        <canvas class="lane" id="practice-lane" role="img" aria-label="Practice lane: reference notes scroll down to the line; your pitch is the orange trail"></canvas>
+        <canvas class="lane" id="practice-lane" role="img" aria-label="Practice lane: the turkey's notes are grey blocks that slide down to the white line; your call draws an orange line"></canvas>
         <p class="count" id="practice-count" aria-live="assertive"></p>
       </div>
       <p class="muted" id="practice-run-status" role="status">Starting the microphone…</p>
@@ -94,12 +94,29 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
         <h3>Your notes vs. the reference</h3>
         <canvas class="overlay" id="practice-overlay" role="img"></canvas>
         <p class="muted legend"><span class="key ref"></span> <span id="practice-overlay-ref"></span> <span class="key you"></span> You</p>
-        <p class="tip" id="practice-tip"></p>
+        <h3>How to improve</h3>
+        <ul class="tips" id="practice-tips"></ul>
+        <p class="muted" id="practice-tips-note" hidden>“Good” means as close to the turkey recording as the turkey recordings are to each other.</p>
       </div>
       <div class="actions">
         <button type="button" class="btn primary" id="practice-again">Try again</button>
         <button type="button" class="btn" id="practice-relisten">Listen again</button>
       </div>
+    </section>
+    <section class="help" id="practice-help" aria-labelledby="practice-help-title">
+      <h3 id="practice-help-title">How it works</h3>
+      <ul>
+        <li>Grey blocks are the turkey's notes. They slide down to the white line.</li>
+        <li>Call when a block reaches the line, and hold the note while the block crosses it. Taller block = longer note.</li>
+        <li>Your call draws an orange line. Further right = higher, further left = deeper.</li>
+        <li>Try to keep your orange line on the grey blocks.</li>
+      </ul>
+      <p class="legend help-legend">
+        <span class="legend-item"><span class="key ref"></span> Turkey note</span>
+        <span class="legend-item"><span class="key now"></span> Call now</span>
+        <span class="legend-item"><span class="key line"></span> The line</span>
+        <span class="legend-item"><span class="key trail"></span> You</span>
+      </p>
     </section>
     <audio id="practice-audio" preload="none"></audio>
   `;
@@ -119,18 +136,25 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
   const tapBtn = $<HTMLButtonElement>('practice-tap');
   const calibStatus = $('practice-calib-status');
   const shownRef = call.references[0];
+  const targetEl = $('practice-target');
+  const notesEl = $('practice-notes');
 
   let alive = true;
   let refs: Features[] = [];
   let plan: PracticePlan | null = null;
   let lane: Lane | null = null;
   let latencyMs = loadLatency() ?? 0;
+  let target = { notes: 0, seconds: 0 };
+  /** Reference levels for the verdicts; computed at the first result. */
+  let levels: SubScores | null | undefined;
 
   // Take state. `takeId` invalidates callbacks of an abandoned take.
   let takeId = 0;
   let capture: Capture | null = null;
   let recorder: TakeRecorder | null = null;
   let pitch: LivePitch | null = null;
+  let noteCounter: LiveNoteCounter | null = null;
+  let shownNotes = -1;
   let rate = 0;
   let floorDb: number | null = null;
   let lastChunkT = 0;
@@ -197,6 +221,9 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       refs = fs;
       plan = makePlan(fs[0], fs);
       lane = new Lane($<HTMLCanvasElement>('practice-lane'), plan);
+      target = noteTarget(fs[0]);
+      targetEl.textContent = `Your goal: ${targetText(target)}`;
+      targetEl.hidden = false;
       $('practice-loading').hidden = true;
       readyBtn.disabled = calibrating;
     })
@@ -293,6 +320,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     capture = null;
     recorder = null;
     pitch = null;
+    noteCounter = null;
     floorDb = null;
     cancelAnimationFrame(raf);
     clearInterval(watchdog);
@@ -331,9 +359,9 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     const best = loadBest(call.id);
     $('practice-best').textContent = isBest ? 'New best!' : best !== null ? `Best: ${best}` : '';
     $('practice-subs').replaceChildren(
-      ...(['rhythm', 'pitch', 'tone'] as const).flatMap((k) => {
+      ...PARTS.flatMap((k) => {
         const dt = document.createElement('dt');
-        dt.textContent = SUB_LABELS[k];
+        dt.textContent = PART_LABELS[k];
         const dd = document.createElement('dd');
         dd.textContent = String(Math.round(result[k]));
         dd.dataset.sub = k;
@@ -345,7 +373,19 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     const overlay = $<HTMLCanvasElement>('practice-overlay');
     overlay.setAttribute('aria-label', `Your ${take.notes.length} notes against the ${ref.notes.length} notes of reference clip ${result.bestReference + 1}`);
     drawOverlay(overlay, plan, ref, take, latencyMs / 1000);
-    $('practice-tip').textContent = tipFor(result, take, ref).text;
+    if (levels === undefined) levels = referenceLevels(refs, call.weights);
+    $('practice-tips').replaceChildren(
+      ...tipsFor(result, take, ref, levels).map((t) => {
+        const li = document.createElement('li');
+        li.dataset.part = t.part;
+        if (t.verdict) li.dataset.verdict = t.verdict;
+        const head = document.createElement('strong');
+        head.textContent = t.verdict ? `${t.label}: ${t.verdict}.` : `${t.label}:`;
+        li.append(head, ` ${t.text}`);
+        return li;
+      }),
+    );
+    $('practice-tips-note').hidden = levels === null;
   };
 
   const finishTake = () => {
@@ -376,6 +416,16 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     if (floorDb === null && lastChunkT >= plan.performStart) {
       const countIn = recorder.samples.subarray(0, Math.round(plan.performStart * rate));
       floorDb = extractFeatures({ samples: countIn, sampleRate: rate }).noiseFloorDb;
+      // Same take start, length and floor as finishTake, so the last count is the scored count.
+      noteCounter = new LiveNoteCounter(rate, recorder.target - Math.round(plan.performStart * rate), floorDb);
+    }
+    if (noteCounter) {
+      const n = noteCounter.update(recorder.buffer, Math.round(plan.performStart * rate), recorder.recorded);
+      if (n !== shownNotes) {
+        shownNotes = n;
+        notesEl.textContent = `Notes so far: ${n} of ${target.notes}`;
+        notesEl.dataset.count = String(n);
+      }
     }
     if (floorDb !== null) {
       const loud = chunkLevel(chunk).rmsDb > floorDb + TRAIL_ABOVE_FLOOR_DB;
@@ -394,7 +444,10 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     errorEl.hidden = true;
     show('run');
     shownCount = -1;
+    shownNotes = -1;
     countEl.textContent = '';
+    notesEl.textContent = targetText(target);
+    delete notesEl.dataset.count;
     runStatus.textContent = 'Starting the microphone…';
     lane.resize();
     lane.clearTrail();

@@ -38,6 +38,9 @@ export async function takeOnce(page: Page): Promise<number | null> {
   // Nothing plays while recording.
   expect(await page.locator('#practice-audio').evaluate((a: HTMLAudioElement) => a.paused)).toBe(true);
   await expect(page.locator('#practice-count')).toHaveText('3', { timeout: 10_000 });
+  // Count-in: the note target is shown above the lane; while recording, the live note count.
+  await expect(page.locator('#practice-notes')).toHaveText(/^Make (1 note lasting|\d+ notes in) about \d+\.\d seconds\.$/);
+  await expect(page.locator('#practice-notes')).toHaveText(/^Notes so far: \d+ of \d+$/, { timeout: 10_000 });
   await expect(page.locator('#practice-results')).toBeVisible({ timeout: 20_000 });
   if (await page.locator('#practice-rejected').isVisible()) return null;
   return Number(await page.locator('#practice-score').getAttribute('data-score'));

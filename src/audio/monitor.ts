@@ -74,6 +74,10 @@ export class TakeRecorder {
   get samples(): Float32Array {
     return this.buf.subarray(0, this.n);
   }
+  /** The whole take buffer (valid up to `recorded`); no view is created, for per-chunk use. */
+  get buffer(): Float32Array {
+    return this.buf;
+  }
 }
 
 export interface LiveStatus {
