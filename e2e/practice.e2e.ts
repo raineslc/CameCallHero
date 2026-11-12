@@ -90,7 +90,7 @@ test.describe('practice with a reference gobble', () => {
 
 test('locked call: Practice stays disabled and the mic is never opened', async ({ page }) => {
   await spy(page);
-  await page.goto('#/practice/yelp');
+  await page.goto('#/practice/kee-kee-run');
   await expect(page.getByText('Recordings needed', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: "I'm ready" })).toBeDisabled();
   expect((await micState(page)).streams).toBe(0);
