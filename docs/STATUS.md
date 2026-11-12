@@ -74,7 +74,7 @@ the Phase 1 search log below and in [PR #1](https://github.com/raineslc/CameCall
 | 0 | Bootstrap | done | pushed to `main` (empty repo had no base branch) |
 | 1 | Reference audio | partial — gobble, yelp, kee kee run; cut and purr missing | [#1](https://github.com/raineslc/CameCallHero/pull/1), re-run: [#5](https://github.com/raineslc/CameCallHero/pull/5) |
 | 2 | Scoring engine | done — gobble calibrated, other calls locked | [#2](https://github.com/raineslc/CameCallHero/pull/2) |
-| 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | this branch |
+| 2b | Calibrate yelp | done — yelp unlocked; kee kee run locked (cannot be told from yelp) | [#10](https://github.com/raineslc/CameCallHero/pull/10) |
 | 3 | Mic check | done — fake-mic test in CI; real phone not tested | [#3](https://github.com/raineslc/CameCallHero/pull/3) |
 | 4 | Library | done — gobble playable; 4 calls listed as "Recordings needed" | [#4](https://github.com/raineslc/CameCallHero/pull/4) |
 | 5 | Practice | | |
