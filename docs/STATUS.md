@@ -1,6 +1,6 @@
 # Status
 
-## Phase 9: turkey calling challenge (2026-11-13, PR link below once opened)
+## Phase 9: turkey calling challenge (2026-11-13, [#18](https://github.com/raineslc/GameCallHero/pull/18))
 
 **Owner: please try on the phone**
 1. Calls → Wild turkey → **Calling challenge** → I'm ready. Stay quiet for the 3-2-1, then call a
