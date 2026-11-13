@@ -1,6 +1,6 @@
 # Status
 
-## Phase 12: elk (2026-11-13, PR link below once opened)
+## Phase 12: elk (2026-11-13, [#20](https://github.com/raineslc/GameCallHero/pull/20))
 
 **Owner: please check / try**
 1. **On the phone**: Calls → **Elk** → **Calf call** → Practice (and Elk → Calling challenge). Is the score sensible for a calf
