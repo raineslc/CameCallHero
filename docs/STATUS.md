@@ -1,5 +1,96 @@
 # Status
 
+## Phase 12: elk (2026-11-13, [#20](https://github.com/raineslc/GameCallHero/pull/20))
+
+**Owner: please check / try**
+1. **On the phone**: Calls → **Elk** → **Calf call** → Practice (and Elk → Calling challenge). Is the score sensible for a calf
+   call from a person or a call? Does a bugle or a cow call score clearly lower? The pass rests on
+   3 clips of one calf (see below), so treat scores with caution.
+2. **License check (affects locked calls only)**: the Rocky Mountain National Park files
+   (bugle-7, cow-mew-1..4, glug-1..3) are credited "J. Job", not "NPS / <name>". The park's sound
+   library page says its recordings are in the public domain; I did not find whether J. Job
+   recorded them as an NPS employee. The unlocked calf call is credited "NPS / Shan Burson".
+3. **Sources blocked here** (for more elk calls / clips, if you want to allow them): rmef.org,
+   cpw.state.co.us, wdfw.wa.gov, fs.usda.gov, en.wikipedia.org and academic.oup.com (no
+   connection); digitalmedia.fws.gov was refused by the proxy (403) although the notes below list it.
+
+Gate: passed (4 calls with ≥ 3 legal clips; species added). Calibration: **calf call unlocked**;
+bugle, glug and cow mew locked.
+
+What changed:
+- **Audio** `public/audio/elk/` (17 clips, 4.5 MB, manifest + ATTRIBUTION.md): all from NPS sound
+  libraries whose pages say the files are public domain. Yellowstone: Neal Herbert (bugle-1/2),
+  Jennifer Jerrett (bugle-3..6, one bull), Shan Burson (calf-call-1..3, one calf). Rocky Mountain
+  NP: J. Job (bugle-7, cow-mew-1..4, glug-1..3). Yellowstone files co-credited to MSU Acoustic Atlas
+  were left out. No page states playback (`playbackUsed: null`, test rejects `true`).
+- **Calls and sources** (`src/calls/elk.ts`, manifest `callDefinitions`), all read on nps.gov:
+  the Yellowstone elk book (White et al., p. 16, citing Feighny et al. 2006, Bowyer & Kitchen 1987,
+  Geist 2002), the Yellowstone and Rocky Mountain elk pages, and the two sound-library pages. Cow
+  mew and calf call: no source read says when elk give them, and the screen says so. Not
+  included: estrus cow and chirp (no recording labelled as such found), alarm bark (one 4 s
+  Rocky Mountain recording; not on the candidate list).
+- **Species** `elk` (picker, `#/elk/...` routes, best-score keys `camecallhero.best.elk.<call>`,
+  "Play elk", "When elk use it"). Analysis band 300–6000 Hz (`ELK_BAND`), measured on the clips:
+  glug pulses and bugle onsets from ~0.45–0.6 kHz, whistles ~2.0–2.8 kHz, mews to ~3.1 kHz,
+  harmonics to ~5.5 kHz.
+- **Elk calling challenge** (`#/elk/challenge`, Phase 10 rules, data only in
+  `src/challenge/rules.ts`): calf call threshold **55** (worst wrong sound bugle-7 54.2; lowest
+  leave-one-out 77.2). Split gap **0 s** by the rule (each calf reference is one note, so the
+  longest within-call gap is 0): any pause the note finder keeps starts a new call, so a calf call
+  with a break in it is split (shortcut, revisit with real takes). Rank titles are made-up names.
+- Tests: `test/calibration-elk.test.ts`, elk in `test/reference-audio.test.js` and
+  `test/species.test.ts`; e2e `e2e/practice-elk.e2e.ts` (fake mic plays calf-call-1: scored 99.6,
+  saved under the elk key, no turkey/owl wording) and the elk screens in `e2e/a11y.e2e.ts`.
+
+### Elk calibration (same rules: margin 15, leave-one-out, matrix rule; negatives = other elk calls, every turkey and barred owl reference, turkey wrong-call fixtures, junk; all in the elk band)
+
+| Call | Clips (recordings) | Best weights (r/p/t/s) | Worst-case margin | Result |
+|---|---|---|---|---|
+| Calf call | 3 (1) | 3 / 0.5 / 2.5 / – | **26.2** (matrix 26.2) | **unlocked** |
+| Bugle | 7 (4) | 1.5 / 1.5 / 3 / – | -12.0 (matrix -12.0) | locked, "Coming soon" |
+| Glug | 3 (1) | 2.5 / 1 / 0.5 / 0.5 | 3.3 (matrix 13.3) | locked, "Coming soon" |
+| Cow mew | 4 (1) | – | all 4 clips fail the noise gate (SNR 5.8–14.8 dB < 15) | locked, "Recordings needed" |
+
+Calf call leave-one-out: 80.8 / 77.2 / 80.8; worst negative bugle-4 (51.0). **Caveat**: the 3
+clips are one calf in one recording, which flatters leave-one-out.
+
+Bugle: clip-to-clip scores are 28–72 with equal weights (bulls differ a lot; bugle-1 has grunts after, bugle-7 is
+a lower-pitched bull at ~0.9 kHz). Leave-one-out 36.2–69.9; worst negatives calf-call-3 (48.2)
+and gobble-3 (48.0); bugle-1 (-10.4) and bugle-7 (-12.0) fail.
+
+Elk confusion matrix (mean score; own row leave-one-out):
+
+| take \ target | bugle | glug | cow mew | calf call |
+|---|---|---|---|---|
+| bugle | **51.6** | 28.1 | 25.3 | 36.6 |
+| glug | 28.8 | **50.2** | 24.7 | 13.1 |
+| cow mew | 0.0 | 0.0 | 0.0 | 0.0 |
+| calf call | 46.5 | 24.4 | 24.4 | **79.6** |
+
+What was tried (best worst-case margins bugle / glug / calf call):
+- Bands, grid rhythm/pitch/tone 0.5..3: 150–8000 Hz -12.2 / 0.3 / 26.2; 300–6000 -12.0 / 2.8 /
+  26.2; 400–5000 -14.4 / 3.7 / 26.7; 250–4000 -13.4 / 1.5 / 27.8; 500–3000 -14.2 / 0.8 / 28.5.
+  300–6000 Hz kept: it holds the measured range incl. first harmonics; calf passes in every band.
+- Plus the structure weight 0..3 (300–6000, 250–4000, 150–8000 Hz): bugle unchanged (best with
+  structure 0), glug 3.3–3.8, calf 26.2–27.8. 176 of 1512 weight sets pass for the calf call.
+- Margin, negatives, gates and leave-one-out unchanged. Turkey and owl calibration output is
+  byte-identical to `main` (diffed, 70 lines); no scoring code changed.
+
+Sources checked for clips:
+- **www.nps.gov**: Yellowstone sound library (elk page, 7 files), Rocky Mountain NP wildlife
+  soundscapes (6 elk files incl. a 51-min dawn rut soundscape), NPS Natural Sounds gallery
+  (Great Sand Dunes bugling; several bulls overlap, not used). Used as above. The dawn soundscape
+  was scanned for mews: only overlapping bugles found.
+- **xeno-canto** accepts mammals: 6 wapiti recordings. XC971966 (Washington) says "Playback used:
+  yes": rejected. XC766194–766198 (Mongolia, *C. c. sibericus*, CC BY-NC-SA 4.0, playback
+  "unknown"): not used (not North American elk; playback not stated).
+- Freesound and Wikimedia Commons are reachable but were not searched.
+
+Next for elk: more bugles per bull and more bulls (or a whistle-contour feature) for the bugle;
+clearer cow mews (another park, or recordists to ask); recordings of other calves.
+
+Verified: `npm ci && npm test` (330 unit tests), `npm run build`, `npm run e2e` (77 passed, 3
+skipped; includes the elk challenge design pass). Not verified: anything on a real phone; a person's or a commercial call's calf call.
 ## Phase 10: calling challenge for every species (2026-11-13, [#19](https://github.com/raineslc/GameCallHero/pull/19))
 
 **Owner: please try on the phone**

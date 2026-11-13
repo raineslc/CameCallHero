@@ -1,7 +1,7 @@
 # Attribution
 
 Audio used in Game Call Hero. Machine-readable source of truth:
-`public/audio/turkey/manifest.json` and `public/audio/barred-owl/manifest.json` (trim times, quality notes),
+`public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json` and `public/audio/elk/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings
@@ -74,6 +74,44 @@ www.xeno-canto.org/1141309." (same form for each number above).
 
 Calls were classified by measurement against cited descriptions (notes in the manifest), not
 confirmed by the recordists or an expert. The three caterwaul clips are marked uncertain.
+
+## Elk reference recordings
+
+Wild elk (*Cervus canadensis*) from National Park Service sound libraries: Yellowstone National
+Park ([sound library](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm): "The files
+available here were recorded in the park and are in the public domain. They may be downloaded and
+used without limitation; however, please credit the 'National Park Service' where appropriate") and
+Rocky Mountain National Park ([sound library](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm):
+"The recordings found here are in the public domain and may be downloaded and used without
+limitation; however, please credit the 'National Park Service' where appropriate"). Checked
+2026-11-13. Yellowstone files co-credited to MSU Acoustic Atlas were not used. Credit: National
+Park Service. No page says whether playback was used; the pages describe free-living elk and no
+human-made call is heard in the clips. All clips were trimmed from the original MP3 and converted
+to mono 44.1 kHz 16-bit WAV (stereo originals: channels averaged). No filtering or gain change.
+Machine-readable details, measurements and cited call definitions: `public/audio/elk/manifest.json`.
+
+| File | Call | Original | Recordist (as credited) | License |
+|---|---|---|---|---|
+| `public/audio/elk/bugle-1.wav` | bugle | [Elk Bugle One](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-ElkBugle1.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 1.90–9.00 s | NPS / Neal Herbert | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-2.wav` | bugle | [Elk Bugle Two](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-ElkBugle2.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 12.30–16.60 s | NPS / Neal Herbert | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-3.wav` | bugle | [Male Elk Bugling Near Grazing Females](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLElkBullandCows20151018T012.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 2.80–7.60 s | NPS / Jennifer Jerrett | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-4.wav` | bugle | [Male Elk Bugling Near Grazing Females](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLElkBullandCows20151018T012.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 16.20–20.20 s | NPS / Jennifer Jerrett | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-5.wav` | bugle | [Male Elk Bugling Near Grazing Females](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLElkBullandCows20151018T012.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 29.70–33.00 s | NPS / Jennifer Jerrett | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-6.wav` | bugle | [Male Elk Bugling Near Grazing Females](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLElkBullandCows20151018T012.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 56.20–60.80 s | NPS / Jennifer Jerrett | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/bugle-7.wav` | bugle | [Elk mew, bugle and glug](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMoraineParkExerpt-ElkGlugBugleMew.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 28.80–33.30 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/calf-call-1.wav` | calf call | [Elk Calf](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLMJ23ElkCalf20051116.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 0.00–3.30 s | NPS / Shan Burson | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/calf-call-2.wav` | calf call | [Elk Calf](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLMJ23ElkCalf20051116.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 3.20–6.00 s | NPS / Shan Burson | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/calf-call-3.wav` | calf call | [Elk Calf](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/yell-YELLMJ23ElkCalf20051116.mp3) on [YELL sound page](https://www.nps.gov/yell/learn/photosmultimedia/sounds-elk.htm), 6.45–9.15 s | NPS / Shan Burson | [Public domain (US government work)](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/cow-mew-1.wav` | cow mew | [Elk mew](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMoraineParkExerpt-ElkMews.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 1.10–2.20 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/cow-mew-2.wav` | cow mew | [Elk mew](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMoraineParkExerpt-ElkMews.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 2.25–3.10 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/cow-mew-3.wav` | cow mew | [Elk mew](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMoraineParkExerpt-ElkMews.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 7.50–8.90 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/cow-mew-4.wav` | cow mew | [Elk mew](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMoraineParkExerpt-ElkMews.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 15.25–16.40 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/glug-1.wav` | glug | [Bull Elk glug](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMorainParkExerpt-ElkGlug.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 1.50–4.20 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/glug-2.wav` | glug | [Bull Elk glug](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMorainParkExerpt-ElkGlug.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 4.20–6.60 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+| `public/audio/elk/glug-3.wav` | glug | [Bull Elk glug](https://www.nps.gov/nps-audiovideo/legacy/mp3/imr/avElement/romo-20170923ROMOMorainParkExerpt-ElkGlug.mp3) on [ROMO sound page](https://www.nps.gov/romo/learn/photosmultimedia/sounds-wildlife-soundscapes.htm), 6.60–9.00 s | J. Job (credited on the Rocky Mountain National Park page) | [Public domain (US government work)](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm) |
+
+Bugle, glug, cow mew and calf call were classified by measurement against the NPS descriptions
+(notes in the manifest), not confirmed by the recordists or an expert; the cow mews are uncertain.
 
 ## Test fixtures
 

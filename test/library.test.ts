@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { extractFeatures, HOP_SEC } from '../src/audio/features';
 import { TURKEY_CALLS } from '../src/calls/turkey';
-import { callSeconds, clipInfo, describeMeasure, measure, playheadFraction, type ClipInfo } from '../src/library/references';
+import { callSeconds, clipInfo, describeMeasure, measure, playheadFraction, sourceLabel, type ClipInfo } from '../src/library/references';
 import { backHref, matchRoute } from '../src/router';
 import { readWav } from './wav';
 
@@ -94,5 +94,16 @@ describe('challenge routes (Phase 10)', () => {
     expect(matchRoute('/barred-owl/challenge', routes, '/', ['barred-owl'])).toEqual(['/challenge', 'barred-owl']);
     expect(backHref('/challenge', '')).toBe('#/');
     expect(backHref('/challenge', 'barred-owl')).toBe('#/barred-owl');
+  });
+});
+
+describe('clip source label', () => {
+  const manifest = (dir: string) => JSON.parse(readFileSync(new URL(`public/audio/${dir}/manifest.json`, root), 'utf8')).clips as ClipInfo[];
+  it('names xeno-canto clips by catalogue number and NPS clips by library and title', () => {
+    for (const c of [...manifest('turkey'), ...manifest('barred-owl')]) expect(sourceLabel(c)).toMatch(/^xeno-canto XC\d+$/);
+    for (const c of manifest('elk')) {
+      expect(sourceLabel(c)).toBe(`National Park Service sound library: ${c.sourceTitle}`);
+      expect(sourceLabel(c)).not.toMatch(/undefined/);
+    }
   });
 });

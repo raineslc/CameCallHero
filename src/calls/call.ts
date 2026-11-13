@@ -1,5 +1,5 @@
 // What every call of every species has: name, lock state, reference clips, scoring weights
-// and a cited description. Species-specific lists live in turkey.ts and barred-owl.ts.
+// and a cited description. Species-specific lists live in turkey.ts, barred-owl.ts and elk.ts.
 
 import type { Weights } from '../audio/score';
 

@@ -11,12 +11,23 @@ export interface ClipInfo {
   file: string;
   call: string;
   sourceUrl: string;
-  sourceId: string;
+  /** xeno-canto catalogue number (XC…); absent for other sources. */
+  sourceId?: string;
+  /** Archive or library name and the recording's title there (sources without an id, e.g. NPS). */
+  source?: string;
+  sourceTitle?: string;
   author: string;
   license: string;
   licenseUrl: string;
   trimStartSec: number;
   trimEndSec: number;
+}
+
+/** Link text naming where a clip comes from: "xeno-canto XC123" or "<library>: <title>". */
+export function sourceLabel(info: Pick<ClipInfo, 'sourceId' | 'source' | 'sourceTitle'>): string {
+  if (info.sourceId) return `xeno-canto ${info.sourceId}`;
+  if (info.source && info.sourceTitle) return `${info.source}: ${info.sourceTitle}`;
+  return info.source ?? info.sourceTitle ?? 'Original recording';
 }
 
 export interface Measure {

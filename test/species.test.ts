@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { extractFeatures, FULL_BAND } from '../src/audio/features';
 import { LivePitch } from '../src/audio/pitch';
 import { OWL_BAND } from '../src/calls/barred-owl';
-import { BARRED_OWL, bestId, callHref, homeHref, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
+import { BARRED_OWL, bestId, callHref, ELK, homeHref, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { loadBest, saveBest } from '../src/practice/storage';
 import { tipsFor } from '../src/practice/tips';
@@ -62,6 +62,9 @@ describe('species calls', () => {
     expect(resolveCall('barred-owl/inspection-call')).toMatchObject({ species: BARRED_OWL, call: { id: 'inspection-call' } });
     expect(resolveCall('inspection-call')).toBeNull();
     expect(resolveCall('barred-owl/gobble')).toBeNull();
+    expect(resolveCall('elk/calf-call')).toMatchObject({ species: ELK, call: { id: 'calf-call' } });
+    expect(resolveCall('elk/inspection-call')).toBeNull();
+    expect(resolveCall('calf-call')).toBeNull();
     expect(resolveCall('nope/gobble')).toBeNull();
     expect(resolveCall('')).toBeNull();
   });
@@ -70,8 +73,18 @@ describe('species calls', () => {
     expect(TURKEY.calls).toBe(TURKEY_CALLS);
     expect(TURKEY.calls.map((c) => c.id)).toEqual(['yelp', 'cut', 'purr', 'gobble', 'kee-kee-run']);
   });
-  it('owl references live in the owl folder', () => {
+  it('owl references live in the owl folder, elk references in the elk folder', () => {
     for (const c of BARRED_OWL.calls) for (const p of c.references) expect(p).toMatch(/^audio\/barred-owl\//);
+    for (const c of ELK.calls) for (const p of c.references) expect(p).toMatch(/^audio\/elk\//);
+  });
+  it('species order and ids: turkey (default), barred owl, elk', () => {
+    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk']);
+    expect(ELK.calls.map((c) => [c.id, c.locked])).toEqual([
+      ['bugle', true],
+      ['glug', true],
+      ['cow-mew', true],
+      ['calf-call', false],
+    ]);
   });
   it('links: turkey keeps the short form, other species carry their id; every link resolves', () => {
     const gobble = TURKEY.calls.find((c) => c.id === 'gobble')!;
@@ -106,6 +119,15 @@ describe('best-score keys', () => {
     expect(saveBest(bestId(BARRED_OWL, hoo), 55, store)).toBe(true);
     expect(store.m.get('camecallhero.best.barred-owl.inspection-call')).toBe('55');
     expect(loadBest(bestId(TURKEY, gobble), store)).toBe(71);
+  });
+  it('elk keys are prefixed by the species id', () => {
+    const store = mem();
+    const calf = ELK.calls.find((c) => c.id === 'calf-call')!;
+    expect(bestId(ELK, calf)).toBe('elk.calf-call');
+    expect(saveBest(bestId(ELK, calf), 62, store)).toBe(true);
+    expect([...store.m.keys()]).toEqual(['camecallhero.best.elk.calf-call']);
+    expect(callHref(ELK, calf)).toBe('#/elk/call/calf-call');
+    expect(practiceHref(ELK, calf)).toBe('#/elk/practice/calf-call');
   });
 });
 
