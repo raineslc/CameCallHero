@@ -17,6 +17,7 @@ import {
   measure,
   playheadFraction,
   type ClipInfo,
+  sourceLabel,
 } from '../library/references';
 import { showSpectrogram } from '../ui/spectrogram';
 
@@ -34,7 +35,7 @@ function attribution(info: ClipInfo | undefined): HTMLElement {
     'p',
     { className: 'attribution muted' },
     `${info.author}, `,
-    link(info.sourceUrl, `xeno-canto ${info.sourceId}`),
+    link(info.sourceUrl, sourceLabel(info)),
     ` (${info.trimStartSec.toFixed(2)}–${info.trimEndSec.toFixed(2)} s, trimmed), `,
     link(info.licenseUrl, info.license),
   );
