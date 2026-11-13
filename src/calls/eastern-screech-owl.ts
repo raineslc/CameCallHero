@@ -35,7 +35,9 @@ export const EASTERN_SCREECH_OWL_CALLS: CallDef[] = [
     references: [],
     // Best of the grid search with OWL_BAND (worst-case margin 10.0, below 15); not used while locked.
     // shortcut: the note finder splits some trills into their pulses and keeps others whole, so the
-    // rhythm part compares unlike things; a trill-rate feature is the next thing to try.
+    // rhythm part compares unlike things. Phase 16 added that trill-rate feature (pulse weight):
+    // it measures every trill at 10-17 pulses/s split or whole, but the best margin rose only to
+    // 10.4 (8.7 with every species' clips as negatives; worst: barred owl hoo-wah, which also pulses).
     weights: { rhythm: 1.5, pitch: 0.5, tone: 0.5, structure: 0 },
     // AAB: an even-pitched trill, often called a "bounce song" or tremolo; used by pairs or
     // families to keep in touch, 3-6 seconds long. MDC: trilling, an even-pitched sound.
