@@ -1,10 +1,11 @@
 // Library home: a species picker, then one compact row per call of the picked species (name,
 // one-line meaning, small spectrogram of the first reference clip or a lock badge
 // ("Recordings needed" / "Coming soon"), and the best practice score saved on this device).
-// The species comes from the route (#/ = wild turkey, #/<species>).
+// The species comes from the route (#/ = wild turkey, #/<species>). Wild turkey also links to
+// the calling challenge.
 
 import { lockInfo } from '../calls/call';
-import { bestId, callHref, DEFAULT_SPECIES, homeHref, SPECIES, speciesById } from '../calls/species';
+import { bestId, callHref, DEFAULT_SPECIES, homeHref, SPECIES, speciesById, TURKEY } from '../calls/species';
 import { loadSpectrogram } from '../library/references';
 import { loadBest } from '../practice/storage';
 import { showSpectrogram } from '../ui/spectrogram';
@@ -19,6 +20,14 @@ export function homeScreen(root: HTMLElement, param = ''): () => void {
       ).join('')}
     </div>
     <h2>${species.name}</h2>
+    ${
+      species === TURKEY
+        ? `<div class="challenge-cta">
+      <p>Who calls best? Record a whole sequence and get rated against wild turkeys.</p>
+      <a class="btn primary" href="#/challenge">Calling challenge</a>
+    </div>`
+        : ''
+    }
     <ul class="cards">
       ${species.calls
         .map((c) => {
