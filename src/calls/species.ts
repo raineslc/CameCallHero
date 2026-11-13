@@ -8,6 +8,7 @@ import { OWL_BAND, OWL_CALLS } from './barred-owl';
 import type { CallDef } from './call';
 import { ELK_BAND, ELK_CALLS } from './elk';
 import { MALLARD_BAND, MALLARD_CALLS } from './mallard';
+import { EASTERN_SCREECH_OWL_CALLS } from './eastern-screech-owl';
 import { GREAT_HORNED_OWL_CALLS } from './great-horned-owl';
 import { TURKEY_CALLS } from './turkey';
 
@@ -38,7 +39,18 @@ export const GREAT_HORNED_OWL: Species = {
   band: OWL_BAND,
 };
 
-export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD, GREAT_HORNED_OWL];
+// Eastern screech-owl trills measure 560-904 Hz and whinnies 754-1227 Hz (manifest notes), inside
+// the barred owl's band.
+export const EASTERN_SCREECH_OWL: Species = {
+  id: 'eastern-screech-owl',
+  name: 'Eastern screech-owl',
+  noun: 'owl',
+  nounPlural: 'owls',
+  calls: EASTERN_SCREECH_OWL_CALLS,
+  band: OWL_BAND,
+};
+
+export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD, GREAT_HORNED_OWL, EASTERN_SCREECH_OWL];
 export const DEFAULT_SPECIES = TURKEY;
 
 export const speciesById = (id: string): Species | undefined => SPECIES.find((s) => s.id === id);
