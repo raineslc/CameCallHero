@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BARRED_OWL, ELK, GREAT_HORNED_OWL, MALLARD } from '../src/calls/species';
+import { BARRED_OWL, EASTERN_SCREECH_OWL, ELK, GREAT_HORNED_OWL, MALLARD } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { audit } from './design-audit';
 import { takeOnce } from './practice-helpers';
@@ -24,6 +24,9 @@ screens.push('#/mallard', '#/mallard/challenge', ...MALLARD.calls.map((c) => `#/
 // Phase 13: the great horned owl home, call page, practice page and challenge.
 const gho = GREAT_HORNED_OWL.id;
 screens.push(`#/${gho}`, `#/${gho}/challenge`, ...GREAT_HORNED_OWL.calls.flatMap((c) => [`#/${gho}/call/${c.id}`, `#/${gho}/practice/${c.id}`]));
+// Phase 15: the eastern screech-owl home, challenge ("Coming soon") and call pages (both calls locked).
+const eso = EASTERN_SCREECH_OWL.id;
+screens.push(`#/${eso}`, `#/${eso}/challenge`, ...EASTERN_SCREECH_OWL.calls.map((c) => `#/${eso}/call/${c.id}`));
 
 async function settle(page: Page) {
   await page.locator('main h2').first().waitFor();

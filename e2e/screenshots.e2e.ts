@@ -53,3 +53,12 @@ test('great horned owl pages', async ({ page }) => {
   await expect(page.locator('#call-measure')).toHaveText(/note/);
   await page.screenshot({ path: out('call-great-horned-owl-hoot') });
 });
+
+test('eastern screech-owl pages', async ({ page }) => {
+  await page.goto('#/eastern-screech-owl');
+  await expect(page.locator('.card')).toHaveCount(2);
+  await page.screenshot({ path: out('home-eastern-screech-owl') });
+  await page.goto('#/eastern-screech-owl/call/whinny');
+  await expect(page.locator('main h2').first()).toBeVisible();
+  await page.screenshot({ path: out('call-eastern-screech-owl-whinny') });
+});

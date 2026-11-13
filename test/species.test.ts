@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { extractFeatures, FULL_BAND } from '../src/audio/features';
 import { LivePitch } from '../src/audio/pitch';
 import { OWL_BAND } from '../src/calls/barred-owl';
-import { BARRED_OWL, bestId, callHref, ELK, homeHref, MALLARD, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
+import { BARRED_OWL, bestId, callHref, EASTERN_SCREECH_OWL, ELK, homeHref, MALLARD, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { loadBest, saveBest } from '../src/practice/storage';
 import { tipsFor } from '../src/practice/tips';
@@ -77,14 +77,27 @@ describe('species calls', () => {
     for (const c of BARRED_OWL.calls) for (const p of c.references) expect(p).toMatch(/^audio\/barred-owl\//);
     for (const c of ELK.calls) for (const p of c.references) expect(p).toMatch(/^audio\/elk\//);
   });
-  it('species order and ids: turkey (default), barred owl, elk, mallard, great horned owl', () => {
-    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard', 'great-horned-owl']);
+  it('species order and ids: turkey (default), barred owl, elk, mallard, great horned owl, eastern screech-owl', () => {
+    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard', 'great-horned-owl', 'eastern-screech-owl']);
     expect(ELK.calls.map((c) => [c.id, c.locked])).toEqual([
       ['bugle', true],
       ['glug', true],
       ['cow-mew', true],
       ['calf-call', false],
     ]);
+  });
+  it('eastern screech-owl: owl band, every call cited; both calls locked with no references (Phase 15)', () => {
+    expect(EASTERN_SCREECH_OWL.band).toEqual(OWL_BAND);
+    expect(EASTERN_SCREECH_OWL.calls.map((c) => [c.id, c.locked])).toEqual([
+      ['monotone-trill', true],
+      ['whinny', true],
+    ]);
+    for (const c of EASTERN_SCREECH_OWL.calls) {
+      expect(c.sources.length).toBeGreaterThan(0);
+      expect(c.references).toEqual([]);
+      expect(c.lock?.reason).toBeTruthy();
+    }
+    expect(bestId(EASTERN_SCREECH_OWL, EASTERN_SCREECH_OWL.calls[0])).toBe('eastern-screech-owl.monotone-trill');
   });
   it('mallard: its own band, every call cited; locked calls have no references', () => {
     expect(MALLARD.band).toEqual({ minHz: 1000, maxHz: 4000 });
