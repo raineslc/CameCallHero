@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { fft } from '../src/audio/fft';
 import { extractFeatures, type AudioClip } from '../src/audio/features';
-import { scoreTake, checkTake, combine, compare, compareNotes, noteShapes, type Weights } from '../src/audio/score';
+import {
+  scoreTake,
+  checkTake,
+  combine,
+  compare,
+  compareNotes,
+  noteShapes,
+  partWeights,
+  structureShape,
+  structureSimilarity,
+  type Weights,
+} from '../src/audio/score';
 import { TURKEY_CALLS, callById } from '../src/calls/turkey';
 import { readWav } from './wav';
 
@@ -47,7 +58,13 @@ describe('fft', () => {
 });
 
 describe('score is always finite and within 0-100', () => {
-  const weightSets: Weights[] = [gobble.weights, { rhythm: 1, pitch: 1, tone: 1 }, { rhythm: 0, pitch: 0, tone: 0 }];
+  const weightSets: Weights[] = [
+    gobble.weights,
+    { rhythm: 1, pitch: 1, tone: 1 },
+    { rhythm: 0, pitch: 0, tone: 0 },
+    { rhythm: 3, pitch: 0.5, tone: 2, structure: 3 },
+    { rhythm: 0, pitch: 0, tone: 0, structure: 1 },
+  ];
 
   it('for random input (noise, tones, bursts, NaN, odd sample rates, odd lengths)', () => {
     const r = rng(42);
@@ -225,5 +242,93 @@ describe('per-note rhythm and break', () => {
     expect(compareNotes([], noteShapes(even))).toEqual({ timing: Infinity, fall: Infinity });
     const s = compare(extractFeatures({ samples: new Float32Array(sr), sampleRate: sr }), even);
     for (const v of [s.rhythm, s.pitch, s.tone]) expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('structure (envelope autocorrelation, owl hoots)', () => {
+  const sr = 22050;
+  /** Steady 500 Hz notes [start, end] (s) over quiet noise. */
+  function notes(spans: [number, number][], gain = 0.3): AudioClip {
+    const r = rng(11);
+    const total = spans[spans.length - 1][1] + 0.5;
+    const x = new Float32Array(Math.round(total * sr));
+    for (let i = 0; i < x.length; i++) x[i] = (r() * 2 - 1) * 0.001 * gain;
+    for (const [a, b] of spans)
+      for (let i = Math.round(a * sr); i < Math.round(b * sr); i++) x[i] += gain * Math.sin((2 * Math.PI * 500 * i) / sr);
+    return { samples: x, sampleRate: sr };
+  }
+  // Two identical phrases of four uneven notes, the second starting 1.7 s after the first.
+  const phrase = (t: number): [number, number][] => [[t, t + 0.12], [t + 0.4, t + 0.52], [t + 0.8, t + 0.9], [t + 1.0, t + 1.3]];
+  const twoPhrase = extractFeatures(notes([...phrase(0.4), ...phrase(2.1)]));
+  // Four evenly spaced notes 0.35 s apart: shorter than the phrase window.
+  const even = extractFeatures(notes([0, 1, 2, 3].map((k) => [0.4 + 0.35 * k, 0.52 + 0.35 * k] as [number, number])));
+  const single = extractFeatures(notes([[0.4, 1.2]]));
+
+  it('a repeated phrase scores high on phrase; evenly spaced notes high on notes', () => {
+    const a = structureShape(twoPhrase);
+    const b = structureShape(even);
+    // At a 1.7 s lag only the last 1.2 s of the 2.9 s call overlaps itself, so ~0.4 is the most a
+    // perfect repeat can reach here.
+    expect(a.phrase).toBeGreaterThan(0.35);
+    expect(a.phrase).toBeGreaterThan(a.notes);
+    expect(b.notes).toBeGreaterThan(0.5);
+    expect(b.phrase).toBe(0); // the call is shorter than the phrase window
+    expect(a.notes).toBeLessThan(b.notes);
+  });
+
+  it('a single note and no call give no structure, and every value stays in [0, 1]', () => {
+    expect(structureShape(single).phrase).toBe(0);
+    const none = extractFeatures({ samples: new Float32Array(sr), sampleRate: sr });
+    expect(none.span).toBeNull();
+    expect(structureShape(none)).toEqual({ notes: 0, phrase: 0 });
+    for (const f of [twoPhrase, even, single]) {
+      const s = structureShape(f);
+      for (const v of [s.notes, s.phrase]) {
+        expect(Number.isFinite(v)).toBe(true);
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it('does not depend on level', () => {
+    const loud = structureShape(twoPhrase);
+    const quiet = structureShape(extractFeatures(notes([...phrase(0.4), ...phrase(2.1)], 0.01)));
+    expect(quiet.notes).toBeCloseTo(loud.notes, 2);
+    expect(quiet.phrase).toBeCloseTo(loud.phrase, 2);
+  });
+
+  it('similarity: 100 for the same shape, lower the more they differ, never outside 0..100', () => {
+    const a = structureShape(twoPhrase);
+    const b = structureShape(even);
+    expect(structureSimilarity(a, a)).toBe(100);
+    expect(structureSimilarity(a, b)).toBeLessThan(50);
+    expect(structureSimilarity({ notes: 0, phrase: 0 }, { notes: 0.1, phrase: 0 })).toBeGreaterThan(
+      structureSimilarity({ notes: 0, phrase: 0 }, { notes: 0.5, phrase: 0 }),
+    );
+    expect(structureSimilarity({ notes: NaN, phrase: 0 }, { notes: 0, phrase: 0 })).toBe(0);
+  });
+
+  it('without a structure weight, compare and combine are unchanged (turkey calls)', () => {
+    const w = { rhythm: 2, pitch: 1, tone: 1 };
+    expect(compare(twoPhrase, even, w)).toEqual(compare(twoPhrase, even));
+    expect(compare(twoPhrase, even, { ...w, structure: 0 })).toEqual(compare(twoPhrase, even));
+    expect(partWeights(w)).toEqual(w);
+    const s = { rhythm: 80, pitch: 40, tone: 60 };
+    expect(combine(s, w)).toBeCloseTo((2 * 80 + 40 + 60) / 4, 10);
+  });
+
+  it('with a structure weight, rhythm blends in structure and the total equals four weighted parts', () => {
+    const w = { rhythm: 1, pitch: 1, tone: 1, structure: 3 };
+    const plain = compare(twoPhrase, even);
+    const withS = compare(twoPhrase, even, w);
+    const sim = structureSimilarity(structureShape(twoPhrase), structureShape(even));
+    expect(withS.rhythm).toBeCloseTo(0.25 * plain.rhythm + 0.75 * sim, 6);
+    expect(withS.pitch).toBe(plain.pitch);
+    expect(withS.tone).toBe(plain.tone);
+    expect(partWeights(w)).toEqual({ rhythm: 4, pitch: 1, tone: 1 });
+    expect(combine(withS, w)).toBeCloseTo((plain.rhythm + 3 * sim + plain.pitch + plain.tone) / 6, 6);
+    // The same call scores higher against itself than against a different structure.
+    expect(compare(twoPhrase, twoPhrase, w).rhythm).toBeGreaterThan(withS.rhythm);
   });
 });

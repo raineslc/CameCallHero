@@ -4,14 +4,19 @@
 // each note's high-to-low break (spectral centroid), compared note by note.
 // Rhythm: call length, note count, how much of the call is sound vs gap, and the
 // per-note pattern (note lengths and spacing, aligned note by note).
+// Structure (only for calls whose weights set it, the owl hoots): how evenly the notes repeat
+// and whether a phrase repeats, from the loudness envelope's autocorrelation. It is part of
+// "rhythm" on screen (folded in by its weight), so the app still shows three parts.
 // The take is compared with every reference; the best match counts.
 
-import { extractFeatures, type AudioClip, type Features } from './features';
+import { extractFeatures, HOP_SEC, NOTE_ABOVE_FLOOR_DB, NOTE_BELOW_PEAK_DB, type AudioClip, type Features } from './features';
 
 export interface Weights {
   rhythm: number;
   pitch: number;
   tone: number;
+  /** Weight of the envelope structure (see structureShape). Absent or 0: not used (turkey calls). */
+  structure?: number;
 }
 
 export interface SubScores {
@@ -52,6 +57,16 @@ const PITCH_SHAPE_SCALE = 6; // semitones
 const PITCH_OFFSET_SCALE = 12; // semitones
 const NOTE_TIMING_SCALE = 0.5; // mean |ln ratio| of note length and spacing at which the note pattern falls to 1/e
 export const NOTE_BREAK_SCALE = 4; // mel bands of difference in a note's high-to-low break at which it falls to 1/e
+export const STRUCTURE_SCALE = 0.2; // mean autocorrelation difference at which structure falls to 1/e
+
+/**
+ * Lag windows of the structure feature, in seconds, measured from the owl references
+ * (public/audio/barred-owl/manifest.json notes): ascending-hoot notes start 0.32-0.40 s apart;
+ * the two sets of the two-phrase hoot start 1.56-1.94 s apart. The windows hold those ranges
+ * with room for a slower or faster caller.
+ */
+export const NOTE_LAG_SEC: readonly [number, number] = [0.25, 0.5];
+export const PHRASE_LAG_SEC: readonly [number, number] = [1.2, 2.5];
 
 const clamp100 = (v: number) => (Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0);
 
@@ -220,8 +235,77 @@ export function compareNotes(a: NoteShape[], b: NoteShape[]): { timing: number; 
   return { timing: at(n - 1, m - 1) / steps[n * m - 1], fall: fall / count };
 }
 
-/** Compares two analyzed recordings. Does not apply the take gates (see scoreTake). */
-export function compare(take: Features, ref: Features): SubScores {
+/**
+ * Rhythm structure that note counting misses in echo: notes merge in reverberant
+ * recordings, but the loudness envelope still repeats. Envelope = frame loudness in dB above the
+ * note threshold (so level does not matter) over the call's span; its normalized autocorrelation
+ * (mean removed), highest value in each lag window. 0 when the call is shorter than the window.
+ */
+export interface StructureShape {
+  /** Highest autocorrelation at NOTE_LAG_SEC: high for evenly spaced notes. */
+  notes: number;
+  /** Highest autocorrelation at PHRASE_LAG_SEC: high when a phrase repeats. */
+  phrase: number;
+}
+
+export function structureShape(f: Features): StructureShape {
+  if (!f.span) return { notes: 0, phrase: 0 };
+  const threshold = Math.max(f.noiseFloorDb + NOTE_ABOVE_FLOOR_DB, f.peakDb - NOTE_BELOW_PEAK_DB);
+  const n = f.span.end - f.span.start;
+  const x = new Float64Array(n);
+  let mean = 0;
+  for (let i = 0; i < n; i++) {
+    const v = f.rmsDb[f.span.start + i] - threshold;
+    x[i] = Number.isFinite(v) ? Math.max(0, v) : 0;
+    mean += x[i];
+  }
+  mean /= n;
+  let r0 = 0;
+  for (let i = 0; i < n; i++) {
+    x[i] -= mean;
+    r0 += x[i] * x[i];
+  }
+  const peak = ([lo, hi]: readonly [number, number]) => {
+    let best = 0;
+    if (!(r0 > 0)) return best;
+    for (let lag = Math.round(lo / HOP_SEC); lag <= Math.round(hi / HOP_SEC) && lag < n; lag++) {
+      let r = 0;
+      for (let i = 0; i + lag < n; i++) r += x[i] * x[i + lag];
+      best = Math.max(best, r / r0);
+    }
+    return best;
+  };
+  return { notes: peak(NOTE_LAG_SEC), phrase: peak(PHRASE_LAG_SEC) };
+}
+
+/** 0-100: how alike two structure shapes are. */
+export function structureSimilarity(a: StructureShape, b: StructureShape): number {
+  const d = (Math.abs(a.notes - b.notes) + Math.abs(a.phrase - b.phrase)) / 2;
+  return clamp100(100 * Math.exp(-d / STRUCTURE_SCALE));
+}
+
+/**
+ * Weights of the three parts shown on screen: the structure weight is added to rhythm, whose
+ * sub-score then includes structure in the same proportion (see compare).
+ */
+export function partWeights(w: Weights): { rhythm: number; pitch: number; tone: number } {
+  const s = w.structure ?? 0;
+  return { rhythm: w.rhythm + (s > 0 ? s : 0), pitch: w.pitch, tone: w.tone };
+}
+
+/** Share of the rhythm part that comes from structure, in [0, 1]. */
+function structureShare(w: Weights | undefined): number {
+  const s = w?.structure ?? 0;
+  if (!(s > 0)) return 0;
+  const total = w!.rhythm + s;
+  return total > 0 ? s / total : 0;
+}
+
+/**
+ * Compares two analyzed recordings. Does not apply the take gates (see scoreTake).
+ * With `weights` that set `structure`, rhythm blends in the structure similarity.
+ */
+export function compare(take: Features, ref: Features, weights?: Weights): SubScores {
   if (!take.span || !ref.span) return { rhythm: 0, pitch: 0, tone: 0 };
   const a = take.mel.slice(take.span.start, take.span.end);
   const b = ref.mel.slice(ref.span.start, ref.span.end);
@@ -257,12 +341,16 @@ export function compare(take: Features, ref: Features): SubScores {
   const countSim = ratio(take.notes.length, ref.notes.length);
   const fillSim = 1 - Math.abs(voicedFraction(take) - voicedFraction(ref));
   // Call length gates the rest: a 40 ms click is not a 1 s call, however its notes compare.
-  const rhythm = 100 * Math.sqrt(durSim) * (0.25 * countSim + 0.25 * fillSim + 0.5 * pattern);
+  let rhythm = 100 * Math.sqrt(durSim) * (0.25 * countSim + 0.25 * fillSim + 0.5 * pattern);
+  const share = structureShare(weights);
+  if (share > 0) rhythm = (1 - share) * rhythm + share * structureSimilarity(structureShape(take), structureShape(ref));
 
   return { rhythm: clamp100(rhythm), pitch: clamp100(pitch), tone: clamp100(tone) };
 }
 
-export function combine(s: SubScores, w: Weights): number {
+/** Weighted total of the three parts (rhythm already includes structure, see compare). */
+export function combine(s: SubScores, weights: Weights): number {
+  const w = partWeights(weights);
   const total = w.rhythm + w.pitch + w.tone;
   if (!(total > 0)) return 0;
   return clamp100((w.rhythm * s.rhythm + w.pitch * s.pitch + w.tone * s.tone) / total);
@@ -283,7 +371,7 @@ export function scoreTake(take: AudioClip | Features, references: Features[], we
   if (rejected) return { ...zero, rejected };
   let best: ScoreResult = { ...zero, rejected: null };
   references.forEach((ref, i) => {
-    const s = compare(f, ref);
+    const s = compare(f, ref, weights);
     const score = combine(s, weights);
     if (best.bestReference === -1 || score > best.score) best = { ...s, score, bestReference: i, rejected: null };
   });

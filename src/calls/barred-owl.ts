@@ -12,7 +12,8 @@ import { type CallDef, type Source } from './call';
  * birds (thrushes, chickadees). Loudness, gates and note segmentation do not use the band.
  * Tried on the calibration set: 150-8000, 150-2000, 200-1500 and 250-3000 Hz; 200-1500 Hz
  * gave the inspection call the largest margin (18.3; 15.3 at 150-8000 Hz). No band separated
- * the two hoot series (best margins 4-7). Numbers in docs/STATUS.md.
+ * the two hoot series (best margins 4-7); the structure feature in score.ts does for the
+ * two-phrase hoot. Numbers in docs/STATUS.md.
  */
 export const OWL_BAND: Band = { minHz: 200, maxHz: 1500 };
 
@@ -34,16 +35,15 @@ export const OWL_CALLS: CallDef[] = [
   {
     id: 'two-phrase-hoot',
     name: 'Who cooks for you',
-    locked: true,
-    // 7 clips (public/audio/barred-owl/two-phrase-hoot-1..7.wav) from 4 recordings; no weights
-    // separated them from the ascending hoot by the calibration margin (docs/STATUS.md).
-    lock: {
-      label: 'Coming soon',
-      reason: 'We have 7 recordings of this call, but the scorer cannot yet tell it apart from the ascending hoot, so it cannot be practiced yet.',
-    },
-    references: [],
-    // Best of the same grid search as the hoo-wah (worst-case margin 4.1, below 15); not used while locked.
-    weights: { rhythm: 2, pitch: 0.5, tone: 2.5 },
+    locked: false,
+    // 7 clips (two-phrase-hoot-1..7.wav) from 4 recordings.
+    references: refs('two-phrase-hoot', 7),
+    // Grid search over rhythm/pitch/tone 0.5..3 and structure 0..3 (step 0.5) with OWL_BAND:
+    // best worst-case margin 15.7 (test/calibration-owl.test.ts, docs/STATUS.md). Structure (the
+    // repeated phrase) is what separates it from the ascending hoot; without it the best was 4.1.
+    // shortcut: a narrow pass (4 of 1512 weight sets reach 15, at 15.0-15.7) fitted to 7 clips
+    // from 4 recordings; re-tune with more clips and real takes.
+    weights: { rhythm: 3, pitch: 0.5, tone: 2, structure: 3 },
     // Odom & Mennill: two sets of four syncopated notes, three short and one long; given often
     // in spontaneous calling bouts and when confronting other Barred Owls. BOW: the familiar
     // "Who cooks for you? Who cooks for you-all?".
@@ -58,14 +58,15 @@ export const OWL_CALLS: CallDef[] = [
     name: 'Ascending hoot',
     locked: true,
     // 6 clips (ascending-hoot-1..6.wav, label of -5 uncertain) from 4 recordings; no weights
-    // separated them from the two-phrase hoot by the calibration margin.
+    // separated them from the other owl calls by the calibration margin, with or without structure.
     lock: {
       label: 'Coming soon',
-      reason: 'We have 6 recordings of this call, but the scorer cannot yet tell it apart from "Who cooks for you", so it cannot be practiced yet.',
+      reason: 'We have 6 recordings of this call, but the scorer cannot yet tell it apart from other owl calls, so it cannot be practiced yet.',
     },
     references: [],
-    // Best of the same grid search as the hoo-wah (worst-case margin 4.0, below 15); not used while locked.
-    weights: { rhythm: 2.5, pitch: 2, tone: 2.5 },
+    // Best of the grid search with structure (worst-case margin 13.0, below 15; 4.0 without
+    // structure); not used while locked.
+    weights: { rhythm: 2.5, pitch: 3, tone: 2.5, structure: 2 },
     // BOW: 6-9 regularly spaced, evenly accentuated, ascending syllables, followed by a
     // downwardly inflected "hoo-aw". Odom & Mennill name it as its own call type. Neither
     // excerpt said when owls use it, so the app says so instead of guessing.

@@ -13,8 +13,9 @@ yourself, and get a score for how close you came. Free test build, Android phone
 - **Cut, purr and kee kee run are listed but locked.** Cut and purr: "Recordings needed" (no
   usable free-licensed recordings found yet). Kee kee run: "Coming soon" (4 clips exist, but
   the scorer cannot yet tell it apart from a yelp).
-- **Barred owl: only the hoo-wah can be practiced** (3 clips, 3 recordists). "Who cooks for
-  you" and the ascending hoot are "Coming soon" (the scorer cannot yet tell them apart); the
+- **Barred owl: the hoo-wah (3 clips, 3 recordists) and "Who cooks for you" (7 clips, 4
+  recordings) can be practiced.** "Who cooks for you" passed calibration only narrowly. The
+  ascending hoot is "Coming soon" (the scorer cannot yet tell it apart from other owl calls); the
   caterwaul is a two-owl duet and is not practicable. Pick the species at the top of the
   Calls screen.
 - **Tested platform: Chrome on Android.** Other browsers and iPhone are untested. Even on
