@@ -37,6 +37,33 @@ export function paddedClip(source: string, name: string): string {
   return fileURLToPath(file);
 }
 
+/**
+ * A calling sequence: background for the count-in, then each clip with `pauseSec` of
+ * background between them, then background up to `totalSec` (so the loop does not restart
+ * inside a 20 s challenge take). Background is at the first clip's noise floor.
+ */
+export function sequenceClip(sources: string[], name: string, pauseSec = 1, totalSec = 28): string {
+  const clips = sources.map((s) => readWav(new URL(s, root)));
+  const sr = clips[0].sampleRate;
+  if (clips.some((c) => c.sampleRate !== sr)) throw new Error('clips differ in sample rate');
+  const amp = 10 ** (extractFeatures(clips[0]).noiseFloorDb / 20) * Math.sqrt(3);
+  let seed = 1;
+  const out = Float32Array.from({ length: Math.round(totalSec * sr) }, () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return amp * (2 * (seed / 0x7fffffff) - 1);
+  });
+  let at = Math.round(LEAD_SEC * sr);
+  for (const c of clips) {
+    out.set(c.samples, at);
+    at += c.samples.length + Math.round(pauseSec * sr);
+  }
+  if (at > out.length) throw new Error('sequence longer than totalSec');
+  mkdirSync(outDir, { recursive: true });
+  const file = new URL(name, outDir);
+  writeFileSync(file, encodeWav(out, sr));
+  return fileURLToPath(file);
+}
+
 /** Steady uniform noise at `rmsDb` dBFS, `seconds` long (a mic in a noisy place). */
 export function noiseClip(name: string, rmsDb: number, seconds = 12, sr = 48000): string {
   const amp = 10 ** (rmsDb / 20) * Math.sqrt(3);

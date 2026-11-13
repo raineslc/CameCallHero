@@ -1,6 +1,7 @@
 import './styles/theme.css';
 import { SPECIES } from './calls/species';
 import { backHref, startRouter } from './router';
+import { challengeScreen } from './screens/challenge';
 import { callDetailScreen } from './screens/call-detail';
 import { homeScreen } from './screens/home';
 import { micCheckScreen } from './screens/mic-check';
@@ -29,6 +30,7 @@ startRouter(
     '/mic': micCheckScreen,
     '/call': callDetailScreen,
     '/practice': practiceScreen,
+    '/challenge': challengeScreen,
   },
   '/',
   (route, param) => {

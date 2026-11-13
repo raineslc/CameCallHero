@@ -1,5 +1,54 @@
 # Status
 
+## Phase 9: turkey calling challenge (2026-11-13, [#18](https://github.com/raineslc/GameCallHero/pull/18))
+
+**Owner: please try on the phone**
+1. Calls → Wild turkey → **Calling challenge** → I'm ready. Stay quiet for the 3-2-1, then call a
+   sequence (for example a yelp series, a pause, a gobble), tap Stop. Are the calls split and named
+   sensibly? Does a real yelp/gobble from a person or a box call clear the recognition line?
+2. Enter a name, Save score, pass the phone, and try **Share score card** (on Android Chrome it should
+   open the share sheet with a PNG).
+
+What changed:
+- **Challenge screen** (`#/challenge`, `src/screens/challenge.ts`): free take up to 20 s with Stop,
+  same capture, count-in quiet light, loudness meter and take gates as practice; mic released before
+  scoring; nothing plays while recording.
+- **Split into calls** (`src/challenge/analyze.ts`): notes (the scorer's own note finder) are grouped
+  at pauses of 0.5 s or more. Measured within-call gaps: yelp 0.08–0.28 s, gobble 0.04 s (kee kee run,
+  locked: up to 0.37 s, plus one 1.01 s pause in kee-kee-run-3). Each call is cut out with up to 0.3 s
+  around it and scored against every unlocked turkey call; the best match names it.
+- **Recognition thresholds** (`RECOGNIZE_MIN`): worst wrong sound + 1, measured both as whole clips and
+  through the challenge split: **yelp 40** (worst putt-2 39.6), **gobble 53** (worst putt-4 52.8 — one
+  putt of the series split off by its 0.7 s pauses; as a whole clip it scored only 17.8). Lowest
+  leave-one-out: yelp 62.2, gobble 67.7. `test/challenge.test.ts` recomputes them from the files.
+- **Score** = Σ(recognized score × call length) / Σ(all call lengths); not recognized counts 0, pauses
+  do not count, no bonuses. Stars as practice; ranks by star band: Poult, Jake, Gobbler, Longbeard,
+  Boss gobbler. One next step: the part that cost the most points.
+- **Leaderboard** (`src/challenge/leaderboard.ts`): top 10 in localStorage, validated on every read;
+  names cleaned (control/bidi characters, spaces, 20 characters) and shown as text only. Clear asks first.
+- **Score card** (`src/challenge/card.ts`): 1080×1350 PNG on canvas from theme tokens; Web Share with
+  the file when the browser can share files, else a download. Image only.
+- **Extra rating hook**: documented on `ChallengeResult` (a new field filled after
+  `analyzeChallenge`, shown next to the score, never changing `score`). No code added for it.
+- `extractFeatures` takes an optional `maxSeconds` (the 20 s take is only note-split, no DTW on it).
+
+Verified: unit tests (segmentation, thresholds, formula incl. random/NaN inputs, ranks, next step,
+leaderboard with corrupt/throwing storage); e2e with fake mic: reference yelp + 1 s pause + gobble →
+"Yelp 94", "Gobble 98", score 95; noise and silence rejected; leaderboard entry saved, survives reload,
+cleared; share falls back to download in headless Chromium (PNG checked); design pass on intro,
+recording, results, leaderboard. Screenshots: `docs/screenshots/challenge-*.png`.
+
+Not verified / known limits:
+- Nothing on a real phone (Web Share sheet, real callers, box/slate calls).
+- Thresholds are tight: putts reach 39.6–39.7 as a yelp (line 40). Fitted to few clips.
+- If the background gets louder after the count-in than during it, wrong sounds score higher (with a
+  count-in 10 dB quieter than a putt's background, putts reached 46–60). Same as practice.
+- A yelp series much longer than the references (~2–3 s) scores lower (call length is part of rhythm).
+- Kee kee runs score 50–66 as a yelp, so one may be named "Yelp".
+- A call more than ~20–30 dB quieter than the loudest call in the take is not split out (the scorer's
+  note finder drops notes far below the peak, to ignore background birds and echo). It is left out of
+  the score, not counted as 0 (Codex review on #18; revisit with real phone takes).
+
 ## Phase 8b: separate the owl two-phrase hoot from the ascending hoot (2026-11-13, [#17](https://github.com/raineslc/GameCallHero/pull/17))
 
 **Owner: please check / try**

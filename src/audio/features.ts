@@ -297,11 +297,14 @@ export interface FeatureOptions {
   /** Noise floor measured during the count-in (dBFS). Used instead of the take's own estimate,
    *  which reads the call itself when the take has little background. */
   noiseFloorDb?: number;
+  /** Analysis length cap in seconds; default MAX_SECONDS. Raise it only where no DTW runs on
+   *  the result (the calling challenge finds notes in a 20 s take, then scores short slices). */
+  maxSeconds?: number;
 }
 
 export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Features {
   const sampleRate = Number.isFinite(clip.sampleRate) && clip.sampleRate >= 4000 ? clip.sampleRate : 0;
-  const maxLen = Math.floor(MAX_SECONDS * sampleRate);
+  const maxLen = Math.floor((opts.maxSeconds ?? MAX_SECONDS) * sampleRate);
   const x = new Float64Array(Math.min(clip.samples.length, maxLen));
   let peakSample = 0;
   let run = 0;
