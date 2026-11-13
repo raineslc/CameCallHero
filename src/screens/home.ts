@@ -1,11 +1,12 @@
 // Library home: a species picker, then one compact row per call of the picked species (name,
 // one-line meaning, small spectrogram of the first reference clip or a lock badge
 // ("Recordings needed" / "Coming soon"), and the best practice score saved on this device).
-// The species comes from the route (#/ = wild turkey, #/<species>). Wild turkey also links to
-// the calling challenge.
+// The species comes from the route (#/ = wild turkey, #/<species>). Each species links to its
+// calling challenge, or shows it as "Coming soon" while no call can be recognized.
 
 import { lockInfo } from '../calls/call';
-import { bestId, callHref, DEFAULT_SPECIES, homeHref, SPECIES, speciesById, TURKEY } from '../calls/species';
+import { bestId, callHref, DEFAULT_SPECIES, homeHref, SPECIES, speciesById } from '../calls/species';
+import { challengeHref, scorableCalls } from '../challenge/rules';
 import { loadSpectrogram } from '../library/references';
 import { loadBest } from '../practice/storage';
 import { showSpectrogram } from '../ui/spectrogram';
@@ -21,12 +22,15 @@ export function homeScreen(root: HTMLElement, param = ''): () => void {
     </div>
     <h2>${species.name}</h2>
     ${
-      species === TURKEY
+      scorableCalls(species).length > 0
         ? `<div class="challenge-cta">
-      <p>Who calls best? Record a whole sequence and get rated against wild turkeys.</p>
-      <a class="btn primary" href="#/challenge">Calling challenge</a>
+      <p>Who calls best? Record a whole sequence and get rated against wild ${species.nounPlural}.</p>
+      <a class="btn primary" href="${challengeHref(species)}">Calling challenge</a>
     </div>`
-        : ''
+        : `<div class="challenge-cta" id="challenge-soon">
+      <p>Calling challenge: <span class="badge">Coming soon</span></p>
+      <p class="muted">It opens once the app can recognize a ${species.noun} call.</p>
+    </div>`
     }
     <ul class="cards">
       ${species.calls

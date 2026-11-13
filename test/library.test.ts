@@ -86,3 +86,13 @@ describe('backHref', () => {
     expect(backHref('/practice', '')).toBe('#/');
   });
 });
+
+describe('challenge routes (Phase 10)', () => {
+  const routes = { '/': 1, '/challenge': 1 };
+  it('#/challenge is turkey, #/<species>/challenge carries the species; back goes to that species home', () => {
+    expect(matchRoute('/challenge', routes, '/', ['barred-owl'])).toEqual(['/challenge', '']);
+    expect(matchRoute('/barred-owl/challenge', routes, '/', ['barred-owl'])).toEqual(['/challenge', 'barred-owl']);
+    expect(backHref('/challenge', '')).toBe('#/');
+    expect(backHref('/challenge', 'barred-owl')).toBe('#/barred-owl');
+  });
+});

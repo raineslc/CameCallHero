@@ -4,10 +4,15 @@
 // the board is not remembered. Names are plain text: shown with textContent and drawn on a
 // canvas, never parsed as HTML.
 
+import { DEFAULT_SPECIES, type Species } from '../calls/species';
+
 type Store = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
-/** Same prefix as the practice storage (src/practice/storage.ts). */
+/** Same prefix as the practice storage (src/practice/storage.ts). The turkey board's key (Phase 9). */
 export const BOARD_KEY = 'camecallhero.challenge.board';
+
+/** One board per species: turkey keeps BOARD_KEY so boards saved before Phase 10 survive; others add the species id. */
+export const boardKey = (s: Species): string => (s === DEFAULT_SPECIES ? BOARD_KEY : `${BOARD_KEY}.${s.id}`);
 export const BOARD_SIZE = 10;
 export const NAME_MAX = 20;
 
@@ -56,9 +61,9 @@ function valid(e: unknown): BoardEntry | null {
 /** Highest score first; equal scores keep their order (the earlier entry stays ahead). */
 const sortBoard = (b: BoardEntry[]) => b.map((e, i) => [e, i] as const).sort((x, y) => y[0].score - x[0].score || x[1] - y[1]).map(([e]) => e);
 
-export function loadBoard(store: Store | null = defaultStore()): BoardEntry[] {
+export function loadBoard(store: Store | null = defaultStore(), key = BOARD_KEY): BoardEntry[] {
   try {
-    const raw = store?.getItem(BOARD_KEY);
+    const raw = store?.getItem(key);
     if (!raw) return [];
     const data: unknown = JSON.parse(raw);
     if (!Array.isArray(data)) return [];
@@ -77,16 +82,16 @@ export interface AddResult {
 }
 
 /** Adds a score. Returns null if the name is empty after cleaning or the score is not 0-100. */
-export function addEntry(name: string, score: number, date = today(), store: Store | null = defaultStore()): AddResult | null {
+export function addEntry(name: string, score: number, date = today(), store: Store | null = defaultStore(), key = BOARD_KEY): AddResult | null {
   const entry = valid({ name, score, date });
   if (!entry) return null;
-  const old = loadBoard(store);
+  const old = loadBoard(store, key);
   const board = sortBoard([...old, entry]).slice(0, BOARD_SIZE);
   const place = board.indexOf(entry);
   let saved = false;
   try {
     if (store) {
-      store.setItem(BOARD_KEY, JSON.stringify(board));
+      store.setItem(key, JSON.stringify(board));
       saved = true;
     }
   } catch {
@@ -96,10 +101,10 @@ export function addEntry(name: string, score: number, date = today(), store: Sto
 }
 
 /** Removes every entry. Returns false if the browser would not. */
-export function clearBoard(store: Store | null = defaultStore()): boolean {
+export function clearBoard(store: Store | null = defaultStore(), key = BOARD_KEY): boolean {
   try {
     if (!store) return false;
-    store.removeItem(BOARD_KEY);
+    store.removeItem(key);
     return true;
   } catch {
     return false;

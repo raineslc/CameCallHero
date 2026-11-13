@@ -1,20 +1,24 @@
-// Calling challenge (wild turkey): one free take of up to 20 s that can hold a whole sequence
-// of calls. Ready → 3-2-1 count-in (noise floor, quiet light) → record with the loudness meter
-// until Stop or 20 s → the take is split into calls and scored (src/challenge/analyze.ts) →
+// Calling challenge, one per species (#/challenge for wild turkey, #/<species>/challenge): one
+// free take of up to 20 s that can hold a whole sequence of calls. Ready → 3-2-1 count-in
+// (noise floor, quiet light) → record with the loudness meter until Stop or 20 s → the take is split into calls and scored (src/challenge/analyze.ts) →
 // results (timeline, score, stars, rank, next step, Play yours) → save to the pass-the-phone
 // leaderboard and share a score card image. The mic is opened per take and released before
 // scoring. The take stays in memory for "Play yours" and is dropped on the next take or when
-// leaving. Nothing plays while the mic records, and no audio leaves the device.
+// leaving. Nothing plays while the mic records, and no audio leaves the device. Split gap,
+// thresholds and rank titles come from src/challenge/rules.ts; a species with no call the
+// challenge can recognize shows "Coming soon".
 
 import { classifyMicError, startCapture, type Capture } from '../audio/capture';
 import { extractFeatures, LiveFloor } from '../audio/features';
 import { quietCheck } from '../audio/meter';
 import { chunkFrameDb, chunkLevel, TakeRecorder } from '../audio/monitor';
-import { analyzeChallenge, CHALLENGE_SECONDS, nextStep, RECOGNIZE_MIN, SEGMENT_GAP_SEC, type CallRefs, type ChallengeResult } from '../challenge/analyze';
+import { analyzeChallenge, CHALLENGE_SECONDS, nextStep, type CallRefs, type ChallengeResult } from '../challenge/analyze';
 import { CARD_FILE, cardBlob, drawCard, shareCard } from '../challenge/card';
-import { addEntry, BOARD_SIZE, cleanName, clearBoard, loadBoard, NAME_MAX, today, type BoardEntry } from '../challenge/leaderboard';
-import { practiceHref, TURKEY } from '../calls/species';
+import { addEntry, BOARD_SIZE, boardKey, cleanName, clearBoard, loadBoard, NAME_MAX, today, type BoardEntry } from '../challenge/leaderboard';
+import { challengeRules, scorableCalls } from '../challenge/rules';
+import { DEFAULT_SPECIES, homeHref, practiceHref, speciesById } from '../calls/species';
 import { loadFeatures } from '../library/references';
+import { STAR_BANDS } from '../practice/hits';
 import { COUNT_IN_SEC } from '../practice/plan';
 import { LevelMeter } from '../ui/meter';
 
@@ -29,21 +33,40 @@ const COUNT_TEXT = ['Call now', '1', '2', '3'];
 /** "a, b and c" */
 const listText = (items: string[]) => (items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
 
-export function challengeScreen(root: HTMLElement): () => void {
-  const species = TURKEY;
-  const scorable = species.calls.filter((c) => !c.locked && c.references.length > 0 && RECOGNIZE_MIN[c.id] !== undefined);
+const capital = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+
+export function challengeScreen(root: HTMLElement, param = ''): () => void {
+  const species = param ? speciesById(param) : DEFAULT_SPECIES;
+  if (!species) {
+    root.innerHTML = `<h2>Calling challenge</h2><p>There is no such species here.</p><div class="actions"><a class="btn" href="#/">Calls</a></div>`;
+    return () => undefined;
+  }
+  const rules = challengeRules(species);
+  const scorable = scorableCalls(species);
+  if (!rules || scorable.length === 0) {
+    root.innerHTML = `
+      <h2>Calling challenge</h2>
+      <p><span class="badge">Coming soon</span></p>
+      <p id="challenge-soon">The ${species.noun} calling challenge opens once the app can recognize at least one ${species.noun} call.</p>
+      <div class="actions"><a class="btn" href="${homeHref(species)}">${species.name} calls</a></div>`;
+    return () => undefined;
+  }
   const locked = species.calls.filter((c) => !scorable.includes(c));
   const callNames = listText(scorable.map((c) => c.name.toLowerCase()));
   const lockedNames = listText(locked.map((c) => c.name.toLowerCase()));
-  const thresholds = listText(scorable.map((c) => `${c.name.toLowerCase()} ${RECOGNIZE_MIN[c.id]} or more`));
+  const thresholds = listText(scorable.map((c) => `${c.name.toLowerCase()} ${rules.recognizeMin[c.id]} or more`));
+  const rankBands = rules.ranks.map((t, i) => (i === 0 ? `${t} under ${STAR_BANDS[1]}` : i === rules.ranks.length - 1 ? `${t} ${STAR_BANDS[i]} and up` : `${t} ${STAR_BANDS[i]}`)).join(', ');
+  const key = boardKey(species);
+  const title = `${capital(species.noun)} calling challenge`;
 
   root.innerHTML = `
     <h2>Calling challenge</h2>
     <p class="error" id="challenge-error" role="alert" hidden></p>
 
     <section id="challenge-intro">
-      <p>Make your best turkey calling: one call or a whole sequence, up to ${CHALLENGE_SECONDS} seconds.
-        Each call is rated against recordings of wild turkeys. Then pass the phone.</p>
+      <p>Make your best ${species.noun} calling: one call or a whole sequence, up to ${CHALLENGE_SECONDS} seconds.
+        Each call is rated against recordings of wild ${species.nounPlural}. Then pass the phone.</p>
       <div class="actions">
         <button type="button" class="btn primary" id="challenge-ready" disabled>I'm ready</button>
       </div>
@@ -118,12 +141,12 @@ export function challengeScreen(root: HTMLElement): () => void {
     <section class="help" id="challenge-help" aria-labelledby="challenge-help-title">
       <h3 id="challenge-help-title">How the score works</h3>
       <ul>
-        <li>Your take is split into calls wherever you pause for ${SEGMENT_GAP_SEC} s or more.</li>
-        <li>Each call is compared with recordings of wild turkeys for every call the app can score (${callNames}), with the same scorer as practice. The best match names it.</li>
-        <li>A call counts as recognized when it scores higher than any wrong sound did in our tests (putts, noise, the other call): ${thresholds}. Otherwise it shows as Not recognized.</li>
+        <li>Your take is split into calls wherever you pause for ${rules.gapSec} s or more.</li>
+        <li>Each call is compared with recordings of wild ${species.nounPlural} for every call the app can score (${callNames}), with the same scorer as practice. The best match names it.</li>
+        <li>A call counts as recognized when it scores higher than any wrong sound did in our tests (noise, other ${species.noun} sounds, the other calls): ${thresholds}. Otherwise it shows as Not recognized.</li>
         <li>Score = the average of the recognized calls' scores, weighted by how long each call lasts. Time spent on calls that were not recognized counts as 0. Pauses do not count. Example: a 3 s yelp scoring 80 and a 1 s sound that was not recognized give 80 × 3 / 4 = 60.</li>
-        <li>Stars and rank go by the score: Poult under 20, Jake 20, Gobbler 40, Longbeard 60, Boss gobbler 80 and up.</li>
-        <li>${lockedNames.charAt(0).toUpperCase()}${lockedNames.slice(1)} cannot be recognized yet.</li>
+        <li>Stars and rank go by the score: ${rankBands}. The rank titles are just names.</li>
+        ${locked.length ? `<li>${capital(lockedNames)} cannot be recognized yet.</li>` : ''}
         <li>Scores and names stay on this phone. The score card is a picture only, with no sound.</li>
       </ul>
     </section>
@@ -151,7 +174,10 @@ export function challengeScreen(root: HTMLElement): () => void {
   const cardCanvas = $<HTMLCanvasElement>('challenge-card');
   const meter = new LevelMeter('challenge-meter');
   $('challenge-meter-slot').replaceWith(meter.el);
-  $('challenge-locked').textContent = `${lockedNames.charAt(0).toUpperCase()}${lockedNames.slice(1)} cannot be recognized yet: they show as Not recognized. A kee kee run may show as a yelp.`;
+  $('challenge-locked').textContent = [
+    locked.length ? `${capital(lockedNames)} cannot be recognized yet: ${locked.length === 1 ? 'it shows' : 'they show'} as Not recognized.` : '',
+    rules.note ?? '',
+  ].filter(Boolean).join(' ');
 
   let alive = true;
   let calls: CallRefs[] = [];
@@ -205,19 +231,19 @@ export function challengeScreen(root: HTMLElement): () => void {
     $('challenge-confirm').hidden = true;
     $('challenge-clear').hidden = false;
   };
-  renderBoard(loadBoard());
+  renderBoard(loadBoard(undefined, key));
   $('challenge-clear').addEventListener('click', () => {
     $('challenge-clear').hidden = true;
     $('challenge-confirm').hidden = false;
     $('challenge-clear-no').focus();
   });
   $('challenge-clear-no').addEventListener('click', () => {
-    renderBoard(loadBoard());
+    renderBoard(loadBoard(undefined, key));
     $('challenge-clear').focus();
   });
   $('challenge-clear-yes').addEventListener('click', () => {
-    if (!clearBoard()) showError('This browser would not clear the leaderboard.');
-    renderBoard(loadBoard());
+    if (!clearBoard(undefined, key)) showError('This browser would not clear the leaderboard.');
+    renderBoard(loadBoard(undefined, key));
   });
 
   saveForm.addEventListener('submit', (e) => {
@@ -229,7 +255,7 @@ export function challengeScreen(root: HTMLElement): () => void {
       nameInput.focus();
       return;
     }
-    const added = addEntry(name, result.score);
+    const added = addEntry(name, result.score, today(), undefined, key);
     if (!added) {
       saveStatus.textContent = 'Could not save this score.';
       return;
@@ -256,11 +282,11 @@ export function challengeScreen(root: HTMLElement): () => void {
     shareBtn.disabled = true;
     shareStatus.textContent = 'Making the card…';
     try {
-      await drawCard(cardCanvas, { name, date: today(), result });
+      await drawCard(cardCanvas, { title, name, date: today(), result });
       if (!alive) return;
       cardCanvas.hidden = false;
       cardCanvas.setAttribute('aria-label', `Score card: ${name}, ${Math.round(result.score)} of 100, ${result.stars} of ${STARS} stars, rank ${result.rank}`);
-      const how = await shareCard(await cardBlob(cardCanvas), `${name} scored ${Math.round(result.score)} in the Game Call Hero turkey calling challenge.`);
+      const how = await shareCard(await cardBlob(cardCanvas), `${name} scored ${Math.round(result.score)} in the Game Call Hero ${species.noun} calling challenge.`);
       if (!alive) return;
       shareStatus.textContent =
         how === 'shared' ? 'Shared.' : how === 'downloaded' ? `Saved the card as an image (${CARD_FILE}).` : 'Not shared.';
@@ -431,7 +457,7 @@ export function challengeScreen(root: HTMLElement): () => void {
       if (!alive || id !== takeId) return;
       const take = all.slice(start);
       lastTake = { samples: take, rate: sr };
-      showResult(analyzeChallenge({ samples: take, sampleRate: sr }, calls, floor, species.band));
+      showResult(analyzeChallenge({ samples: take, sampleRate: sr }, calls, floor, species.band, rules));
     }, 30);
   };
 

@@ -1,5 +1,50 @@
 # Status
 
+## Phase 10: calling challenge for every species (2026-11-13, PR link below)
+
+**Owner: please try on the phone**
+1. Calls → **Barred owl** → **Calling challenge** → I'm ready. Stay quiet for the 3-2-1, then make a
+   "who cooks for you" (both phrases), pause **2 s or more**, then a hoo-wah; tap Stop. Are both named
+   and recognized? Owl calls closer together than 1.3 s are scored as one call.
+2. Check the turkey challenge still has your saved scores (its leaderboard key is unchanged).
+
+What changed:
+- **Challenge for any species**: `#/<species>/challenge` (turkey keeps `#/challenge`), entry on every
+  species home. A species with no call the challenge can recognize shows "Coming soon" (home and route).
+- **Per-species data, no per-species code**: `src/challenge/rules.ts` holds each species' split gap,
+  recognition thresholds, rank titles (and optional notes). `test/challenge.test.ts` runs the Phase 9
+  measurements for every species with unlocked calls and fails, printing the values, if an entry is
+  missing or drifts. Adding a species to the challenge = one data entry.
+- **Split gap rule**: longest pause between notes inside any unlocked reference × 1.8 (Phase 9's room
+  for a slower caller), rounded to 0.1 s. Turkey 0.28 s (yelp-3) → **0.5 s** (unchanged). Barred owl
+  0.70 s (two-phrase-hoot-7, the pause between the two phrases) → **1.3 s**.
+- **Thresholds** (worst wrong sound + 1, whole clips and through the split; wrong sounds = junk,
+  `test/fixtures/<species>-other`, the species' locked-call recordings, the other unlocked calls):
+  - Turkey (unchanged): yelp **40** (putt-2 39.6), gobble **53** (putt-4 52.8). Kee kee run left out
+    (ends in a yelp). Lowest leave-one-out: 62.2 / 67.7.
+  - Barred owl: who cooks for you **48** (ascending-hoot-5 47.0), hoo-wah **52** (two-phrase-hoot-2
+    51.2). Lowest leave-one-out: 62.8 / 69.4.
+- **Rank titles**: turkey keeps Poult/Jake/Gobbler/Longbeard/Boss gobbler. Owl: Night listener, Hoot
+  rookie, Night caller, Moon hooter, Who-cooker supreme (made-up names; the help says rank titles are
+  just names).
+- **Leaderboard per species**: turkey keeps `camecallhero.challenge.board`; others
+  `camecallhero.challenge.board.<species>`. Score card title and share text name the species.
+- Back button from a species' challenge goes to that species' home.
+- `docs/ROADMAP.md`: Phases 10-15 and candidate species (linked from `docs/PLAN.md`).
+
+Verified: unit tests (gap and thresholds recomputed per species; owl take hoot + 2 s + hoo-wah →
+both recognized 99.9 / 98.7; an ascending hoot between them is Not recognized and lowers the score;
+per-species boards; routes); e2e with fake mic: owl hoot + hoo-wah → "Who cooks for you 98",
+"Hoo-wah 99", saved to the owl board, turkey board stays empty; turkey challenge e2e unchanged;
+a11y pass on `#/barred-owl/challenge`; full e2e suite.
+
+Not verified / known limits:
+- Nothing on a real phone (real owl callers, by voice or call).
+- Owl thresholds fitted to few clips (7 + 3 references, 4 recordings for the hoot). The hoo-wah line
+  (52) is set by a two-phrase hoot scored as a hoo-wah.
+- Two owl calls less than 1.3 s apart merge into one call and score lower.
+- The "Coming soon" state is covered by a unit test only: no species without unlocked calls exists yet.
+
 ## Phase 9: turkey calling challenge (2026-11-13, [#18](https://github.com/raineslc/GameCallHero/pull/18))
 
 **Owner: please try on the phone**

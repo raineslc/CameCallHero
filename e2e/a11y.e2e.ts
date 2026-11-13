@@ -14,6 +14,8 @@ const screens = ['', '#/mic', ...TURKEY_CALLS.map((c) => `#/call/${c.id}`), ...T
 // Phase 8: the barred owl home, call pages and practice pages.
 // Phase 9: the calling challenge (intro and leaderboard; results are checked in challenge.e2e.ts).
 screens.push('#/challenge');
+// Phase 10: the owl calling challenge.
+screens.push('#/barred-owl/challenge');
 screens.push('#/barred-owl', ...BARRED_OWL.calls.flatMap((c) => [`#/barred-owl/call/${c.id}`, `#/barred-owl/practice/${c.id}`]));
 
 async function settle(page: Page) {

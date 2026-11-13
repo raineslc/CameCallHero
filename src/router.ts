@@ -24,8 +24,8 @@ export function matchRoute(path: string, routes: Record<string, unknown>, fallba
 }
 
 /**
- * Where the header's back button goes from a route: practice → its call, other inner screens →
- * home (the scope's home for a scoped param such as 'barred-owl/x'), home → none.
+ * Where the header's back button goes from a route: practice → its call, a species' challenge →
+ * its home, other inner screens → home (the scope's home for a scoped param such as 'barred-owl/x'), home → none.
  */
 export function backHref(route: string, param: string): string | null {
   if (route === '/') return null;
@@ -33,6 +33,8 @@ export function backHref(route: string, param: string): string | null {
   const scope = slash < 0 ? '' : param.slice(0, slash);
   if (route === '/practice' && param) return scope ? `#/${scope}/call/${param.slice(slash + 1)}` : `#/call/${param}`;
   if (route === '/call' && scope) return `#/${scope}`;
+  // The challenge param is the species id ('' for turkey): back to that species' home.
+  if (route === '/challenge' && param) return `#/${param}`;
   return '#/';
 }
 
