@@ -299,6 +299,8 @@ describe('next step', () => {
     expect(nextStep(tips, scores, levels, { rhythm: 1, pitch: 1, tone: 1 })).toBe('Copy the sound of the turkey, not just the timing');
     // Rhythm weighted 3 (yelp): 3 x 10 > 1 x 20.
     expect(nextStep(tips, scores, levels, { rhythm: 3, pitch: 0.5, tone: 1 })).toBe('Copy when each note starts and how long it lasts');
+    // Structure is part of rhythm on screen, so its weight counts for rhythm: (1 + 2) x 10 > 1 x 20.
+    expect(nextStep(tips, scores, levels, { rhythm: 1, pitch: 1, tone: 1, structure: 2 })).toBe('Copy when each note starts and how long it lasts');
   });
 
   it('without reference levels, uses the gap to 100', () => {

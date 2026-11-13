@@ -53,7 +53,7 @@ export const MAX_HZ = 8000;
 const SILENT_DB = -120;
 /** Notes: frames louder than max(noise floor + NOTE_ABOVE_FLOOR_DB, peak - NOTE_BELOW_PEAK_DB). */
 export const NOTE_ABOVE_FLOOR_DB = 10;
-const NOTE_BELOW_PEAK_DB = 30;
+export const NOTE_BELOW_PEAK_DB = 30;
 /** Gaps shorter than this many frames are bridged; notes shorter than MIN_NOTE_FRAMES dropped. */
 const MAX_GAP_FRAMES = 3;
 const MIN_NOTE_FRAMES = 2;

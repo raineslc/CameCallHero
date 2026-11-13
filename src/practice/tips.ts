@@ -6,7 +6,7 @@
 // "semitones" or "frequency" in the text (a unit test checks this).
 
 import type { Features } from '../audio/features';
-import { NOTE_BREAK_SCALE, noteShapes, scoreTake, type SubScores, type Weights } from '../audio/score';
+import { NOTE_BREAK_SCALE, noteShapes, partWeights, scoreTake, type SubScores, type Weights } from '../audio/score';
 import { spanSeconds } from './plan';
 
 export type Part = keyof SubScores;
@@ -189,9 +189,10 @@ export const SAME_AGAIN = 'Do it again the same way';
  * take matched the references on every part.
  */
 export function nextStep(tips: Tip[], scores: SubScores, levels: SubScores | null, weights: Weights): string {
+  const w = partWeights(weights);
   const cost = (p: Part) => {
     const gap = levels ? Math.max(0, levels[p] - scores[p]) : 100 - scores[p];
-    return weights[p] * (Number.isFinite(gap) ? gap : 0);
+    return w[p] * (Number.isFinite(gap) ? gap : 0);
   };
   const ranked = tips.filter((t) => t.action !== null).sort((a, b) => cost(b.part) - cost(a.part));
   return ranked[0]?.action ?? SAME_AGAIN;

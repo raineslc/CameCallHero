@@ -1,5 +1,87 @@
 # Status
 
+## Phase 8b: separate the owl two-phrase hoot from the ascending hoot (2026-11-13, [#17](https://github.com/raineslc/GameCallHero/pull/17))
+
+**Owner: please check / try**
+1. **On the phone**: Calls → **Barred owl** → **Who cooks for you** → Practice. Make the full call
+   (two sets of four hoots, ~3 s). Is the score sensible? Does an ascending series of even hoots,
+   or a single hoo-wah, score clearly lower?
+2. The pass is narrow (see below). If real takes score oddly, relocking it is a one-line change
+   in `src/calls/barred-owl.ts` (`locked: true`, `references: []`).
+
+Gate: one owl hoot call unlocked (two-phrase hoot); the ascending hoot stays locked.
+
+What changed:
+- **New structure feature** (`structureShape`, `structureSimilarity` in `src/audio/score.ts`):
+  the loudness envelope of the call (dB above the note threshold, so level does not matter),
+  its normalized autocorrelation, and the highest value in two lag windows: 0.25–0.5 s (even
+  note spacing) and 1.2–2.5 s (a repeated phrase). Windows come from the reference
+  measurements in the manifest: ascending-hoot notes start 0.32–0.40 s apart; the two sets of
+  the two-phrase hoot start 1.56–1.94 s apart. Similarity = 100·exp(−mean |difference| / 0.2);
+  0.2 was set before the grid search and not tuned.
+- **Weights get an optional `structure`.** Absent or 0 (all turkey calls, hoo-wah): nothing
+  changes. Otherwise it is folded into rhythm ("Timing & notes" on screen): rhythm becomes
+  (r·rhythm + s·structure)/(r+s) and its weight r+s, so the total equals four weighted parts and
+  the screen still shows three. `nextStep` uses the same part weights (`partWeights`).
+- **Who cooks for you unlocked**: weights rhythm 3 / pitch 0.5 / tone 2 / structure 3, the 7
+  manifest clips as references. Ascending hoot lock reason now says "other owl calls" (its worst
+  negatives are the two-phrase hoot and caterwaul-1, not only the two-phrase hoot).
+- Unit tests for the feature (repeat vs even spacing, single note, no call, level, range, NaN,
+  unchanged scores without a structure weight, the four-part total); random-input range test
+  includes structure weights. New e2e `e2e/practice-owl-hoot.e2e.ts`: fake mic plays two-phrase
+  hoot 1, scored 89.7, saved under the owl key.
+
+### Calibration (same rules: margin 15, leave-one-out, matrix rule, all negatives incl. turkey and junk)
+
+| Call | Weights (r/p/t/s) | Worst-case margin | Before (Phase 8) | Result |
+|---|---|---|---|---|
+| Who cooks for you (two-phrase hoot) | 3 / 0.5 / 2 / 3 | **15.7** (leave-one-out 15.9, matrix 15.7) | 4.1 | **unlocked** |
+| Ascending hoot | 2.5 / 3 / 2.5 / 2 | 13.0 (matrix 13.0) | 4.0 | locked, "Coming soon" |
+| Hoo-wah | 1 / 2.5 / 1.5 / – | 18.3 (unchanged) | 18.3 | unlocked |
+| Caterwaul | 0.5 / 0.5 / 3 / – | -39.2 (unchanged) | -39.2 | locked |
+
+**The two-phrase pass is narrow**: of 1512 weight sets (r/p/t 0.5..3, s 0..3, step 0.5) only 4
+reach 15 (15.0, 15.3, 15.6, 15.7), all with pitch 0.5 and rhythm 2.5–3. Fitted to 7 clips from 4
+recordings. Worst negatives: kee-kee-run-4 (turkey, 49.0) and, for clip 7, the tone sweep (45.9).
+Lowest leave-one-out scores: clip 7 (62.8), clips 5/6 (64.9).
+
+Ascending hoot: worst negative two-phrase-hoot-7 (53.4) for clips 1–4 and 6, caterwaul-1 (53.4) for
+clip 5. two-phrase-hoot-7 has the most even note spacing of the two-phrase clips (envelope
+autocorrelation 0.34 at the note lag vs 0.01–0.24 for the others), and caterwaul-1 has a run of
+evenly spaced notes 0.36 s apart.
+
+Owl confusion matrix (mean score; own row leave-one-out):
+
+| take \ target | two-phrase | ascending | hoo-wah | caterwaul |
+|---|---|---|---|---|
+| two-phrase hoot | **70.6** | 50.9 | 48.3 | 33.6 |
+| ascending hoot | 44.0 | **67.6** | 44.8 | 35.0 |
+| hoo-wah | 37.6 | 40.6 | **81.2** | 29.5 |
+| caterwaul | 27.6 | 33.7 | 21.7 | 24.3 |
+
+What was tried (measured on the references, best worst-case margins two-phrase / ascending):
+- **Phrase segmentation by gaps**: not used. Echo merges notes (two-phrase-hoot-5/6 come out as
+  3 notes); the largest-to-median gap ratio overlaps between the calls (two-phrase 1.0–3.5,
+  ascending 1.1–3.2 with the scorer's notes; 1.68–6.0 vs 1.05–1.61 at a −15 dB threshold, where
+  two-phrase-hoot-3 at 1.68 is still close to ascending-hoot-2 at 1.61).
+- **Pitch rise across notes**: not used. With the scorer's dominant frequency (43 Hz bins) the
+  slope over the notes is negative for ascending-hoot-3/4 (their faint first notes read at
+  600–690 Hz) and positive for some two-phrase clips; the mel spectral centroid per note did not
+  show the rise either. The manifest's measured rises (e.g. 409 → 538 Hz) need a finer pitch
+  measure than the scorer has.
+- **Envelope autocorrelation, two peak values** (kept): blended into rhythm with r/p/t 0.5..3 and
+  structure share 0–1: 14.8 / 12.9; as its own weight 0..3: **15.7 / 13.0**.
+- **Envelope autocorrelation, whole curve** (lags 0.1–2.5 s, mean |difference|): 6.1 / 5.6.
+- Margin, negatives, leave-one-out and the matrix rule are unchanged; turkey calibration output
+  is byte-identical to `main` (diffed, 55 lines).
+
+Next for the ascending hoot: more clips (especially two-phrase clips with clearly uneven spacing
+and more ascending series), or a finer pitch measure for the rise across notes.
+
+Verified: `npm ci && npm test` (236 unit tests), `npm run build`, `npm run e2e` (59 passed, 3
+skipped). Not verified: anything on a real phone; a human "who cooks for you" (only recorded
+owls were scored).
+
 ## Phase 8: multi-species app and barred owl calls (2026-11-13, [#16](https://github.com/raineslc/GameCallHero/pull/16))
 
 **Owner: please check / try**
