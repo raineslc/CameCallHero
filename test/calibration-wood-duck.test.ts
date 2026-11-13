@@ -1,10 +1,10 @@
 // Calibration of the wood duck calls (Phase 14), same rules as test/calibration-mallard.test.ts:
 // leave-one-out over each call's references must beat every negative by MARGIN points, and the
 // matrix rule (lowest same-call score minus highest score of another wood duck call's clip) must
-// also reach MARGIN. Negatives: the other wood duck calls, every turkey, barred owl, elk and mallard
-// reference (locked calls included), the turkey wrong-call fixtures and the junk clips. Every clip
-// is analyzed in the wood duck band, as the app does for a wood duck take. Clips come from the
-// manifest, so locked calls (no references in the app) are measured too.
+// also reach MARGIN. Negatives: the other wood duck calls, every turkey, barred owl, elk, mallard
+// and great horned owl reference (locked calls included), the turkey wrong-call fixtures and the
+// junk clips. Every clip is analyzed in the wood duck band, as the app does for a wood duck take.
+// Clips come from the manifest, so locked calls (no references in the app) are measured too.
 
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -39,6 +39,7 @@ const otherSpecies: Clip[] = [
   ...species('public/audio/barred-owl', 'owl'),
   ...species('public/audio/elk', 'elk'),
   ...species('public/audio/mallard', 'mallard'),
+  ...species('public/audio/great-horned-owl', 'great-horned-owl'),
   ...species('test/fixtures/turkey-other', 'other'),
   ...species('test/fixtures/junk', 'other'),
 ];
