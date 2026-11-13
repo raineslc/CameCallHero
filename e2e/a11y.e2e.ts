@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BARRED_OWL, ELK } from '../src/calls/species';
+import { BARRED_OWL, ELK, MALLARD } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { audit } from './design-audit';
 import { takeOnce } from './practice-helpers';
@@ -17,8 +17,10 @@ screens.push('#/challenge');
 // Phase 10: the owl calling challenge.
 screens.push('#/barred-owl/challenge');
 screens.push('#/barred-owl', ...BARRED_OWL.calls.flatMap((c) => [`#/barred-owl/call/${c.id}`, `#/barred-owl/practice/${c.id}`]));
-// Phase 12: the elk home (three species in the picker), call pages and practice pages.
+// Phase 12: the elk home, call pages and practice pages.
 screens.push('#/elk', '#/elk/challenge', ...ELK.calls.flatMap((c) => [`#/elk/call/${c.id}`, `#/elk/practice/${c.id}`]));
+// Phase 11: the mallard home and call pages (all mallard calls are locked, so no practice pages).
+screens.push('#/mallard', '#/mallard/challenge', ...MALLARD.calls.map((c) => `#/mallard/call/${c.id}`));
 
 async function settle(page: Page) {
   await page.locator('main h2').first().waitFor();

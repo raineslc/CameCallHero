@@ -1,7 +1,8 @@
 # Attribution
 
 Audio used in Game Call Hero. Machine-readable source of truth:
-`public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json` and `public/audio/elk/manifest.json` (trim times, quality notes),
+`public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json`, `public/audio/elk/manifest.json` and
+`public/audio/mallard/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings
@@ -112,6 +113,45 @@ Machine-readable details, measurements and cited call definitions: `public/audio
 
 Bugle, glug, cow mew and calf call were classified by measurement against the NPS descriptions
 (notes in the manifest), not confirmed by the recordists or an expert; the cow mews are uncertain.
+
+## Mallard reference recordings
+
+Wild mallards (*Anas platyrhynchos*) from xeno-canto; every recording's page says no playback was
+used, and none mentions a domestic, farm, captive, park or fed bird (mallards hybridise with
+domestic ducks). All clips were trimmed from the original and converted to mono 44.1 kHz 16-bit
+WAV (stereo originals: channels averaged; 48 kHz originals: resampled). No filtering or gain
+change by this project (some recordists high-pass filtered before upload; noted per clip). Clips
+are shared under the same license as the original (CC BY-NC-SA requires this). NonCommercial (NC)
+clips may only be used non-commercially; Game Call Hero is free, with no ads, purchases or
+donations. Calls were classified by measurement, not confirmed by the recordists or an expert.
+Machine-readable details, measurements and cited call definitions:
+`public/audio/mallard/manifest.json`.
+
+| File | Call | Original | Recordist | License |
+|---|---|---|---|---|
+| `public/audio/mallard/hail-call-1.wav` | hail call | [XC615311](https://xeno-canto.org/615311), 27.47–29.80 s | Stanislas Wroza | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-2.wav` | hail call | [XC615311](https://xeno-canto.org/615311), 63.69–66.08 s | Stanislas Wroza | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-3.wav` | hail call | [XC536892](https://xeno-canto.org/536892), 1.77–4.45 s | Sue Riffe | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-4.wav` | hail call | [XC839134](https://xeno-canto.org/839134), 37.29–39.62 s | Uku Paal | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-5.wav` | hail call | [XC839688](https://xeno-canto.org/839688), 0.30–2.83 s | Johannes Dag Mayer | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-6.wav` | hail call | [XC758328](https://xeno-canto.org/758328), 4.75–7.63 s | Uku Paal | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-7.wav` | hail call | [XC932958](https://xeno-canto.org/932958), 0.47–2.63 s | Bram Piot | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-1.wav` | quack | [XC372992](https://xeno-canto.org/372992), 5.69–6.53 s | Jordi Calvet | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-2.wav` | quack | [XC372992](https://xeno-canto.org/372992), 44.17–45.09 s | Jordi Calvet | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-3.wav` | quack | [XC392206](https://xeno-canto.org/392206), 9.76–10.61 s | Thomas Lüthi | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-4.wav` | quack | [XC438369](https://xeno-canto.org/438369), 31.00–31.92 s | Vincent Pourchaire | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-5.wav` | quack | [XC196991](https://xeno-canto.org/196991), 51.63–52.52 s | Patrik Åberg | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/quack-6.wav` | quack | [XC292066](https://xeno-canto.org/292066), 17.79–18.60 s | Mikael Litsgård | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-1.wav` | drake raeb | [XC1082130](https://xeno-canto.org/1082130), 0.56–3.14 s | João Ferreira Tomás | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-2.wav` | drake raeb | [XC1082130](https://xeno-canto.org/1082130), 35.53–38.38 s | João Ferreira Tomás | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-3.wav` | drake raeb | [XC1094846](https://xeno-canto.org/1094846), 0.93–3.91 s | Petter Westberg | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-4.wav` | drake raeb | [XC1094846](https://xeno-canto.org/1094846), 3.77–6.97 s | Petter Westberg | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-5.wav` | drake raeb | [XC348395](https://xeno-canto.org/348395), 0.28–3.16 s | Jerome Fischer | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-6.wav` | drake raeb | [XC650944](https://xeno-canto.org/650944), 0.31–3.86 s | Albert Noorlander | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-8.wav` | hail call | [XC995348](https://xeno-canto.org/995348), 1.36–4.54 s | David Darrell-Lambert | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/hail-call-9.wav` | hail call | [XC189880](https://xeno-canto.org/189880), 23.07–25.26 s | Albert Lastukhin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/mallard/drake-raeb-7.wav` | drake raeb | [XC140461](https://xeno-canto.org/140461), 2.35–5.02 s | Bernard BOUSQUET | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/mallard/drake-raeb-8.wav` | drake raeb | [XC1007773](https://xeno-canto.org/1007773), 5.04–7.52 s | David A. Brinkman | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
 ## Test fixtures
 

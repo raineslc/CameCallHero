@@ -1,5 +1,104 @@
 # Status
 
+## Phase 11: mallard (2026-11-13, [#22](https://github.com/raineslc/GameCallHero/pull/22))
+
+**Owner: decisions and checks**
+1. **Hen quack: unlock for practice only?** It passes the practice calibration (worst-case margin
+   39.4, matrix 53.5), but the scorer cannot tell one hen quack from one note of a drake's raeb
+   (single drake notes score up to 95 as a quack; best margin over 4 bands x 342 weight sets: -4.3).
+   The calling challenge rules (Phase 10) require every unlocked call to be recognizable there, so
+   it is locked. Unlocking it for practice only means the challenge test must allow a species to opt
+   out, or drake notes counted as "not wrong" (I did not do either: both weaken a check). Your call.
+2. **Mallard call wording**: the text (`src/calls/mallard.ts`) comes from Birds of the World and three
+   Ducks Unlimited pages, read only through web-search excerpts (this environment blocks
+   birdsoftheworld.org, allaboutbirds.org and ducks.org, checked 2026-11-13). Please check it against
+   the pages.
+
+Gate: every call has ≥ 3 legal clips, but none passes all the checks, so the species is merged with
+all three calls locked ("Coming soon") and no hand-off.
+
+What changed:
+- **Calls** (definitions with sources in `public/audio/mallard/manifest.json` `callDefinitions`):
+  - **Hail call** (hen decrescendo): BOW: the female's Decrescendo Call or "hail call", 2-10 notes,
+    modal note 250 ms; DU (Understanding Waterfowl): typically 5-6 notes, one or two loud quacks then
+    shorter, softer ones; Hochbaum named it because hens appear to greet ducks flying overhead.
+  - **Hen quack**: DU (8 Duck Calls): the basic quack, learned first; BOW: quacks are the female's,
+    the male's rab is quieter.
+  - **Drake raeb**: BOW: the male's most common call is a rasping rab; the slow Raehb is one or a
+    series of evenly spaced notes (1.0-4.0 kHz, modal note 350 ms); DU (Waterfowl Vocalizations):
+    males answer the decrescendo with a slow raehb.
+  - Not included: feed chuckle (only one allowed recording labels it, XC964309, faint); comeback call
+    and lonesome hen (DU describes them only as hunters' calling patterns, nothing to classify wild
+    clips against); drake grunt-whistle (courtship display, not attempted).
+- **References**: 23 clips, 4.4 MB, all xeno-canto, all "Playback used: no", licenses CC BY-NC-SA 4.0
+  (22) and 3.0 (1), checked on each page. 1608 mallard recordings listed; 826 had an allowed license
+  and quality A/B (domestic and hybrid entries excluded); pages mentioning a domestic, farm, captive, tame or fed bird, a park, garden or city
+  were skipped (e.g. XC62258, Powderhorn Park; XC536943 "domestic type female"). Originals with clipped
+  samples were rejected (XC694834).
+
+  | Call | Clips | Recordings (recordists) | Uncertain |
+  |---|---|---|---|
+  | hail call | 9 | XC615311 (2 clips), XC536892, XC839134, XC839688, XC758328, XC932958, XC995348, XC189880 (7) | hail-call-9 (labelled alarm call) |
+  | hen quack | 6 | XC372992 (2), XC392206, XC438369, XC196991, XC292066 (5) | – |
+  | drake raeb | 8 | XC1082130 (2), XC1094846 (2), XC348395, XC650944, XC140461, XC1007773 (6) | drake-raeb-8 (short notes) |
+
+  Classification by measurement against the cited definitions (note count, spacing, level and length
+  across notes; per-clip notes in the manifest). Sex not stated on 5 hail-call pages: the decrescendo
+  is a female call (BOW), so a hen is assumed (noted per clip).
+- **App**: `src/calls/mallard.ts`, `MALLARD` in `src/calls/species.ts` (fourth picker button, after elk; "duck"
+  wording, best-score keys `mallard.<call>`), analysis band 1000-4000 Hz. Turkey and owl code, weights,
+  scores and keys unchanged (their calibration and challenge tests pass unchanged). No challenge rules
+  for the mallard (no unlocked call): its challenge shows "Coming soon".
+- **Tests**: `test/calibration-mallard.test.ts` (owl rules: leave-one-out, margin 15, matrix rule;
+  negatives: other mallard calls, all turkey and owl references, turkey wrong-call fixtures, junk;
+  every mallard reference passes the take gates); `test/reference-audio.test.js` covers the mallard
+  folder (licenses, no playback, wild-bird note, call definitions cite sources, < 15 MB);
+  `test/species.test.ts` (routes, links, keys); a11y e2e covers the mallard home, challenge and call pages.
+
+### Calibration (margin 15, not changed; nothing loosened after seeing results)
+
+| Call | Clips | Best weights (r/p/t/s) | Worst-case margin | Result |
+|---|---|---|---|---|
+| Hen quack | 6 | 3 / 0.5 / 0.5 / – | **39.4** (matrix 53.5) | passes practice calibration; locked (challenge: single drake notes, see above) |
+| Hail call | 9 | 0.5 / 2 / 0.5 / 1 | 1.3 (matrix 3.5) | locked, "Coming soon" |
+| Drake raeb | 8 | 1 / 3 / 0.5 / 1 | -3.8 (matrix -3.8) | locked, "Coming soon" |
+
+Mallard confusion matrix (mean score; own row leave-one-out):
+
+| take \ target | quack | hail call | drake raeb |
+|---|---|---|---|
+| quack | **85.6** | 50.5 | 53.0 |
+| hail call | 26.2 | **69.1** | 57.7 |
+| drake raeb | 20.4 | 49.2 | **69.6** |
+
+What was tried (best worst-case margin, grid r/p/t 0.5..3 and structure 0..3, step 0.5, 864 sets):
+
+| Band (Hz) | Quack (sets ≥ 15) | Hail call | Drake raeb |
+|---|---|---|---|
+| 150-8000 | 37.5 (115) | -1.8 | -8.1 |
+| 300-6000 | 37.9 (107) | -1.0 | -2.8 |
+| 500-5000 | 37.0 (99) | 0.6 | -5.2 |
+| 1000-4000 (kept) | 39.4 (145) | 1.3 | -3.8 |
+
+- With the first 7 hail and 6 drake clips the best margins were 5.5 and 8.3; adding the other clips
+  that met the classification rules (hail-call-8/9, drake-raeb-7/8) made both lower. Leaving out the
+  worst clip of each (hail-call-3, drake-raeb-6; diagnosis only) still gave at most 11.1 and 10.3.
+- Worst negatives: hail call — claps (a series of short sounds), kee kee run, owl ascending hoot;
+  drake raeb — hail-call-4 and owl hoots. All are series of similar short notes; the scorer ignores
+  level, and what sets a decrescendo apart (each note softer and shorter) is level-based.
+- One reference was replaced before calibration because it failed the take gates (quack-5 from XC990400
+  was "too noisy" from a low hum; now XC196991).
+- Quack vs single drake notes (split as the challenge does, gap 0 s): best -4.3 at 1000-4000 Hz with
+  r/p/t 0.5/0.5/2; -8.0 to -8.5 in the other bands.
+
+Next for the mallard: a per-note level/length trend feature (relative, not absolute loudness) for the
+hail call; for the quack and drake, a measure of raspiness (spectral flatness) that the tone feature
+does not capture after noise normalisation. Both are scoring changes for their own phase.
+
+Verified (after rebase on Phase 12 elk): `npm ci && npm test` (413 unit tests), `npm run build`, `npm run e2e` (83 passed, 3 skipped).
+Not verified: anything on a real phone; call classifications by an expert or the recordists (by
+spectrogram and measurement only); the source text against the full pages.
+
 ## Phase 12: elk (2026-11-13, [#20](https://github.com/raineslc/GameCallHero/pull/20))
 
 **Owner: please check / try**
@@ -91,6 +190,7 @@ clearer cow mews (another park, or recordists to ask); recordings of other calve
 
 Verified: `npm ci && npm test` (330 unit tests), `npm run build`, `npm run e2e` (77 passed, 3
 skipped; includes the elk challenge design pass). Not verified: anything on a real phone; a person's or a commercial call's calf call.
+
 ## Phase 10: calling challenge for every species (2026-11-13, [#19](https://github.com/raineslc/GameCallHero/pull/19))
 
 **Owner: please try on the phone**
