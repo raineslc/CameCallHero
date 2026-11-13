@@ -45,6 +45,9 @@ Not verified / known limits:
   count-in 10 dB quieter than a putt's background, putts reached 46–60). Same as practice.
 - A yelp series much longer than the references (~2–3 s) scores lower (call length is part of rhythm).
 - Kee kee runs score 50–66 as a yelp, so one may be named "Yelp".
+- A call more than ~20–30 dB quieter than the loudest call in the take is not split out (the scorer's
+  note finder drops notes far below the peak, to ignore background birds and echo). It is left out of
+  the score, not counted as 0 (Codex review on #18; revisit with real phone takes).
 
 ## Phase 8b: separate the owl two-phrase hoot from the ascending hoot (2026-11-13, [#17](https://github.com/raineslc/GameCallHero/pull/17))
 
