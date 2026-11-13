@@ -1,6 +1,6 @@
 // Checks the reference-audio manifests: every WAV is listed, every entry has an
 // allowed license and proof URL, files are mono 44.1 kHz 16-bit, each species folder < 15 MB, and
-// every barred owl call definition cites a source.
+// every barred owl and elk call definition cites a source.
 // Plain JS (not TS): the project has no @types/node and this test needs node:fs.
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -25,6 +25,8 @@ const sets = [
   { dir: 'public/audio/turkey', needsCall: true, trimmed: true },
   // Wild birds only: every barred owl entry must say the recording used no playback.
   { dir: 'public/audio/barred-owl', needsCall: true, trimmed: true, noPlayback: true },
+  // Wild elk only: no page states playback, so playbackUsed is null ("not stated"); true is rejected.
+  { dir: 'public/audio/elk', needsCall: true, trimmed: true, wildOnly: true },
   { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
   { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
   // Real phone takes stay at the phone's own rate (48 kHz), unconverted.
@@ -42,7 +44,7 @@ function wavFormat(path) {
   };
 }
 
-for (const { dir, needsCall, trimmed, noPlayback = false, sampleRate = 44100 } of sets) {
+for (const { dir, needsCall, trimmed, noPlayback = false, wildOnly = false, sampleRate = 44100 } of sets) {
   describe(`${dir}/manifest.json`, () => {
     const abs = join(root, dir);
     const manifest = JSON.parse(readFileSync(join(abs, 'manifest.json'), 'utf8'));
@@ -67,6 +69,11 @@ for (const { dir, needsCall, trimmed, noPlayback = false, sampleRate = 44100 } o
         expect(c.file).toMatch(new RegExp(`^${c.call}-\\d+\\.wav$`));
       }
       if (noPlayback) expect(c.playbackUsed).toBe(false);
+      if (wildOnly) {
+        expect(c.wild).toBe(true);
+        expect([false, null]).toContain(c.playbackUsed);
+        expect(c.playbackNote).toBeTruthy();
+      }
       if (trimmed) {
         expect(c.sourceUrl).toMatch(/^https:\/\//);
         expect(c.trimStartSec).toBeGreaterThanOrEqual(0);
@@ -86,14 +93,14 @@ for (const { dir, needsCall, trimmed, noPlayback = false, sampleRate = 44100 } o
   });
 }
 
-it.each(['public/audio/turkey', 'public/audio/barred-owl'])('%s is under 15 MB', (d) => {
+it.each(['public/audio/turkey', 'public/audio/barred-owl', 'public/audio/elk'])('%s is under 15 MB', (d) => {
   const dir = join(root, d);
   const total = readdirSync(dir).reduce((sum, f) => sum + statSync(join(dir, f)).size, 0);
   expect(total).toBeLessThan(15 * 1024 * 1024);
 });
 
-describe('public/audio/barred-owl call definitions', () => {
-  const m = JSON.parse(readFileSync(join(root, 'public/audio/barred-owl/manifest.json'), 'utf8'));
+describe.each(['public/audio/barred-owl', 'public/audio/elk'])('%s call definitions', (dir) => {
+  const m = JSON.parse(readFileSync(join(root, dir, 'manifest.json'), 'utf8'));
   const defs = m.callDefinitions;
 
   it('defines exactly the listed calls', () => {
