@@ -1,6 +1,6 @@
 # Status
 
-## Phase 8b: separate the owl two-phrase hoot from the ascending hoot (2026-11-13, PR link below)
+## Phase 8b: separate the owl two-phrase hoot from the ascending hoot (2026-11-13, [#17](https://github.com/raineslc/GameCallHero/pull/17))
 
 **Owner: please check / try**
 1. **On the phone**: Calls → **Barred owl** → **Who cooks for you** → Practice. Make the full call
