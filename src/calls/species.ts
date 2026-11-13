@@ -8,6 +8,7 @@ import { OWL_BAND, OWL_CALLS } from './barred-owl';
 import type { CallDef } from './call';
 import { ELK_BAND, ELK_CALLS } from './elk';
 import { MALLARD_BAND, MALLARD_CALLS } from './mallard';
+import { GREAT_HORNED_OWL_CALLS } from './great-horned-owl';
 import { TURKEY_CALLS } from './turkey';
 
 export interface Species {
@@ -27,7 +28,17 @@ export const BARRED_OWL: Species = { id: 'barred-owl', name: 'Barred owl', noun:
 export const ELK: Species = { id: 'elk', name: 'Elk', noun: 'elk', nounPlural: 'elk', calls: ELK_CALLS, band: ELK_BAND };
 export const MALLARD: Species = { id: 'mallard', name: 'Mallard', noun: 'duck', nounPlural: 'ducks', calls: MALLARD_CALLS, band: MALLARD_BAND };
 
-export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD];
+// Great horned owl hoots measure 269-452 Hz (manifest notes), inside the barred owl's band.
+export const GREAT_HORNED_OWL: Species = {
+  id: 'great-horned-owl',
+  name: 'Great horned owl',
+  noun: 'owl',
+  nounPlural: 'owls',
+  calls: GREAT_HORNED_OWL_CALLS,
+  band: OWL_BAND,
+};
+
+export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD, GREAT_HORNED_OWL];
 export const DEFAULT_SPECIES = TURKEY;
 
 export const speciesById = (id: string): Species | undefined => SPECIES.find((s) => s.id === id);
