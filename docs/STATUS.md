@@ -1,6 +1,6 @@
 # Status
 
-## Phase 16: scoring upgrade for trills, raspy and trending calls (2026-11-13, PR link below)
+## Phase 16: scoring upgrade for trills, raspy and trending calls (2026-11-13, [#25](https://github.com/raineslc/GameCallHero/pull/25))
 
 **Owner: decisions and checks**
 1. **No call was unlocked.** The three new scorer parts (pulse rate, raspiness, note level/length
