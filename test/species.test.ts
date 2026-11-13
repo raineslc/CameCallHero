@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { extractFeatures, FULL_BAND } from '../src/audio/features';
 import { LivePitch } from '../src/audio/pitch';
 import { OWL_BAND } from '../src/calls/barred-owl';
-import { BARRED_OWL, bestId, callHref, ELK, homeHref, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
+import { BARRED_OWL, bestId, callHref, ELK, homeHref, MALLARD, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { loadBest, saveBest } from '../src/practice/storage';
 import { tipsFor } from '../src/practice/tips';
@@ -77,13 +77,31 @@ describe('species calls', () => {
     for (const c of BARRED_OWL.calls) for (const p of c.references) expect(p).toMatch(/^audio\/barred-owl\//);
     for (const c of ELK.calls) for (const p of c.references) expect(p).toMatch(/^audio\/elk\//);
   });
-  it('species order and ids: turkey (default), barred owl, elk', () => {
-    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk']);
+  it('species order and ids: turkey (default), barred owl, elk, mallard', () => {
+    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard']);
     expect(ELK.calls.map((c) => [c.id, c.locked])).toEqual([
       ['bugle', true],
       ['glug', true],
       ['cow-mew', true],
       ['calf-call', false],
+    ]);
+  });
+  it('mallard: its own band, every call cited; locked calls have no references', () => {
+    expect(MALLARD.band).toEqual({ minHz: 1000, maxHz: 4000 });
+    expect(MALLARD.calls.map((c) => c.id)).toEqual(['quack', 'hail-call', 'drake-raeb']);
+    for (const c of MALLARD.calls) {
+      expect(c.sources.length).toBeGreaterThan(0);
+      if (c.locked) expect(c.references).toEqual([]);
+      for (const p of c.references) expect(p).toMatch(/^audio\/mallard\//);
+    }
+    expect(resolveCall('mallard/quack')).toMatchObject({ species: MALLARD, call: { id: 'quack' } });
+    expect(resolveCall('quack')).toBeNull();
+    const quack = MALLARD.calls[0];
+    expect([homeHref(MALLARD), callHref(MALLARD, quack), practiceHref(MALLARD, quack), bestId(MALLARD, quack)]).toEqual([
+      '#/mallard',
+      '#/mallard/call/quack',
+      '#/mallard/practice/quack',
+      'mallard.quack',
     ]);
   });
   it('links: turkey keeps the short form, other species carry their id; every link resolves', () => {

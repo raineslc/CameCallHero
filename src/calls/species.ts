@@ -7,6 +7,7 @@ import { FULL_BAND, type Band } from '../audio/features';
 import { OWL_BAND, OWL_CALLS } from './barred-owl';
 import type { CallDef } from './call';
 import { ELK_BAND, ELK_CALLS } from './elk';
+import { MALLARD_BAND, MALLARD_CALLS } from './mallard';
 import { TURKEY_CALLS } from './turkey';
 
 export interface Species {
@@ -23,10 +24,10 @@ export interface Species {
 
 export const TURKEY: Species = { id: 'turkey', name: 'Wild turkey', noun: 'turkey', nounPlural: 'turkeys', calls: TURKEY_CALLS, band: FULL_BAND };
 export const BARRED_OWL: Species = { id: 'barred-owl', name: 'Barred owl', noun: 'owl', nounPlural: 'owls', calls: OWL_CALLS, band: OWL_BAND };
-
 export const ELK: Species = { id: 'elk', name: 'Elk', noun: 'elk', nounPlural: 'elk', calls: ELK_CALLS, band: ELK_BAND };
+export const MALLARD: Species = { id: 'mallard', name: 'Mallard', noun: 'duck', nounPlural: 'ducks', calls: MALLARD_CALLS, band: MALLARD_BAND };
 
-export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK];
+export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD];
 export const DEFAULT_SPECIES = TURKEY;
 
 export const speciesById = (id: string): Species | undefined => SPECIES.find((s) => s.id === id);
