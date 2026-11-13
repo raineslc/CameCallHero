@@ -46,13 +46,13 @@ describe('measure', () => {
       expect(callSeconds(f)).toBeLessThan(1.6);
     }
     expect(m.notes[0]).toBe(Math.min(...fs.map((f) => f.notes.length)));
-    expect(describeMeasure(m)).toMatch(/^\d+(–\d+)? notes?, \d\.\d\d(–\d\.\d\d)? s long \(as the scorer measures 6 reference clips\)$/);
+    expect(describeMeasure(m)).toMatch(/^\d+(–\d+)? notes?, \d\.\d(–\d\.\d)? s long in our 6 recordings$/);
   });
 
   it('no clips gives null; ranges collapse when equal', () => {
     expect(measure([])).toBeNull();
-    expect(describeMeasure({ clips: 1, notes: [1, 1], seconds: [0.5, 0.5] })).toBe('1 note, 0.50 s long (as the scorer measures 1 reference clip)');
-    expect(describeMeasure({ clips: 2, notes: [2, 3], seconds: [0.5, 0.75] })).toBe('2–3 notes, 0.50–0.75 s long (as the scorer measures 2 reference clips)');
+    expect(describeMeasure({ clips: 1, notes: [1, 1], seconds: [0.5, 0.5] })).toBe('1 note, 0.5 s long in our recording');
+    expect(describeMeasure({ clips: 2, notes: [2, 3], seconds: [0.5, 0.75] })).toBe('2–3 notes, 0.5–0.8 s long in our 2 recordings');
   });
 });
 

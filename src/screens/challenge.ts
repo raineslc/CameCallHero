@@ -19,6 +19,7 @@ import { challengeRules, scorableCalls } from '../challenge/rules';
 import { DEFAULT_SPECIES, homeHref, practiceHref, speciesById } from '../calls/species';
 import { loadFeatures } from '../library/references';
 import { STAR_BANDS } from '../practice/hits';
+import { rejectHelp } from '../practice/reject-help';
 import { COUNT_IN_SEC } from '../practice/plan';
 import { LevelMeter } from '../ui/meter';
 
@@ -65,12 +66,16 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     <p class="error" id="challenge-error" role="alert" hidden></p>
 
     <section id="challenge-intro">
-      <p>Make your best ${species.noun} calling: one call or a whole sequence, up to ${CHALLENGE_SECONDS} seconds.
-        Each call is rated against recordings of wild ${species.nounPlural}. Then pass the phone.</p>
+      <ol class="steps">
+        <li>Tap <strong>I'm ready</strong> and stay quiet for the 3-2-1.</li>
+        <li>Call like a ${species.noun}: one call or a whole sequence, up to ${CHALLENGE_SECONDS} seconds. Tap <strong>Stop</strong> when you are done.</li>
+        <li>Get a score against wild ${species.nounPlural}, save it, and pass the phone.</li>
+      </ol>
+      <p class="muted">The app can score: ${callNames}.</p>
       <div class="actions">
         <button type="button" class="btn primary" id="challenge-ready" disabled>I'm ready</button>
       </div>
-      <p class="muted" id="challenge-loading" role="status">Loading reference clips…</p>
+      <p class="muted" id="challenge-loading" role="status">Loading the ${species.noun} recordings…</p>
     </section>
 
     <section id="challenge-run" hidden>
@@ -89,7 +94,10 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     </section>
 
     <section id="challenge-results" hidden>
-      <p class="error" id="challenge-rejected" role="alert" hidden></p>
+      <div class="rejected" id="challenge-rejected-box" role="alert" hidden>
+        <p class="error" id="challenge-rejected"></p>
+        <p id="challenge-rejected-help"></p>
+      </div>
       <div id="challenge-scored" hidden>
         <div class="result-head">
           <p class="stars" id="challenge-stars" role="img"></p>
@@ -138,8 +146,8 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
       </div>
     </section>
 
-    <section class="help" id="challenge-help" aria-labelledby="challenge-help-title">
-      <h3 id="challenge-help-title">How the score works</h3>
+    <details class="more help" id="challenge-help">
+      <summary><h3 id="challenge-help-title">How the score works</h3></summary>
       <ul>
         <li>Your take is split into calls wherever you pause for ${rules.gapSec} s or more.</li>
         <li>Each call is compared with recordings of wild ${species.nounPlural} for every call the app can score (${callNames}), with the same scorer as practice. The best match names it.</li>
@@ -149,7 +157,7 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
         ${locked.length ? `<li>${capital(lockedNames)} cannot be recognized yet.</li>` : ''}
         <li>Scores and names stay on this phone. The score card is a picture only, with no sound.</li>
       </ul>
-    </section>
+    </details>
   `;
   const $ = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
   const errorEl = $('challenge-error');
@@ -210,6 +218,7 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     // The leaderboard and help stay out of the way while recording.
     $('challenge-board').hidden = section === 'run';
     $('challenge-help').hidden = section === 'run';
+    window.scrollTo(0, 0);
   };
 
   // --- Leaderboard ------------------------------------------------------------------------
@@ -344,7 +353,7 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
       readyBtn.disabled = false;
     })
     .catch(() => {
-      if (alive) $('challenge-loading').textContent = 'Could not load the reference clips. Check your connection and reload.';
+      if (alive) $('challenge-loading').textContent = `Could not load the ${species.noun} recordings. Check your connection and reload the page.`;
     });
 
   // --- Take -------------------------------------------------------------------------------
@@ -379,7 +388,7 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     savedName = null;
     show('results');
     playBtn.disabled = !lastTake;
-    const rejected = $('challenge-rejected');
+    const rejected = $('challenge-rejected-box');
     const scored = $('challenge-scored');
     nameInput.disabled = false;
     saveForm.querySelector('button')!.disabled = false;
@@ -388,7 +397,8 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     delete shareStatus.dataset.how;
     cardCanvas.hidden = true;
     if (r.rejected) {
-      rejected.textContent = `Not scored: ${r.rejected.message}`;
+      $('challenge-rejected').textContent = `Not scored: ${r.rejected.message}`;
+      $('challenge-rejected-help').textContent = rejectHelp(r.rejected.reason);
       rejected.hidden = false;
       scored.hidden = true;
       saveForm.hidden = true;

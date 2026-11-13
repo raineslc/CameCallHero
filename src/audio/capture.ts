@@ -36,7 +36,7 @@ export class MicStartError extends Error {
 const MESSAGES: Record<Exclude<MicErrorKind, 'other'>, string> = {
   insecure: 'The microphone only works on a secure (https://) page. Open the https:// link of this site.',
   denied:
-    "Microphone permission was denied. Allow the microphone for this site in your browser's site settings, then tap Start mic again.",
+    "Microphone permission was denied. Tap the lock or settings icon next to the web address, allow the microphone for this site, then try again.",
   'no-mic': 'No microphone was found on this device.',
   busy: 'The microphone could not be started. Another app may be using it: close it and try again.',
   unsupported: 'This browser cannot record audio here. Use a current version of Chrome.',
@@ -81,6 +81,22 @@ export interface SettingRow {
   actual: boolean | number | string | undefined;
   /** true when the browser reports exactly what was requested. */
   ok: boolean;
+}
+
+/**
+ * One plain line on the phone's voice processing (echo cancellation, noise suppression, auto
+ * gain), from the compareSettings rows. `ok` is false only when the phone reports one left on.
+ */
+export function processingSummary(rows: SettingRow[], labels: Record<string, string>): { ok: boolean; text: string } {
+  const voice = rows.filter((r) => typeof r.requested === 'boolean');
+  const on = voice.filter((r) => r.actual !== undefined && !r.ok);
+  if (on.length > 0)
+    return {
+      ok: false,
+      text: `Your phone still changes the sound (left on: ${on.map((r) => labels[r.key].toLowerCase()).join(', ')}). Scores may be less accurate.`,
+    };
+  if (voice.some((r) => r.actual === undefined)) return { ok: true, text: 'This phone does not say whether it changes the sound. If scores seem off, send feedback.' };
+  return { ok: true, text: 'Your phone records the sound as it is: nothing is changing it.' };
 }
 
 export function compareSettings(actual: MediaTrackSettings): SettingRow[] {

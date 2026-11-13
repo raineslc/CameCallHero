@@ -69,8 +69,11 @@ for (const c of TURKEY_CALLS) {
     if (c.locked) {
       await expect(page.locator('.title-row .badge')).toHaveText(lockInfo(c).label);
       await expect(page.locator('#call-lock-reason')).toHaveText(`${lockInfo(c).label}: ${lockInfo(c).reason}`);
-      await expect(page.getByRole('button', { name: 'Practice' })).toBeDisabled();
+      // No Practice for a locked call; none of the locked turkey calls has listen-only clips.
+      await expect(page.getByRole('link', { name: 'Practice' })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Practice' })).toHaveCount(0);
       await expect(page.getByRole('button', { name: /^Play/ })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: 'Other turkey calls' })).toHaveAttribute('href', '#/');
       await expect(page.locator('#call-measure')).toHaveCount(0);
       await noHorizontalScroll(page);
       await tapTargets(page);
@@ -88,7 +91,7 @@ for (const c of TURKEY_CALLS) {
     await page.locator('#call-play').click();
     await expect(page.locator('#call-play')).toHaveText('Play');
     // Clip list with attribution is collapsed until tapped.
-    await page.getByText('Reference clips and licenses').click();
+    await page.getByText('Recordings and credits').click();
     const clips = page.locator('.clip');
     await expect(clips).toHaveCount(c.references.length);
     for (let i = 0; i < c.references.length; i++) {

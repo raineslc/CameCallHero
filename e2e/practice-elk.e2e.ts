@@ -29,7 +29,7 @@ test('a reference calf call is scored, saved under the elk key, with elk wording
 
 test('calf call clips name the NPS library and public-domain license, not xeno-canto', async ({ page }) => {
   await page.goto('#/elk/call/calf-call');
-  await page.getByText('Reference clips and licenses').click();
+  await page.getByText('Recordings and credits').click();
   const attr = page.locator('.clip .attribution');
   await expect(attr).toHaveCount(3);
   for (let i = 0; i < 3; i++) {

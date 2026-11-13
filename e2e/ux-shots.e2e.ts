@@ -99,6 +99,8 @@ for (const { tag, viewport } of SIZES) {
     test('practice tap test', async ({ page }) => {
       await page.goto('#/practice/gobble');
       await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled({ timeout: 10_000 });
+      const timing = page.getByText('Optional: timing check');
+      if (await timing.count()) await timing.click();
       await page.locator('#practice-calibrate').click();
       await expect(page.locator('#practice-tap')).toBeEnabled();
       await page.locator('#practice-tap').scrollIntoViewIfNeeded();

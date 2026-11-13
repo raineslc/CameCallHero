@@ -46,7 +46,7 @@ test('owl hoo-wah page: plays a clip, owl wording, links to owl practice, back t
   await page.locator('#call-play').click();
   await expect(page.locator('#call-play')).toHaveText('Stop');
   await page.locator('#call-play').click();
-  await page.getByText('Reference clips and licenses').click();
+  await page.getByText('Recordings and credits').click();
   await expect(page.locator('.clip')).toHaveCount(hoo.references.length);
   await expect(page.locator('.clip .attribution').first()).toContainText(/xeno-canto XC\d+/);
   await expect(page.getByRole('link', { name: 'Practice' })).toHaveAttribute('href', '#/barred-owl/practice/inspection-call');
@@ -63,12 +63,14 @@ test('owl hoo-wah page: plays a clip, owl wording, links to owl practice, back t
 });
 
 for (const c of BARRED_OWL.calls.filter((x) => x.locked)) {
-  test(`locked owl call ${c.id} shows its reason; practice stays disabled`, async ({ page }) => {
+  test(`locked owl call ${c.id} shows its reason and offers no practice`, async ({ page }) => {
     await page.goto(`#/barred-owl/call/${c.id}`);
     await expect(page.locator('#call-lock-reason')).toHaveText(`${lockInfo(c).label}: ${lockInfo(c).reason}`);
-    await expect(page.getByRole('button', { name: 'Practice' })).toBeDisabled();
+    await expect(page.getByRole('link', { name: 'Practice' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Practice' })).toHaveCount(0);
     await page.goto(`#/barred-owl/practice/${c.id}`);
-    await expect(page.getByRole('button', { name: "I'm ready" })).toBeDisabled();
+    await expect(page.getByRole('button', { name: "I'm ready" })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: `Back to ${c.name}` })).toHaveAttribute('href', `#/barred-owl/call/${c.id}`);
   });
 }
 

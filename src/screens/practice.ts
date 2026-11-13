@@ -14,9 +14,10 @@ import { chunkFrameDb, chunkLevel, TakeRecorder } from '../audio/monitor';
 import { LivePitch } from '../audio/pitch';
 import { scoreTake, type ScoreResult, type SubScores } from '../audio/score';
 import { lockInfo, type CallDef } from '../calls/call';
-import { bestId, resolveCall, type Species } from '../calls/species';
+import { bestId, callHref, resolveCall, type Species } from '../calls/species';
 import { assetUrl, loadFeatures, loadSpectrogram } from '../library/references';
 import { CLICK_INTERVAL_SEC, CLICKS, FIRST_CLICK_SEC, latencyFromTaps, MATCH_WINDOW_MS } from '../practice/latency';
+import { rejectHelp } from '../practice/reject-help';
 import { makePlan, noteTarget, targetText, type PracticePlan } from '../practice/plan';
 import { loadBest, loadLatency, saveBest, saveLatency } from '../practice/storage';
 import { HitTracker, matchNotes, starsFor } from '../practice/hits';
@@ -48,13 +49,13 @@ function notFound(root: HTMLElement): void {
   root.innerHTML = `<h2>Call not found</h2><a class="btn" href="#/">Back to calls</a>`;
 }
 
-function lockedScreen(root: HTMLElement, call: CallDef): void {
+function lockedScreen(root: HTMLElement, species: Species, call: CallDef): void {
   const lock = lockInfo(call);
   root.innerHTML = `
     <h2>Practice: ${call.name}</h2>
     <span class="badge">${lock.label}</span>
     <p class="notice">${lock.reason}</p>
-    <button type="button" class="btn primary" disabled>I'm ready</button>
+    <div class="actions"><a class="btn" href="${callHref(species, call)}">Back to ${call.name}</a></div>
   `;
 }
 
@@ -65,7 +66,7 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
   const found = resolveCall(param);
   if (!found) return notFound(root);
   const { species, call }: { species: Species; call: CallDef } = found;
-  if (call.locked || call.references.length === 0) return lockedScreen(root, call);
+  if (call.locked || call.references.length === 0) return lockedScreen(root, species, call);
   const noun = species.noun;
   const Noun = capitalize(noun);
 
@@ -74,16 +75,20 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
     <p class="error" id="practice-error" role="alert" hidden></p>
 
     <section id="practice-intro">
-      <p>1. Listen to the call. 2. Tap <strong>I'm ready</strong> and stay quiet during the 3-2-1.
-        3. Call when the notes reach the line. Nothing plays while you record.</p>
+      <ol class="steps">
+        <li><strong>Listen</strong> to the ${noun}.</li>
+        <li>Tap <strong>I'm ready</strong> and stay quiet for the 3-2-1.</li>
+        <li>Call into the phone when the blocks reach the line.</li>
+      </ol>
       <p class="target" id="practice-target" hidden></p>
       <canvas class="spectrogram" id="practice-spectrogram" role="img" aria-label="Spectrogram of the reference ${call.name.toLowerCase()}"></canvas>
       <div class="actions">
         <button type="button" class="btn" id="practice-listen">Listen</button>
         <button type="button" class="btn primary" id="practice-ready" disabled>I'm ready</button>
       </div>
-      <p class="muted" id="practice-loading" role="status">Loading reference clips…</p>
-      <div class="notice" id="practice-timing">
+      <p class="muted" id="practice-loading" role="status">Loading the ${noun} recordings…</p>
+      <details class="more" id="practice-timing">
+        <summary>Optional: timing check</summary>
         <p id="practice-timing-text"></p>
         <button type="button" class="btn" id="practice-calibrate">Tap test</button>
         <div id="practice-calib" hidden>
@@ -91,7 +96,7 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
           <button type="button" class="btn primary tap" id="practice-tap">Tap</button>
           <p id="practice-calib-status" role="status"></p>
         </div>
-      </div>
+      </details>
     </section>
 
     <section id="practice-run" hidden>
@@ -110,7 +115,10 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
     </section>
 
     <section id="practice-results" hidden>
-      <p class="error" id="practice-rejected" role="alert" hidden></p>
+      <div class="rejected" id="practice-rejected-box" role="alert" hidden>
+        <p class="error" id="practice-rejected"></p>
+        <p id="practice-rejected-help"></p>
+      </div>
       <div id="practice-scored" hidden>
         <div class="result-head">
           <p class="stars" id="practice-stars" role="img"></p>
@@ -134,13 +142,13 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
         <ul class="tips" id="practice-tips"></ul>
         <p class="muted" id="practice-tips-note" hidden>“Good” means as close to the ${noun} recording as the ${noun} recordings are to each other.</p>
       </div>
-      <div class="actions">
+      <div class="actions sticky-actions">
         <button type="button" class="btn primary" id="practice-again">Try again</button>
         <button type="button" class="btn" id="practice-relisten">Listen again</button>
       </div>
     </section>
-    <section class="help" id="practice-help" aria-labelledby="practice-help-title">
-      <h3 id="practice-help-title">How it works</h3>
+    <details class="more help" id="practice-help"${loadBest(bestId(species, call)) === null ? ' open' : ''}>
+      <summary><h3 id="practice-help-title">How it works</h3></summary>
       <ul>
         <li>Grey blocks are the ${noun}'s notes. They slide down to the white line.</li>
         <li>Call when a block reaches the line, and hold the note while the block crosses it. Taller block = longer note. A leaning block = a note that goes from high to low (or low to high).</li>
@@ -156,7 +164,7 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
         <span class="legend-item"><span class="key line"></span> The line</span>
         <span class="legend-item"><span class="key trail"></span> You</span>
       </p>
-    </section>
+    </details>
     <audio id="practice-audio" preload="none"></audio>
   `;
   const $ = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
@@ -236,13 +244,19 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
     intro.hidden = section !== 'intro';
     run.hidden = section !== 'run';
     results.hidden = section !== 'results';
+    // The lane help is out of the way during a take and folded (still one tap away) under the results.
+    const help = $<HTMLDetailsElement>('practice-help');
+    help.hidden = section === 'run';
+    if (section === 'results') help.open = false;
+    // The new section starts at the top, also when the tapped button was further down the page.
+    window.scrollTo(0, 0);
   };
 
   const updateTiming = () => {
     const stored = loadLatency();
     $('practice-timing-text').textContent =
       stored === null
-        ? 'One-time timing check: tap along to 4 clicks so the orange trail lines up on this phone. You can skip it.'
+        ? 'One-time timing check: tap along to 4 clicks, so the orange line you draw matches the moment you call on this phone. You can skip it.'
         : `Timing offset: ${stored} ms (from your tap test).`;
     calibBtn.textContent = stored === null ? 'Tap test' : 'Redo tap test';
   };
@@ -345,7 +359,7 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
       readyBtn.disabled = calibrating;
     })
     .catch(() => {
-      if (alive) $('practice-loading').textContent = 'Could not load the reference clips. Check your connection and reload.';
+      if (alive) $('practice-loading').textContent = `Could not load the ${noun} recordings. Check your connection and reload the page.`;
     });
 
   // --- Tap calibration ----------------------------------------------------------------
@@ -484,12 +498,13 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
 
   const showResult = (result: ScoreResult, take: Features) => {
     show('results');
-    const rejected = $('practice-rejected');
+    const rejected = $('practice-rejected-box');
     const scored = $('practice-scored');
     const compare = $('practice-compare');
     playTakeBtn.disabled = !lastTake;
     if (result.rejected || !plan) {
-      rejected.textContent = `Not scored: ${result.rejected?.message ?? 'no result.'}`;
+      $('practice-rejected').textContent = `Not scored: ${result.rejected?.message ?? 'no result.'}`;
+      $('practice-rejected-help').textContent = rejectHelp(result.rejected?.reason);
       rejected.hidden = false;
       scored.hidden = true;
       compare.hidden = true;

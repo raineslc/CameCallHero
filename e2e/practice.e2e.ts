@@ -17,7 +17,7 @@ test.describe('practice with a reference gobble', () => {
     await noHorizontalScroll(page);
     await tapTargets(page);
 
-    // Note target from the shown reference, and the always-visible help.
+    // Note target from the shown reference, and the help (open on a first visit).
     await expect(page.locator('#practice-target')).toHaveText(/^Your goal: Make (1 note lasting|\d+ notes in) about \d+\.\d seconds\.$/);
     const help = page.locator('#practice-help');
     await expect(help.getByRole('heading', { name: 'How it works' })).toBeVisible();
@@ -67,7 +67,10 @@ test.describe('practice with a reference gobble', () => {
     const scored = (await page.locator('#practice-overlay').getAttribute('aria-label'))!.match(/^Your (\d+) notes/)![1];
     await expect(page.locator('#practice-notes')).toHaveAttribute('data-count', scored);
     await expect(page.locator('#practice-notes')).toHaveText(new RegExp(`^Notes so far: ${scored} of \\d+$`));
-    await expect(help).toBeVisible();
+    // Under the results the help is folded, one tap away; Try again stays on screen.
+    await expect(help.getByRole('heading', { name: 'How it works' })).toBeVisible();
+    await expect(help.locator('.legend-item').first()).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Try again' })).toBeInViewport();
     await expect(page.locator('#practice-best')).toHaveText('New best!');
     expect(await page.locator('#practice-overlay').evaluate((c: HTMLCanvasElement) => c.width)).toBeGreaterThan(1);
     await noHorizontalScroll(page);
@@ -146,6 +149,9 @@ test.describe('practice with a reference gobble', () => {
 
   test('tap test stores a latency', async ({ page }) => {
     await page.goto('#/practice/gobble');
+    // The tap test is optional and collapsed until opened.
+    await expect(page.getByRole('button', { name: 'Tap test' })).toBeHidden();
+    await page.getByText('Optional: timing check').click();
     await expect(page.locator('#practice-timing-text')).toContainText('One-time timing check');
     await page.getByRole('button', { name: 'Tap test' }).click();
     for (let k = 1; k <= 4; k++) {
@@ -166,12 +172,13 @@ test.describe('practice with a reference gobble', () => {
   });
 });
 
-test('locked call: Practice stays disabled and the mic is never opened', async ({ page }) => {
+test('locked call: no way to start a take and the mic is never opened', async ({ page }) => {
   await spy(page);
   await page.goto('#/practice/kee-kee-run');
   await expect(page.getByText('Coming soon', { exact: true })).toBeVisible();
   await expect(page.locator('main')).toContainText('cannot yet tell it apart from a yelp');
-  await expect(page.getByRole('button', { name: "I'm ready" })).toBeDisabled();
+  await expect(page.getByRole('button', { name: "I'm ready" })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Back to Kee kee run' })).toHaveAttribute('href', '#/call/kee-kee-run');
   expect((await micState(page)).streams).toBe(0);
 });
 
@@ -201,6 +208,7 @@ test('Ready stays disabled while the tap test runs, even when the references fin
   await page.goto('#/practice/gobble');
   const ready = page.getByRole('button', { name: "I'm ready" });
   await expect(ready).toBeDisabled();
+  await page.getByText('Optional: timing check').click();
   await page.getByRole('button', { name: 'Tap test' }).click();
   release();
   await expect(page.locator('#practice-loading')).toBeHidden({ timeout: 10_000 });
