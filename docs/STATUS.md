@@ -100,7 +100,9 @@ Bands tried (grid r/p/t 0.5, 1, 2, 3 × structure 0, 1, 2 = 192 sets; best worst
   help the hen flush call (best weights still lose to the mallard drake raeb).
 
 Next for the wood duck: more clean drake whistle recordings from other recordists (only Paul
-Marvin's two and one overlapped clip were usable here); for the hen flush call, the same scoring work as the mallard hail call (a
+Marvin's two and one overlapped clip were usable here); when the whistle is unlocked, extend the
+practice lane's pitch axis (`pitchRange()` in `src/practice/plan.ts` caps at 8 kHz; the whistle
+reaches ~9 kHz, Codex review on #24); for the hen flush call, the same scoring work as the mallard hail call (a
 per-note feature for a series of similar notes).
 
 Verified: `npm ci && npm test` (519 unit tests), `npm run build`, `npm run e2e` (94 passed,
