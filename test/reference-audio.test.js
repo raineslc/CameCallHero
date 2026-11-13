@@ -1,6 +1,6 @@
 // Checks the reference-audio manifests: every WAV is listed, every entry has an
 // allowed license and proof URL, files are mono 44.1 kHz 16-bit, each species folder < 15 MB, and
-// every owl, elk and mallard call definition cites a source.
+// every owl, elk, mallard and wood duck call definition cites a source.
 // Plain JS (not TS): the project has no @types/node and this test needs node:fs.
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -30,6 +30,7 @@ const sets = [
   { dir: 'public/audio/mallard', needsCall: true, trimmed: true, noPlayback: true },
   // Same for the great horned owl (Phase 13).
   { dir: 'public/audio/great-horned-owl', needsCall: true, trimmed: true, noPlayback: true },
+  { dir: 'public/audio/wood-duck', needsCall: true, trimmed: true, noPlayback: true },
   { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
   { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
   // Real phone takes stay at the phone's own rate (48 kHz), unconverted.
@@ -96,13 +97,13 @@ for (const { dir, needsCall, trimmed, noPlayback = false, wildOnly = false, samp
   });
 }
 
-it.each(['public/audio/turkey', 'public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl'])('%s is under 15 MB', (d) => {
+it.each(['public/audio/turkey', 'public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl', 'public/audio/wood-duck'])('%s is under 15 MB', (d) => {
   const dir = join(root, d);
   const total = readdirSync(dir).reduce((sum, f) => sum + statSync(join(dir, f)).size, 0);
   expect(total).toBeLessThan(15 * 1024 * 1024);
 });
 
-describe.each(['public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl'])('%s call definitions', (dir) => {
+describe.each(['public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl', 'public/audio/wood-duck'])('%s call definitions', (dir) => {
   const m = JSON.parse(readFileSync(join(root, dir, 'manifest.json'), 'utf8'));
   const defs = m.callDefinitions;
 
@@ -117,12 +118,22 @@ describe.each(['public/audio/barred-owl', 'public/audio/elk', 'public/audio/mall
   });
 });
 
-describe('public/audio/mallard wild birds', () => {
-  const m = JSON.parse(readFileSync(join(root, 'public/audio/mallard/manifest.json'), 'utf8'));
-  // Mallards hybridise with domestic ducks: every clip records why it counts as a wild bird.
+// Mallards hybridise with domestic ducks; wood ducks are kept in waterfowl collections and have
+// escaped and feral birds outside their native range. Every clip records why it counts as a wild bird.
+describe.each(['public/audio/mallard', 'public/audio/wood-duck'])('%s wild birds', (dir) => {
+  const m = JSON.parse(readFileSync(join(root, dir, 'manifest.json'), 'utf8'));
   it.each(m.clips.map((c) => [c.file, c]))('%s says it is a wild bird', (_f, c) => {
     expect(c.wildBird).toBeTruthy();
     // The notes quote the recording page (place, remarks): none may mention a kept or park bird.
-    expect(c.notes).not.toMatch(/\b(domestic|farm|captive|tame|feral|park|zoo|bread)\b/i);
+    expect(c.notes).not.toMatch(/\b(domestic|farm|captive|tame|feral|escaped|park|zoo|bread|collection)\b/i);
+  });
+});
+
+describe('public/audio/wood-duck native range', () => {
+  const m = JSON.parse(readFileSync(join(root, 'public/audio/wood-duck/manifest.json'), 'utf8'));
+  // Recordings from Europe are of escaped or feral birds (their pages say so): only North American
+  // recordings are used (the countries below are the ones checked; add others only with a source).
+  it.each(m.clips.map((c) => [c.file, c]))('%s was recorded in the native range', (_f, c) => {
+    expect(c.wildBird).toMatch(/^native range \((United States|Canada)\)/);
   });
 });

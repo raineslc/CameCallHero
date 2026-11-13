@@ -10,6 +10,7 @@ import { ELK_BAND, ELK_CALLS } from './elk';
 import { MALLARD_BAND, MALLARD_CALLS } from './mallard';
 import { GREAT_HORNED_OWL_CALLS } from './great-horned-owl';
 import { TURKEY_CALLS } from './turkey';
+import { WOOD_DUCK_BAND, WOOD_DUCK_CALLS } from './wood-duck';
 
 export interface Species {
   id: string;
@@ -38,7 +39,9 @@ export const GREAT_HORNED_OWL: Species = {
   band: OWL_BAND,
 };
 
-export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD, GREAT_HORNED_OWL];
+export const WOOD_DUCK: Species = { id: 'wood-duck', name: 'Wood duck', noun: 'duck', nounPlural: 'ducks', calls: WOOD_DUCK_CALLS, band: WOOD_DUCK_BAND };
+
+export const SPECIES: Species[] = [TURKEY, BARRED_OWL, ELK, MALLARD, GREAT_HORNED_OWL, WOOD_DUCK];
 export const DEFAULT_SPECIES = TURKEY;
 
 export const speciesById = (id: string): Species | undefined => SPECIES.find((s) => s.id === id);

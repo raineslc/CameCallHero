@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { extractFeatures, FULL_BAND } from '../src/audio/features';
 import { LivePitch } from '../src/audio/pitch';
 import { OWL_BAND } from '../src/calls/barred-owl';
-import { BARRED_OWL, bestId, callHref, ELK, homeHref, MALLARD, practiceHref, resolveCall, SPECIES, TURKEY } from '../src/calls/species';
+import { BARRED_OWL, bestId, callHref, ELK, homeHref, MALLARD, practiceHref, resolveCall, SPECIES, TURKEY, WOOD_DUCK } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { loadBest, saveBest } from '../src/practice/storage';
 import { tipsFor } from '../src/practice/tips';
@@ -77,8 +77,8 @@ describe('species calls', () => {
     for (const c of BARRED_OWL.calls) for (const p of c.references) expect(p).toMatch(/^audio\/barred-owl\//);
     for (const c of ELK.calls) for (const p of c.references) expect(p).toMatch(/^audio\/elk\//);
   });
-  it('species order and ids: turkey (default), barred owl, elk, mallard, great horned owl', () => {
-    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard', 'great-horned-owl']);
+  it('species order and ids: turkey (default), barred owl, elk, mallard, great horned owl, wood duck', () => {
+    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard', 'great-horned-owl', 'wood-duck']);
     expect(ELK.calls.map((c) => [c.id, c.locked])).toEqual([
       ['bugle', true],
       ['glug', true],
@@ -102,6 +102,26 @@ describe('species calls', () => {
       '#/mallard/call/quack',
       '#/mallard/practice/quack',
       'mallard.quack',
+    ]);
+  });
+  it('wood duck: its own band, every call cited; only the drake whistle is unlocked', () => {
+    expect(WOOD_DUCK.band).toEqual({ minHz: 300, maxHz: 10000 });
+    expect(WOOD_DUCK.calls.map((c) => [c.id, c.locked])).toEqual([
+      ['hen-flush', true],
+      ['drake-whistle', false],
+    ]);
+    for (const c of WOOD_DUCK.calls) {
+      expect(c.sources.length).toBeGreaterThan(0);
+      if (c.locked) expect(c.references).toEqual([]);
+      for (const p of c.references) expect(p).toMatch(/^audio\/wood-duck\//);
+    }
+    const whistle = WOOD_DUCK.calls[1];
+    expect(resolveCall('wood-duck/drake-whistle')).toMatchObject({ species: WOOD_DUCK, call: { id: 'drake-whistle' } });
+    expect([homeHref(WOOD_DUCK), callHref(WOOD_DUCK, whistle), practiceHref(WOOD_DUCK, whistle), bestId(WOOD_DUCK, whistle)]).toEqual([
+      '#/wood-duck',
+      '#/wood-duck/call/drake-whistle',
+      '#/wood-duck/practice/drake-whistle',
+      'wood-duck.drake-whistle',
     ]);
   });
   it('links: turkey keeps the short form, other species carry their id; every link resolves', () => {
