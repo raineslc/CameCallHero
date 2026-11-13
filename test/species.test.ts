@@ -77,8 +77,8 @@ describe('species calls', () => {
     for (const c of BARRED_OWL.calls) for (const p of c.references) expect(p).toMatch(/^audio\/barred-owl\//);
     for (const c of ELK.calls) for (const p of c.references) expect(p).toMatch(/^audio\/elk\//);
   });
-  it('species order and ids: turkey (default), barred owl, elk, mallard', () => {
-    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard']);
+  it('species order and ids: turkey (default), barred owl, elk, mallard, great horned owl', () => {
+    expect(SPECIES.map((s) => s.id)).toEqual(['turkey', 'barred-owl', 'elk', 'mallard', 'great-horned-owl']);
     expect(ELK.calls.map((c) => [c.id, c.locked])).toEqual([
       ['bugle', true],
       ['glug', true],

@@ -69,7 +69,7 @@ Limits:
   were scored). Next for a male/female split: an absolute-pitch feature as its own weight, and
   more clips from more birds.
 
-Verified: `npm ci && npm test` (313 unit tests), `npm run build`, `npm run e2e` (72 passed,
+Verified: `npm ci && npm test` (370 unit tests), `npm run build`, `npm run e2e` (84 passed,
 4 screenshot tests skipped) incl. new `e2e/practice-great-horned-owl.e2e.ts` (picker, call card,
 fake mic plays territorial-hoot-8: scored 95.6, saved under the great horned owl key) and the
 new screens in the a11y design pass. Screenshots: `docs/screenshots/home-great-horned-owl-360.png`,
