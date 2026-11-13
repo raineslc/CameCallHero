@@ -2,11 +2,13 @@
 // reference clips), spectrogram with a playhead, then Play and Practice within the first
 // screen. When the animal uses it (cited) and the clip list with attribution are collapsible.
 // Locked calls show their lock badge and reason ("Recordings needed", or "Coming soon" for a
-// call with recordings the scorer cannot yet tell apart).
+// call with recordings the scorer cannot yet tell apart) and no Practice; a locked call with
+// listen-only clips (src/calls/listen.ts) still gets the spectrogram, Play and the clip list.
 
 import type { Features } from '../audio/features';
 import { lockInfo, type CallDef } from '../calls/call';
-import { practiceHref, resolveCall } from '../calls/species';
+import { playableClips } from '../calls/listen';
+import { homeHref, practiceHref, resolveCall } from '../calls/species';
 import {
   assetUrl,
   clipInfo,
@@ -70,20 +72,18 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
     el('p', { className: 'lead', textContent: call.description.meaning }),
   );
 
+  const clips = playableClips(species, call);
   if (call.locked) {
-    root.append(
-      el('p', {
-        className: 'notice',
-        id: 'call-lock-reason',
-        textContent: `${lockInfo(call).label}: ${lockInfo(call).reason}`,
-      }),
-      el('div', { className: 'actions' }, el('button', { type: 'button', className: 'btn primary', disabled: true, textContent: 'Practice' })),
-      when,
-    );
-    return;
+    root.append(el('p', { className: 'notice', id: 'call-lock-reason', textContent: `${lockInfo(call).label}: ${lockInfo(call).reason}` }));
+    if (clips.length === 0) {
+      root.append(when, el('div', { className: 'actions' }, el('a', { className: 'btn', href: homeHref(species), textContent: `Other ${species.noun} calls` })));
+      return;
+    }
+    root.append(el('p', { className: 'lead', id: 'call-listen-only', textContent: `Listen only for now: these are real wild ${species.nounPlural}.` }));
   }
 
-  const measureEl = el('p', { id: 'call-measure', className: 'facts', textContent: 'Measuring reference clips…' });
+  // The "how many notes" line is the scorer's measure, shown only for calls it can score.
+  const measureEl = el('p', { id: 'call-measure', className: 'facts', textContent: 'Measuring the recordings…', hidden: call.locked });
   const canvas = el('canvas', { className: 'spectrogram large', id: 'call-spectrogram' });
   canvas.setAttribute('role', 'img');
   const playhead = el('div', { className: 'playhead', hidden: true });
@@ -92,15 +92,15 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
   errorEl.setAttribute('role', 'alert');
   const list = el('ol', { className: 'clips' });
   const playMain = el('button', { type: 'button', className: 'btn', id: 'call-play', textContent: 'Play' });
+  if (!call.locked) root.append(measureEl);
   root.append(
-    measureEl,
     el('div', { className: 'spectrogram-wrap' }, canvas, playhead),
     el('p', { className: 'caption muted', textContent: 'Low pitch at the bottom, time left to right. Bright orange is the loudest sound.' }),
     audio,
     errorEl,
-    el('div', { className: 'actions' }, playMain, el('a', { className: 'btn primary', href: practiceHref(species, call), textContent: 'Practice' })),
+    el('div', { className: 'actions' }, playMain, ...(call.locked ? [] : [el('a', { className: 'btn primary', href: practiceHref(species, call), textContent: 'Practice' })])),
     when,
-    el('details', { className: 'more' }, el('summary', { textContent: `Reference clips and licenses (${call.references.length})` }), list),
+    el('details', { className: 'more' }, el('summary', { textContent: `Recordings and credits (${clips.length})` }), list),
   );
 
   let alive = true;
@@ -116,9 +116,9 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
 
   const select = (i: number) => {
     canvas.setAttribute('aria-label', `Spectrogram of ${call.name.toLowerCase()} clip ${i + 1}`);
-    loadSpectrogram(call.references[i], species.band)
+    loadSpectrogram(clips[i], species.band)
       .then((img) => alive && current === i && showSpectrogram(canvas, img))
-      .catch(() => alive && showError(`Could not load clip ${i + 1}.`));
+      .catch(() => alive && showError(`Could not load recording ${i + 1}.`));
   };
 
   const tick = () => {
@@ -141,7 +141,7 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
     raf = requestAnimationFrame(tick);
   });
   audio.addEventListener('error', () => {
-    if (alive && audio.getAttribute('src')) showError(`Could not play clip ${current + 1}.`);
+    if (alive && audio.getAttribute('src')) showError(`Could not play recording ${current + 1}.`);
   });
 
   /** Starts clip i, or stops it if it is the one playing. */
@@ -154,7 +154,7 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
     audio.pause();
     current = i;
     select(i);
-    audio.src = assetUrl(call.references[i]);
+    audio.src = assetUrl(clips[i]);
     audio.play().then(
       () => {
         if (!alive || current !== i) return;
@@ -163,13 +163,13 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
       },
       (err: unknown) => {
         // A newer click replaced this clip before it started: not an error.
-        if (alive && current === i && !(err instanceof DOMException && err.name === 'AbortError')) showError(`Could not play clip ${i + 1}.`);
+        if (alive && current === i && !(err instanceof DOMException && err.name === 'AbortError')) showError(`Could not play recording ${i + 1}.`);
       },
     );
   };
   playMain.addEventListener('click', () => toggle(Math.max(current, 0)));
 
-  call.references.forEach((path, i) => {
+  clips.forEach((path, i) => {
     const btn = el('button', { type: 'button', className: 'btn', textContent: `Play clip ${i + 1}` });
     btn.dataset.clip = String(i);
     buttons.push(btn);
@@ -187,16 +187,24 @@ export function callDetailScreen(root: HTMLElement, param: string): (() => void)
       if (!alive) return;
       list.querySelectorAll<HTMLLIElement>('li').forEach((li) => li.append(attribution(clipInfo(manifest, li.dataset.file!))));
     })
-    .catch(() => alive && showError('Could not load the clip attributions.'));
+    .catch(() => alive && showError('Could not load the credits for these recordings.'));
 
-  Promise.all(call.references.map((p) => loadFeatures(p, species.band)))
-    .then((fs) => {
-      if (!alive) return;
-      fs.forEach((f, i) => (features[i] = f));
-      const m = measure(fs);
-      measureEl.textContent = m ? describeMeasure(m) : 'No reference clips.';
-    })
-    .catch(() => alive && (measureEl.textContent = 'Could not measure the reference clips.'));
+  // Features place the playhead; a locked call loads each clip's only when it is played.
+  if (call.locked) {
+    audio.addEventListener('playing', () => {
+      const i = current;
+      if (!features[i]) void loadFeatures(clips[i], species.band).then((f) => (features[i] = f), () => undefined);
+    });
+  } else {
+    Promise.all(clips.map((p) => loadFeatures(p, species.band)))
+      .then((fs) => {
+        if (!alive) return;
+        fs.forEach((f, i) => (features[i] = f));
+        const m = measure(fs);
+        measureEl.textContent = m ? describeMeasure(m) : 'No recordings.';
+      })
+      .catch(() => alive && (measureEl.textContent = 'Could not measure the recordings.'));
+  }
 
   return () => {
     alive = false;

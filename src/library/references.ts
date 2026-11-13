@@ -104,7 +104,7 @@ const range = ([a, b]: [number, number], fmt: (n: number) => string) => (fmt(a) 
 export function describeMeasure(m: Measure): string {
   const notes = range(m.notes, String);
   const unit = m.notes[1] === 1 ? 'note' : 'notes';
-  return `${notes} ${unit}, ${range(m.seconds, (s) => s.toFixed(2))} s long (as the scorer measures ${m.clips} reference clip${m.clips === 1 ? '' : 's'})`;
+  return `${notes} ${unit}, ${range(m.seconds, (s) => s.toFixed(1))} s long in our ${m.clips === 1 ? 'recording' : `${m.clips} recordings`}`;
 }
 
 /** Fraction 0..1 across the spectrogram for playback time t (s); the image has one column per HOP_SEC. */

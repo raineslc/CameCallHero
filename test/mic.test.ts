@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyMicError, compareSettings, micSupportProblem, MicStartError } from '../src/audio/capture';
+import { classifyMicError, compareSettings, micSupportProblem, MicStartError, processingSummary } from '../src/audio/capture';
 import { analyzeTake, chunkLevel, liveStatus, RollingBuffer, TakeRecorder } from '../src/audio/monitor';
 import { encodeWav } from '../src/audio/wav';
 import { parseWav, readWav } from './wav';
@@ -138,5 +138,23 @@ describe('encodeWav', () => {
     expect(back[1]).toBe(-1);
     expect(back[2]).toBe(0);
     expect(back[3]).toBe(0);
+  });
+});
+
+describe('processingSummary', () => {
+  const labels = { echoCancellation: 'Echo cancellation', noiseSuppression: 'Noise suppression', autoGainControl: 'Auto gain', channelCount: 'Channels' };
+  it('all three off: nothing changes the sound, whatever the channel count', () => {
+    const r = processingSummary(compareSettings({ echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 2 }), labels);
+    expect(r).toEqual({ ok: true, text: 'Your phone records the sound as it is: nothing is changing it.' });
+  });
+  it('names what the phone left on', () => {
+    const r = processingSummary(compareSettings({ echoCancellation: false, noiseSuppression: true, autoGainControl: true, channelCount: 1 }), labels);
+    expect(r.ok).toBe(false);
+    expect(r.text).toBe('Your phone still changes the sound (left on: noise suppression, auto gain). Scores may be less accurate.');
+  });
+  it('unreported settings are not called a problem', () => {
+    const r = processingSummary(compareSettings({}), labels);
+    expect(r.ok).toBe(true);
+    expect(r.text).toContain('does not say');
   });
 });

@@ -3,7 +3,9 @@
 // that is a scope (a species id) is moved into the param: #/<scope> is home with param
 // '<scope>', #/<scope>/call/<id> is the call route with param '<scope>/<id>'. A screen renders
 // into `root` and may return a cleanup function, called when the user leaves the screen
-// (releases mic, audio, timers, URLs).
+// (releases mic, audio, timers, URLs). After each render the page title names the screen (its
+// first h2), and on every navigation after the first that heading takes the focus, so a screen
+// reader announces the new screen and keyboard focus starts at its top.
 
 export type Screen = (root: HTMLElement, param: string) => (() => void) | void;
 
@@ -46,6 +48,8 @@ export function startRouter(
   scopes: readonly string[] = [],
 ): void {
   let cleanup: (() => void) | undefined;
+  let first = true;
+  const appName = document.title;
   const leave = () => {
     const done = cleanup;
     cleanup = undefined;
@@ -59,6 +63,13 @@ export function startRouter(
     root.replaceChildren();
     window.scrollTo(0, 0);
     cleanup = routes[route](root, param) ?? undefined;
+    const heading = root.querySelector<HTMLElement>('h2');
+    document.title = heading?.textContent ? `${heading.textContent} · ${appName}` : appName;
+    if (heading && !first) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+    first = false;
     document.querySelectorAll<HTMLAnchorElement>('nav a').forEach((a) => {
       if (a.getAttribute('href') === `#${route}`) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');

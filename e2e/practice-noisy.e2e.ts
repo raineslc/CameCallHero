@@ -19,4 +19,7 @@ test('loud background: red quiet light with a plain reason, and the scorer refus
   await expect(page.locator('#practice-quiet')).toBeVisible();
   await expect(page.locator('#practice-results')).toBeVisible({ timeout: 20_000 });
   await expect(page.locator('#practice-rejected')).toContainText(/Too noisy|no call/i);
+  // A refused take says what to do next, not only what went wrong.
+  await expect(page.locator('#practice-rejected-help')).toContainText(/Move away from wind|Call right after the count-in/);
+  await expect(page.locator('#practice-results-title')).toBeFocused();
 });

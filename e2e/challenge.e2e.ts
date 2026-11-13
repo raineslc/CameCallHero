@@ -34,6 +34,10 @@ test('a yelp and a gobble in one take: two recognized calls, saved to the leader
   await expect(page).toHaveURL(/#\/challenge$/);
   await expect(page.getByRole('button', { name: "I'm ready" })).toBeEnabled({ timeout: 10_000 });
   await expect(page.locator('#challenge-board-empty')).toBeVisible();
+  // Three numbered steps and the calls the app can score, before the help is opened.
+  await expect(page.locator('#challenge-intro .steps li')).toHaveCount(3);
+  await expect(page.locator('#challenge-intro')).toContainText('The app can score: yelp and gobble.');
+  await expect(page.locator('#challenge-help li').first()).toBeHidden();
 
   const stop = await record(page, 4);
   await shot(page, 'recording');

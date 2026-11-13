@@ -11,7 +11,7 @@ import { practiceScreen } from './screens/practice';
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <header class="camo topbar">
     <a class="plate icon-btn" id="nav-back" href="#/" aria-label="Back" hidden><span aria-hidden="true">←</span></a>
-    <h1 class="plate brand">Game <span class="accent">Call</span> Hero</h1>
+    <h1 class="brand-wrap"><a class="plate brand" href="#/" aria-label="Game Call Hero: all animals">Game <span class="accent">Call</span> Hero</a></h1>
     <nav><a class="plate" href="#/">Calls</a><a class="plate" href="#/mic">Mic check</a></nav>
   </header>
   <main id="screen"></main>

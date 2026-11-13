@@ -1,5 +1,22 @@
 # Status
 
+## UX review (owner request, 2026-11-13, branch `ux-review`)
+
+Full visual and usability pass over every screen: findings, fixes and the
+**"Needs the owner" list** are in [`docs/UX-REVIEW.md`](UX-REVIEW.md).
+Before/after screenshots: `docs/screenshots/ux/before/` and `docs/screenshots/ux/after/`.
+
+**Owner: decisions and checks** (details and reasons in `docs/UX-REVIEW.md`)
+1. Phone test on your Android in daylight (nothing here was tested on hardware).
+2. Is "Listen only" right? 10 locked calls now play their recordings; say the word and it goes.
+3. Sunlight: do you want a light/high-contrast theme? That changes the `AGENTS.md` design rule.
+4. Read the new plain-English wording as a hunter would (home line, practice steps, mic-check
+   headings, the four refused-take hints).
+5. "Add to Home Screen" still never verified on a phone (open since Phase 6).
+6. Content: turkey cut and purr recordings; whether the kee kee run clips (classified by
+   measurement only) and the clips marked `uncertain` should be listenable.
+
+Scoring, calibration and lock decisions were not touched (Phase 16 owns them).
 ## Phase 16: scoring upgrade for trills, raspy and trending calls (2026-11-13, [#25](https://github.com/raineslc/GameCallHero/pull/25))
 
 **Owner: decisions and checks**

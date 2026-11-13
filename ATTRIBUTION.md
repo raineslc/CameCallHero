@@ -2,7 +2,8 @@
 
 Audio used in Game Call Hero. Machine-readable source of truth:
 `public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json`, `public/audio/elk/manifest.json`,
-`public/audio/mallard/manifest.json` and `public/audio/wood-duck/manifest.json` (trim times, quality notes),
+`public/audio/mallard/manifest.json`, `public/audio/great-horned-owl/manifest.json`,
+`public/audio/eastern-screech-owl/manifest.json` and `public/audio/wood-duck/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings

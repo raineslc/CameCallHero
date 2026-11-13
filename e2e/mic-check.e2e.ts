@@ -68,3 +68,25 @@ for (const [name, kind, text] of [
     await expect(page.getByRole('button', { name: 'Start mic' })).toBeEnabled();
   });
 }
+
+// UX review: the mic check reads as four plain checks; the numbers are in Technical details.
+test('four checks, a quiet light, a plain line about the phone, and a verdict on the test take', async ({ page }) => {
+  await page.goto('#/mic');
+  await expect(page.locator('#mic-start-hint')).toContainText('tap Allow');
+  await page.getByRole('button', { name: 'Start mic' }).click();
+  await expect(page.locator('#mic-start-hint')).toBeHidden();
+  await expect(page.locator('main h3')).toHaveText(['1. How loud you are', '2. Background noise', '3. Your phone', '4. Test recording']);
+  await expect(page.locator('#mic-quiet')).toHaveAttribute('data-state', 'ok', { timeout: 10_000 });
+  await expect(page.locator('#mic-quiet-text')).not.toBeEmpty();
+  await expect(page.locator('#mic-summary')).toHaveText(/records the sound as it is|still changes the sound|does not say/);
+
+  // Numbers stay out of the way until opened.
+  await expect(page.locator('#mic-floor')).toBeHidden();
+  await page.getByText('Technical details').click();
+  await expect(page.locator('#mic-floor')).toContainText('dBFS');
+  await expect(page.locator('#mic-settings tr')).toHaveCount(4);
+
+  await page.getByRole('button', { name: 'Record 5 s' }).click();
+  await expect(page.locator('#take-verdict')).toHaveText(/^(Good: the app can score a call like this\.|Not good enough to score\. )/, { timeout: 15_000 });
+  await expect(page.getByRole('link', { name: 'Save recording (WAV)' })).toBeVisible();
+});
