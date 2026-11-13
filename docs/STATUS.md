@@ -39,6 +39,9 @@ What changed:
   200–1500 Hz, reused: hoots measure 269–452 Hz). Picker, routes, call page, practice and
   challenge come from the species list. Best-score key `camecallhero.best.great-horned-owl.territorial-hoot`.
   Turkey and barred owl code, weights and keys unchanged (no change under `src/audio/`).
+- **Species picker** (`theme.css`): three columns at 360 px (min 96 px, label may wrap to two
+  lines, still ≥ 44 px tall), so five species take two rows and all five turkey calls stay on
+  the first screen (`e2e/library.e2e.ts` failed with the old two-column picker and five species).
 - **Challenge** (`src/challenge/rules.ts`): split gap 1.5 s (longest within-call gap 0.83 s ×
   1.8), recognition line 44 (worst wrong sound: tone sweep 43.3; wrong sounds are junk only, as
   the species has one call), made-up rank titles. Barred owl hoots are not wrong sounds in this
@@ -69,7 +72,7 @@ Limits:
   were scored). Next for a male/female split: an absolute-pitch feature as its own weight, and
   more clips from more birds.
 
-Verified: `npm ci && npm test` (370 unit tests), `npm run build`, `npm run e2e` (84 passed,
+Verified: `npm ci && npm test` (452 unit tests, after rebasing onto elk #20 and mallard #22), `npm run build`, `npm run e2e` (89 passed,
 4 screenshot tests skipped) incl. new `e2e/practice-great-horned-owl.e2e.ts` (picker, call card,
 fake mic plays territorial-hoot-8: scored 95.6, saved under the great horned owl key) and the
 new screens in the a11y design pass. Screenshots: `docs/screenshots/home-great-horned-owl-360.png`,
