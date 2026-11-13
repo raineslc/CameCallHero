@@ -89,9 +89,9 @@ describe.each(calls.map((c) => [c.id, c]))('wood duck calibration: %s', (_id, ca
   }, 120_000);
 });
 
-// Stricter than the other species' tests: the drake whistle has two clips from each of two birds,
-// so leave-one-out can match a clip with its sibling from the same recording. Leaving out the
-// whole recording, each clip must still beat every negative by MARGIN.
+// Stricter than the other species' tests, for unlocked calls (none yet): several clips come from one
+// recording (one bird), so leave-one-out can match a clip with its sibling from the same recording.
+// Leaving out the whole recording, each clip must still beat every negative by MARGIN.
 describe.each(calls.filter((c) => !c.locked).map((c) => [c.id, c]))('wood duck leave-one-recording-out: %s', (_id, call) => {
   it(`each clip scored against the other recordings' clips beats every negative by >= ${MARGIN}`, () => {
     const own = clipsOf(call.id);

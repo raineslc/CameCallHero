@@ -1,5 +1,5 @@
 {
-  "about": "Reference recordings of wild wood ducks (Aix sponsa), all from xeno-canto. Licenses were checked on each recording's own page on 2026-11-13. trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps at least 0.3 s before the call for the noise floor. Calls were classified by measurement against the cited call definitions in callDefinitions; uncertain clips would say so in notes (and uncertain: true). Every recording used says 'Playback used: no' on its page. Wood ducks are kept in waterfowl collections and have escaped and feral birds in Europe: only recordings from the native range (United States, Canada) were used, and recordings whose page mentions an escaped, feral, captive, domestic or fed bird, a park or a waterfowl collection were left out (e.g. XC522565 'Feral population', XC855694 'certainly escaped', XC177728 Powderhorn Park, XC754267 'along an urban park'). Originals with samples at full scale were rejected (XC724843). Classification is by spectrogram and measurement; no expert or recordist confirmed it.",
+  "about": "Reference recordings of wild wood ducks (Aix sponsa), all from xeno-canto. Licenses were checked on each recording's own page on 2026-11-13. trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps at least 0.3 s before the call for the noise floor. Calls were classified by measurement against the cited call definitions in callDefinitions; uncertain clips say so in notes (and uncertain: true). Every recording used says 'Playback used: no' on its page. Wood ducks are kept in waterfowl collections and have escaped and feral birds in Europe: only recordings from the native range (United States, Canada) were used, and recordings whose page mentions an escaped, feral, captive, domestic or fed bird, a park or a waterfowl collection were left out (e.g. XC522565 'Feral population', XC855694 'certainly escaped', XC177728 Powderhorn Park, XC754267 'along an urban park'). Originals with samples at full scale were rejected (XC724843). Classification is by spectrogram and measurement; no expert or recordist confirmed it.",
   "calls": [
     "hen-flush",
     "drake-whistle"
@@ -33,7 +33,7 @@
         "name": "Drake whistle",
         "definition": "The male has a thin, rising and falling, zeeting whistle (All About Birds).",
         "use": "The sources read do not say when drakes give it.",
-        "classifyBy": "one thin tonal note, 0.2-0.6 s, rising in pitch (with or without a fall at the end), from a male (page sex or remarks); no other call within 0.3 s before or after.",
+        "classifyBy": "one thin tonal note, 0.2-0.6 s, rising in pitch (with or without a fall at the end), from a male (page sex or remarks).",
         "sources": [
           "aab-sounds"
         ]
@@ -223,7 +223,7 @@
       "trimEndSec": 6.1,
       "modifications": "Trimmed; decoded from MP3 (48 kHz mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by us.",
       "uncertain": false,
-      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.48 s; durations 0.27 s; level re loudest note 0.0 dB; dominant frequency 4544 Hz at the start, highest 6395 Hz, 5771 Hz at the end. Lead-in 0.48 s; SNR 23.0 dB (loudest frame vs 10th-percentile frame); clip peak 0.177 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). The whistle stands alone: no other call within 0.3 s. Page remarks: 'hidden in marsh' (sex male stated; animal seen: no). Page: sex male; animal seen no; playback used no; type 'call'; Oxbow NWR, Massachusetts, United States, 2012-05-16."
+      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.48 s; durations 0.27 s; level re loudest note 0.0 dB; dominant frequency 4544 Hz at the start, highest 6395 Hz, 5771 Hz at the end. Lead-in 0.48 s; SNR 23.0 dB (loudest frame vs 10th-percentile frame); clip peak 0.177 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). Page remarks: 'hidden in marsh' (sex male stated; animal seen: no). Page: sex male; animal seen no; playback used no; type 'call'; Oxbow NWR, Massachusetts, United States, 2012-05-16."
     },
     {
       "file": "drake-whistle-2.wav",
@@ -241,7 +241,7 @@
       "trimEndSec": 13.2,
       "modifications": "Trimmed; decoded from MP3 (48 kHz mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by us.",
       "uncertain": false,
-      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.53 s; durations 0.24 s; level re loudest note 0.0 dB; dominant frequency 4651 Hz at the start, highest 6697 Hz, 6406 Hz at the end. Lead-in 0.53 s; SNR 18.0 dB (loudest frame vs 10th-percentile frame); clip peak 0.169 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). The whistle stands alone: no other call within 0.3 s. Page remarks: 'hidden in marsh' (sex male stated; animal seen: no). Page: sex male; animal seen no; playback used no; type 'call'; Oxbow NWR, Massachusetts, United States, 2012-05-16."
+      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.53 s; durations 0.24 s; level re loudest note 0.0 dB; dominant frequency 4651 Hz at the start, highest 6697 Hz, 6406 Hz at the end. Lead-in 0.53 s; SNR 18.0 dB (loudest frame vs 10th-percentile frame); clip peak 0.169 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). Page remarks: 'hidden in marsh' (sex male stated; animal seen: no). Page: sex male; animal seen no; playback used no; type 'call'; Oxbow NWR, Massachusetts, United States, 2012-05-16."
     },
     {
       "file": "drake-whistle-3.wav",
@@ -259,7 +259,7 @@
       "trimEndSec": 13.9,
       "modifications": "Trimmed; decoded from MP3 (48 kHz mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by us.",
       "uncertain": false,
-      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.50 s; durations 0.45 s; level re loudest note 0.0 dB; dominant frequency 6288 Hz at the start, highest 9022 Hz, 8570 Hz at the end. Lead-in 0.50 s; SNR 23.7 dB (loudest frame vs 10th-percentile frame); clip peak 0.223 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). The whistle stands alone: no other call within 0.3 s. Page remarks: none. Page: sex male; animal seen yes; playback used no; type 'call'; Lindo Lake, Lakeside, San Diego County, California, United States, 2018-01-26."
+      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.50 s; durations 0.45 s; level re loudest note 0.0 dB; dominant frequency 6288 Hz at the start, highest 9022 Hz, 8570 Hz at the end. Lead-in 0.50 s; SNR 23.7 dB (loudest frame vs 10th-percentile frame); clip peak 0.223 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). Page remarks: none. Page: sex male; animal seen yes; playback used no; type 'call'; Lindo Lake, Lakeside, San Diego County, California, United States, 2018-01-26."
     },
     {
       "file": "drake-whistle-4.wav",
@@ -277,7 +277,25 @@
       "trimEndSec": 2.1,
       "modifications": "Trimmed; decoded from MP3 (48 kHz mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by us.",
       "uncertain": false,
-      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.53 s; durations 0.38 s; level re loudest note 0.0 dB; dominant frequency 5017 Hz at the start, highest 7773 Hz, 6051 Hz at the end. Lead-in 0.53 s; SNR 19.8 dB (loudest frame vs 10th-percentile frame); clip peak 0.112 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). The whistle stands alone: no other call within 0.3 s. Page remarks: none. Page: sex male; animal seen yes; playback used no; type 'call'; Lindo Lake, Lakeside, San Diego County, California, United States, 2018-01-26."
+      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.53 s; durations 0.38 s; level re loudest note 0.0 dB; dominant frequency 5017 Hz at the start, highest 7773 Hz, 6051 Hz at the end. Lead-in 0.53 s; SNR 19.8 dB (loudest frame vs 10th-percentile frame); clip peak 0.112 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). Page remarks: none. Page: sex male; animal seen yes; playback used no; type 'call'; Lindo Lake, Lakeside, San Diego County, California, United States, 2018-01-26."
+    },
+    {
+      "file": "drake-whistle-5.wav",
+      "call": "drake-whistle",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/679723",
+      "sourceId": "XC679723",
+      "author": "Aziza Cooper",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "wildBird": "native range (Canada); no escaped, feral, captive, domestic or park note on the page",
+      "trimStartSec": 8.1,
+      "trimEndSec": 9.15,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz stereo, channels averaged) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by us.",
+      "uncertain": true,
+      "notes": "Measured (2500-10000 Hz band, notes within 25 dB of the loudest): 1 note; onsets 0.37 s; durations 0.36 s; level re loudest note 0.0 dB; dominant frequency 4328 Hz at the start, highest 7343 Hz, 3661 Hz at the end. Lead-in 0.37 s; SNR 31.0 dB (loudest frame vs 10th-percentile frame); clip peak 0.104 of full scale. Classified as the drake whistle: one thin, tonal note, 0.2-0.5 s, rising from about 4.5-6.3 kHz to 6.4-9.0 kHz and falling a little at the end, from a male (page), as All About Birds describes it (a thin, rising and falling whistle). Page remarks: 'Females: quiet chatter; males: high-pitched rising whistles; single loud shriek at the end - female, I think.' Uncertain: other wood ducks are calling at the same time (the hens' quiet chatter and other whistles overlap this whistle; the scorer's note finder counts 4 notes), so the clip is not the whistle alone. Kept as classified: the whistle itself matches the definition. Page: sex female, male; animal seen yes; playback used no; type 'call'; Vancouver Island (near  Victoria), Capital, British Columbia, Canada, 2021-10-10."
     }
   ]
 }

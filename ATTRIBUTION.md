@@ -207,6 +207,7 @@ an expert. Machine-readable details, measurements and cited call definitions:
 | `public/audio/wood-duck/drake-whistle-2.wav` | drake whistle | [XC174542](https://xeno-canto.org/174542), 12.10–13.20 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | `public/audio/wood-duck/drake-whistle-3.wav` | drake whistle | [XC453757](https://xeno-canto.org/453757), 12.60–13.90 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | `public/audio/wood-duck/drake-whistle-4.wav` | drake whistle | [XC453757](https://xeno-canto.org/453757), 0.85–2.10 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-5.wav` | drake whistle | [XC679723](https://xeno-canto.org/679723), 8.10–9.15 s | Aziza Cooper | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
 ## Test fixtures
 

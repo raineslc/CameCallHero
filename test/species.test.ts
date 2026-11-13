@@ -104,11 +104,11 @@ describe('species calls', () => {
       'mallard.quack',
     ]);
   });
-  it('wood duck: its own band, every call cited; only the drake whistle is unlocked', () => {
+  it('wood duck: its own band, every call cited; both calls locked, without references', () => {
     expect(WOOD_DUCK.band).toEqual({ minHz: 300, maxHz: 10000 });
     expect(WOOD_DUCK.calls.map((c) => [c.id, c.locked])).toEqual([
       ['hen-flush', true],
-      ['drake-whistle', false],
+      ['drake-whistle', true],
     ]);
     for (const c of WOOD_DUCK.calls) {
       expect(c.sources.length).toBeGreaterThan(0);

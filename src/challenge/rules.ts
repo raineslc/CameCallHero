@@ -78,17 +78,6 @@ export const CHALLENGE_RULES: Readonly<Record<string, ChallengeRules>> = {
     // Made-up fun titles, not owl terms or facts.
     ranks: ['Night listener', 'Hoot rookie', 'Night caller', 'Deep hooter', 'Horned hoot master'],
   },
-  // Phase 14. Only the drake whistle is unlocked; each reference is one note, so the longest
-  // within-call gap is 0 s and the split gap is 0 s (as for the elk). Wrong sounds: junk and the
-  // hen flush recordings (locked). drake whistle: worst claps 32.1 (split at 0 s; the hen flush
-  // clips score lower). Lowest leave-one-out 66.5.
-  // shortcut: a 0 s gap splits a whistle with a break in it; revisit with real takes.
-  'wood-duck': {
-    gapSec: 0,
-    recognizeMin: { 'drake-whistle': 33 },
-    // Made-up fun titles, not duck terms or facts.
-    ranks: ['Pond listener', 'Marsh walker', 'Creek caller', 'Swamp whistler', 'Timber flyer'],
-  },
 };
 
 export const challengeRules = (s: Species): ChallengeRules | undefined => CHALLENGE_RULES[s.id];
