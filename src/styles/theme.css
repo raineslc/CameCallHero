@@ -119,7 +119,7 @@ h2:focus { outline: none; }
 .species-option[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .species-option:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
 
-.first-run { margin: 0 0 8px; padding: 8px 12px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: var(--radius); font-size: 0.9rem; line-height: 1.35; }
+.first-run { margin: 0 0 6px; padding: 6px 12px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: var(--radius); font-size: 0.9rem; line-height: 1.35; }
 .home-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; margin-bottom: 4px; }
 .home-head h2 { margin-bottom: 2px; }
 .home-head p { margin: 0 0 4px; font-size: 0.875rem; }

@@ -25,7 +25,7 @@ export function homeScreen(root: HTMLElement, param = ''): () => void {
     (ready > 0 ? `${ready} of ${count(species.calls.length)} ready to practice.` : 'No calls to practice yet.') +
     (listenOnly > 0 ? ` ${ready > 0 ? `${listenOnly} more` : count(listenOnly)} to listen to.` : '');
   root.innerHTML = `
-    ${firstVisit ? `<p class="first-run" id="home-intro">Pick an animal, listen to a real call, then call into your phone. It scores how close you are.</p>` : ''}
+    ${firstVisit ? `<p class="first-run" id="home-intro">Listen to a real call, then call into your phone for a score.</p>` : ''}
     <div class="species-picker" role="group" aria-label="Species">
       ${SPECIES.map(
         (s) =>
@@ -36,7 +36,7 @@ export function homeScreen(root: HTMLElement, param = ''): () => void {
     ${
       scorableCalls(species).length > 0
         ? `<div class="challenge-cta">
-      <p>Who calls best? Record your calling, then pass the phone.</p>
+      <p>Who calls best?</p>
       <a class="btn primary" href="${challengeHref(species)}">Calling challenge</a>
     </div>`
         : `<div class="challenge-cta" id="challenge-soon">

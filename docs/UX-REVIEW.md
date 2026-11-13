@@ -48,7 +48,7 @@ passes, plus the new ones listed.
 
 | # | Fix | Where |
 |---|---|---|
-| 1 | First-run line on the home screen ("Pick an animal, listen to a real call, then call into your phone. It scores how close you are."), shown until a best score is saved | `src/screens/home.ts` |
+| 1 | First-run line on the home screen ("Listen to a real call, then call into your phone for a score."), shown until a best score is saved | `src/screens/home.ts` |
 | 2 | **Locked calls can be listened to** where the recordings allow it: 10 of the 15 locked calls now play their recordings with the spectrogram and full credits, marked "Listen only for now". Mallard and eastern screech-owl are worth opening again | `src/calls/listen.ts`, `src/screens/call-detail.ts`, `test/listen.test.ts`, `e2e/library.e2e.ts` |
 | 3 | No more disabled buttons: a locked call offers "Other &lt;species&gt; calls", a locked practice URL offers "Back to &lt;call&gt;" | `src/screens/call-detail.ts`, `src/screens/practice.ts` |
 | 4 | Home says how many calls are ready ("2 of 5 calls ready to practice. 1 more to listen to."); locked rows get a grey edge and a ▶ marker when they can be played | `src/screens/home.ts`, `src/styles/theme.css` |

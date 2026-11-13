@@ -165,7 +165,7 @@ test('locked call with listen-only clips: plays, credits each clip, offers no pr
 // UX review: what a first-time user is told on the home screen, and the page title per screen.
 test('home: first-run line, how many calls are ready, page titles and heading focus', async ({ page }) => {
   await page.goto('');
-  await expect(page.locator('#home-intro')).toContainText('Pick an animal');
+  await expect(page.locator('#home-intro')).toContainText('Listen to a real call');
   await expect(page.locator('#home-summary')).toHaveText('2 of 5 calls ready to practice.');
   await expect(page).toHaveTitle('Wild turkey · Game Call Hero');
 
