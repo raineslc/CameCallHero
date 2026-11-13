@@ -35,3 +35,12 @@ test('mic check meter', async ({ page }) => {
   await page.waitForFunction(() => document.querySelector('#mic-meter')?.getAttribute('data-zone') === 'good', null, { polling: 'raf', timeout: 15_000 });
   await page.screenshot({ path: out('mic-check-meter') });
 });
+
+test('species picker and barred owl pages', async ({ page }) => {
+  await page.goto('#/barred-owl');
+  await expect.poll(() => page.locator('.card canvas').first().evaluate((el) => (el as HTMLCanvasElement).width)).toBeGreaterThan(1);
+  await page.screenshot({ path: out('home-owl') });
+  await page.goto('#/barred-owl/call/inspection-call');
+  await expect(page.locator('#call-measure')).toHaveText(/note/);
+  await page.screenshot({ path: out('call-owl-hoo-wah') });
+});

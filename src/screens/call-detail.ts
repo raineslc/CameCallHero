@@ -1,11 +1,12 @@
 // Call detail, compact: what the call means, how many notes and how long (measured from the
 // reference clips), spectrogram with a playhead, then Play and Practice within the first
-// screen. When turkeys use it (cited) and the clip list with attribution are collapsible.
+// screen. When the animal uses it (cited) and the clip list with attribution are collapsible.
 // Locked calls show their lock badge and reason ("Recordings needed", or "Coming soon" for a
 // call with recordings the scorer cannot yet tell apart).
 
 import type { Features } from '../audio/features';
-import { lockInfo, TURKEY_CALLS, type CallDef } from '../calls/turkey';
+import { lockInfo, type CallDef } from '../calls/call';
+import { practiceHref, resolveCall } from '../calls/species';
 import {
   assetUrl,
   clipInfo,
@@ -49,14 +50,16 @@ function notFound(root: HTMLElement): void {
   root.replaceChildren(el('h2', { textContent: 'Call not found' }), el('a', { className: 'btn', href: '#/', textContent: 'Back to calls' }));
 }
 
-export function callDetailScreen(root: HTMLElement, id: string): (() => void) | void {
-  const call = TURKEY_CALLS.find((c) => c.id === id);
-  if (!call) return notFound(root);
+/** `param` is '<call>' (wild turkey) or '<species>/<call>'. */
+export function callDetailScreen(root: HTMLElement, param: string): (() => void) | void {
+  const found = resolveCall(param);
+  if (!found) return notFound(root);
+  const { species, call } = found;
 
   const when = el(
     'details',
     { className: 'more' },
-    el('summary', { textContent: 'When turkeys use it' }),
+    el('summary', { textContent: `When ${species.nounPlural} use it` }),
     el('p', { textContent: call.description.when }),
     sourcesLine(call),
   );
@@ -94,7 +97,7 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
     el('p', { className: 'caption muted', textContent: 'Low pitch at the bottom, time left to right. Bright orange is the loudest sound.' }),
     audio,
     errorEl,
-    el('div', { className: 'actions' }, playMain, el('a', { className: 'btn primary', href: `#/practice/${call.id}`, textContent: 'Practice' })),
+    el('div', { className: 'actions' }, playMain, el('a', { className: 'btn primary', href: practiceHref(species, call), textContent: 'Practice' })),
     when,
     el('details', { className: 'more' }, el('summary', { textContent: `Reference clips and licenses (${call.references.length})` }), list),
   );
@@ -112,7 +115,7 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
 
   const select = (i: number) => {
     canvas.setAttribute('aria-label', `Spectrogram of ${call.name.toLowerCase()} clip ${i + 1}`);
-    loadSpectrogram(call.references[i])
+    loadSpectrogram(call.references[i], species.band)
       .then((img) => alive && current === i && showSpectrogram(canvas, img))
       .catch(() => alive && showError(`Could not load clip ${i + 1}.`));
   };
@@ -178,14 +181,14 @@ export function callDetailScreen(root: HTMLElement, id: string): (() => void) | 
   current = 0;
   select(0);
 
-  loadManifest()
+  loadManifest(species.id)
     .then((manifest) => {
       if (!alive) return;
       list.querySelectorAll<HTMLLIElement>('li').forEach((li) => li.append(attribution(clipInfo(manifest, li.dataset.file!))));
     })
     .catch(() => alive && showError('Could not load the clip attributions.'));
 
-  Promise.all(call.references.map((p) => loadFeatures(p)))
+  Promise.all(call.references.map((p) => loadFeatures(p, species.band)))
     .then((fs) => {
       if (!alive) return;
       fs.forEach((f, i) => (features[i] = f));

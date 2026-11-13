@@ -1,6 +1,7 @@
 // Plain-language feedback after a take: one line for each part of the score, with a verdict
 // and one thing to do. Lines state only what was measured in the take and in the closest
-// reference recording; they make no claims about turkey calls beyond those measurements.
+// reference recording; they make no claims about the calls beyond those measurements.
+// `noun` names the animal (default 'turkey').
 // Words are for a hunter with no music or audio background: no "pitch", "tone", "rhythm",
 // "semitones" or "frequency" in the text (a unit test checks this).
 
@@ -98,7 +99,7 @@ export const describeNotes = (count: number, span: number) =>
 
 type Line = { text: string; action: string | null };
 
-function timingText(take: Features, ref: Features, verdict: Verdict | null): Line {
+function timingText(take: Features, ref: Features, verdict: Verdict | null, noun: string): Line {
   const a = spanSeconds(take);
   const b = spanSeconds(ref);
   const dn = take.notes.length - ref.notes.length;
@@ -107,7 +108,7 @@ function timingText(take: Features, ref: Features, verdict: Verdict | null): Lin
   if (dn < 0) todo.push(`make ${plural(-dn, 'more note')}`);
   const lengthOff = b > 0 && Math.abs(a - b) > LENGTH_TIP_FRACTION * b;
   if (lengthOff) todo.push(a > b ? 'make the whole call shorter' : 'make the whole call longer');
-  const measured = `You made ${describeNotes(take.notes.length, a)}. The closest turkey recording has ${describeNotes(ref.notes.length, b)}.`;
+  const measured = `You made ${describeNotes(take.notes.length, a)}. The closest ${noun} recording has ${describeNotes(ref.notes.length, b)}.`;
   const advice = todo.length
     ? closer(sentence(todo), verdict)
     : verdict === 'Good'
@@ -124,18 +125,18 @@ function timingText(take: Features, ref: Features, verdict: Verdict | null): Lin
   return { text: `${measured} ${advice}`, action };
 }
 
-function highLowText(take: Features, ref: Features, verdict: Verdict | null): Line {
+function highLowText(take: Features, ref: Features, verdict: Verdict | null, noun: string): Line {
   const lines: string[] = [];
   const actions: string[] = [];
   const a = medianHz(take);
   const b = medianHz(ref);
   const st = a > 0 && b > 0 ? 12 * Math.log2(a / b) : 0;
   if (st >= HIGH_LOW_TIP_SEMITONES) {
-    lines.push("Your call was higher than the turkey's. Make it deeper.");
+    lines.push(`Your call was higher than the ${noun}'s. Make it deeper.`);
     actions.push('Make your call deeper');
   }
   if (st <= -HIGH_LOW_TIP_SEMITONES) {
-    lines.push("Your call was deeper than the turkey's. Make it higher.");
+    lines.push(`Your call was deeper than the ${noun}'s. Make it higher.`);
     actions.push('Make your call higher');
   }
 
@@ -146,35 +147,35 @@ function highLowText(take: Features, ref: Features, verdict: Verdict | null): Li
     if (refFall - takeFall >= BREAK_TIP_BANDS) {
       if (refFall >= BREAK_TIP_BANDS) {
         lines.push(
-          `Each turkey note starts high and drops lower. Yours ${takeFall <= 0 ? 'did not drop' : 'dropped less'}. Let each note break downward.`,
+          `Each ${noun} note starts high and drops lower. Yours ${takeFall <= 0 ? 'did not drop' : 'dropped less'}. Let each note break downward.`,
         );
         actions.push('Let each note start high and break downward');
       } else {
-        lines.push("Your notes rise toward their end; the turkey's do not. Keep the end of each note from going up.");
+        lines.push(`Your notes rise toward their end; the ${noun}'s do not. Keep the end of each note from going up.`);
         actions.push('Keep the end of each note from going up');
       }
     } else if (takeFall - refFall >= BREAK_TIP_BANDS) {
-      lines.push("Your notes drop from high to low more than the turkey's. Keep each note steadier.");
+      lines.push(`Your notes drop from high to low more than the ${noun}'s. Keep each note steadier.`);
       actions.push('Keep each note steadier');
     }
   }
   if (lines.length) return { text: closer(lines.join(' '), verdict), action: actions[0] };
   return verdict === 'Good'
     ? { text: 'Keep it up.', action: null }
-    : { text: "Listen again and follow where the turkey's call goes higher and lower.", action: "Follow where the turkey's call goes higher and lower" };
+    : { text: `Listen again and follow where the ${noun}'s call goes higher and lower.`, action: `Follow where the ${noun}'s call goes higher and lower` };
 }
 
-function soundText(verdict: Verdict | null): Line {
+function soundText(verdict: Verdict | null, noun: string): Line {
   return verdict === 'Good'
     ? { text: 'Keep it up.', action: null }
-    : { text: 'Listen again and copy the sound of the turkey, not just the timing.', action: 'Copy the sound of the turkey, not just the timing' };
+    : { text: `Listen again and copy the sound of the ${noun}, not just the timing.`, action: `Copy the sound of the ${noun}, not just the timing` };
 }
 
 /** One line per part, in the order timing, high/low, sound. `ref` is the closest reference. */
-export function tipsFor(scores: SubScores, take: Features, ref: Features, levels: SubScores | null): Tip[] {
+export function tipsFor(scores: SubScores, take: Features, ref: Features, levels: SubScores | null, noun = 'turkey'): Tip[] {
   return PARTS.map((part) => {
     const verdict = levels ? verdictFor(scores[part], levels[part]) : null;
-    const line = part === 'rhythm' ? timingText(take, ref, verdict) : part === 'pitch' ? highLowText(take, ref, verdict) : soundText(verdict);
+    const line = part === 'rhythm' ? timingText(take, ref, verdict, noun) : part === 'pitch' ? highLowText(take, ref, verdict, noun) : soundText(verdict, noun);
     return { part, label: PART_LABELS[part], verdict, ...line };
   });
 }

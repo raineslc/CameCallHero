@@ -47,7 +47,7 @@ export interface Features {
 export const HOP_SEC = 0.01;
 export const CLIP_LEVEL = 0.99;
 const MEL_BANDS = 40;
-/** Frequency range of the mel bands and of the dominant-frequency search. */
+/** Default frequency range of the mel bands and of the dominant-frequency search (FULL_BAND). */
 export const MIN_HZ = 150;
 export const MAX_HZ = 8000;
 const SILENT_DB = -120;
@@ -74,13 +74,13 @@ const melToHz = (mel: number) => 700 * (10 ** (mel / 2595) - 1);
 
 /**
  * Triangular mel filters as [firstBin, weights[]] over an n/2+1 bin spectrum.
- * Band edges are always MIN_HZ..MAX_HZ, so band b means the same frequencies at every
+ * Band edges are always band.minHz..band.maxHz, so band b means the same frequencies at every
  * sample rate. Bands reaching above `maxHz` cannot be measured and get no weights.
  */
-function melFilters(fftSize: number, sampleRate: number, maxHz: number): { first: number; w: Float64Array }[] {
+function melFilters(fftSize: number, sampleRate: number, band: Band, maxHz: number): { first: number; w: Float64Array }[] {
   const binHz = sampleRate / fftSize;
-  const lo = hzToMel(MIN_HZ);
-  const hi = hzToMel(MAX_HZ);
+  const lo = hzToMel(band.minHz);
+  const hi = hzToMel(band.maxHz);
   const edges = Array.from({ length: MEL_BANDS + 2 }, (_, i) => melToHz(lo + ((hi - lo) * i) / (MEL_BANDS + 1)));
   const filters = [];
   for (let b = 0; b < MEL_BANDS; b++) {
@@ -282,7 +282,18 @@ export class LiveFloor {
   }
 }
 
+/** Frequency range of the mel bands and of the dominant-frequency search. */
+export interface Band {
+  minHz: number;
+  maxHz: number;
+}
+
+/** The default analysis band (all turkey calls). */
+export const FULL_BAND: Band = { minHz: MIN_HZ, maxHz: MAX_HZ };
+
 export interface FeatureOptions {
+  /** Analysis band; default FULL_BAND. Loudness and note segmentation do not depend on it. */
+  band?: Band;
   /** Noise floor measured during the count-in (dBFS). Used instead of the take's own estimate,
    *  which reads the call itself when the take has little background. */
   noiseFloorDb?: number;
@@ -309,10 +320,11 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
   const { hop, fftSize } = frameGeometry(sampleRate);
   const frameCount = sampleRate > 0 && x.length >= fftSize ? 1 + Math.floor((x.length - fftSize) / hop) : 0;
   const window = Float64Array.from({ length: fftSize }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / fftSize));
-  const maxHz = Math.min(MAX_HZ, 0.45 * sampleRate);
-  const filters = sampleRate > 0 ? melFilters(fftSize, sampleRate, maxHz) : [];
+  const band = opts.band ?? FULL_BAND;
+  const maxHz = Math.min(band.maxHz, 0.45 * sampleRate);
+  const filters = sampleRate > 0 ? melFilters(fftSize, sampleRate, band, maxHz) : [];
   const binHz = sampleRate / fftSize;
-  const loBin = Math.ceil(MIN_HZ / binHz);
+  const loBin = Math.ceil(band.minHz / binHz);
   const hiBin = Math.floor(maxHz / binHz);
 
   const rmsDb = new Float32Array(frameCount);

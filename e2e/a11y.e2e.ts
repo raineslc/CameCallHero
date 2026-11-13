@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { BARRED_OWL } from '../src/calls/species';
 import { TURKEY_CALLS } from '../src/calls/turkey';
 import { takeOnce } from './practice-helpers';
 
@@ -9,6 +10,8 @@ import { takeOnce } from './practice-helpers';
 test.use({ viewport: { width: 360, height: 740 } });
 
 const screens = ['', '#/mic', ...TURKEY_CALLS.map((c) => `#/call/${c.id}`), ...TURKEY_CALLS.map((c) => `#/practice/${c.id}`)];
+// Phase 8: the barred owl home, call pages and practice pages.
+screens.push('#/barred-owl', ...BARRED_OWL.calls.flatMap((c) => [`#/barred-owl/call/${c.id}`, `#/barred-owl/practice/${c.id}`]));
 
 interface Problem { text: string; issue: string }
 

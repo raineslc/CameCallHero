@@ -1,7 +1,7 @@
 // Practice screen (the game): Listen to a reference → Ready (3-2-1 count-in, noise floor
 // measured, quiet-check light) → Perform against a silent scrolling lane while the mic
-// records; each turkey note turns Hit or Miss → Results (stars, parts, one next step, your
-// take and the turkey to play back, notes marked hit or missed).
+// records; each reference note turns Hit or Miss → Results (stars, parts, one next step, your
+// take and the reference animal to play back, notes marked hit or missed).
 // The timeline runs on the mic's own sample count, so count-in and take length do not drift
 // with timers. The mic is opened per take and released as soon as the take ends. The take
 // stays in memory for "Play yours" and is dropped on the next take or when leaving.
@@ -13,7 +13,8 @@ import { quietCheck } from '../audio/meter';
 import { chunkFrameDb, chunkLevel, TakeRecorder } from '../audio/monitor';
 import { LivePitch } from '../audio/pitch';
 import { scoreTake, type ScoreResult, type SubScores } from '../audio/score';
-import { lockInfo, TURKEY_CALLS, type CallDef } from '../calls/turkey';
+import { lockInfo, type CallDef } from '../calls/call';
+import { bestId, resolveCall, type Species } from '../calls/species';
 import { assetUrl, loadFeatures, loadSpectrogram } from '../library/references';
 import { CLICK_INTERVAL_SEC, CLICKS, FIRST_CLICK_SEC, latencyFromTaps, MATCH_WINDOW_MS } from '../practice/latency';
 import { makePlan, noteTarget, targetText, type PracticePlan } from '../practice/plan';
@@ -57,10 +58,16 @@ function lockedScreen(root: HTMLElement, call: CallDef): void {
   `;
 }
 
-export function practiceScreen(root: HTMLElement, id: string): (() => void) | void {
-  const call = TURKEY_CALLS.find((c) => c.id === id);
-  if (!call) return notFound(root);
+const capitalize = (s: string) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`;
+
+/** `param` is '<call>' (wild turkey) or '<species>/<call>'. */
+export function practiceScreen(root: HTMLElement, param: string): (() => void) | void {
+  const found = resolveCall(param);
+  if (!found) return notFound(root);
+  const { species, call }: { species: Species; call: CallDef } = found;
   if (call.locked || call.references.length === 0) return lockedScreen(root, call);
+  const noun = species.noun;
+  const Noun = capitalize(noun);
 
   root.innerHTML = `
     <h2>Practice: ${call.name}</h2>
@@ -94,7 +101,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       </div>
       <p class="quiet-light" id="practice-quiet" data-state="checking" role="status"><span class="light" aria-hidden="true"></span><span id="practice-quiet-text">Stay quiet: checking background noise…</span></p>
       <div class="lane-wrap">
-        <canvas class="lane" id="practice-lane" role="img" aria-label="Practice lane: the turkey's notes are grey blocks that slide down to the white line and turn orange when you hit them; your call draws an orange line"></canvas>
+        <canvas class="lane" id="practice-lane" role="img" aria-label="Practice lane: the ${noun}'s notes are grey blocks that slide down to the white line and turn orange when you hit them; your call draws an orange line"></canvas>
         <p class="count" id="practice-count" aria-live="assertive"></p>
       </div>
       <div id="practice-meter-slot"></div>
@@ -115,17 +122,17 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       </div>
       <div class="actions" id="practice-play">
         <button type="button" class="btn" id="practice-play-take">Play yours</button>
-        <button type="button" class="btn" id="practice-play-ref">Play turkey</button>
+        <button type="button" class="btn" id="practice-play-ref">Play ${noun}</button>
       </div>
       <div id="practice-compare" hidden>
-        <h3>Your notes vs. the turkey</h3>
+        <h3>Your notes vs. the ${noun}</h3>
         <canvas class="overlay" id="practice-overlay" role="img"></canvas>
         <p class="muted legend"><span class="key ref"></span> <span id="practice-overlay-ref"></span> <span class="key you"></span> You</p>
         <p class="muted legend"><span class="legend-item"><span class="key ref"></span> Filled = hit</span> <span class="legend-item"><span class="key hollow"></span> Hollow = missed</span></p>
         <p id="practice-hit-count"></p>
         <h3>How to improve</h3>
         <ul class="tips" id="practice-tips"></ul>
-        <p class="muted" id="practice-tips-note" hidden>“Good” means as close to the turkey recording as the turkey recordings are to each other.</p>
+        <p class="muted" id="practice-tips-note" hidden>“Good” means as close to the ${noun} recording as the ${noun} recordings are to each other.</p>
       </div>
       <div class="actions">
         <button type="button" class="btn primary" id="practice-again">Try again</button>
@@ -135,14 +142,14 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     <section class="help" id="practice-help" aria-labelledby="practice-help-title">
       <h3 id="practice-help-title">How it works</h3>
       <ul>
-        <li>Grey blocks are the turkey's notes. They slide down to the white line.</li>
+        <li>Grey blocks are the ${noun}'s notes. They slide down to the white line.</li>
         <li>Call when a block reaches the line, and hold the note while the block crosses it. Taller block = longer note. A leaning block = a note that goes from high to low (or low to high).</li>
         <li>Your call draws an orange line. Further right = higher, further left = deeper.</li>
         <li>A block turns orange and says Hit when you call during it. If you miss it, it turns hollow.</li>
         <li>The bar under the lane shows how loud you are: Move closer, Good, or Back off.</li>
       </ul>
       <p class="legend help-legend">
-        <span class="legend-item"><span class="key ref"></span> Turkey note</span>
+        <span class="legend-item"><span class="key ref"></span> ${Noun} note</span>
         <span class="legend-item"><span class="key now"></span> Call now</span>
         <span class="legend-item"><span class="key hit"></span> Hit</span>
         <span class="legend-item"><span class="key hollow"></span> Missed</span>
@@ -245,7 +252,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
   const LABELS = new Map<HTMLButtonElement, string>([
     [listenBtn, 'Listen'],
     [playTakeBtn, 'Play yours'],
-    [playRefBtn, 'Play turkey'],
+    [playRefBtn, `Play ${noun}`],
   ]);
   const markPlaying = (btn: HTMLButtonElement | null) => {
     playingBtn = btn;
@@ -285,7 +292,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     audio.play().catch((err: unknown) => {
       if (!alive) return;
       markPlaying(null);
-      if (!(err instanceof DOMException && err.name === 'AbortError')) showError('Could not play the turkey recording.');
+      if (!(err instanceof DOMException && err.name === 'AbortError')) showError(`Could not play the ${noun} recording.`);
     });
   };
   listenBtn.addEventListener('click', () => playClip(shownRef, listenBtn));
@@ -320,10 +327,10 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     }
   });
 
-  loadSpectrogram(shownRef)
+  loadSpectrogram(shownRef, species.band)
     .then((img) => alive && showSpectrogram($<HTMLCanvasElement>('practice-spectrogram'), img))
     .catch(() => undefined); // the features load below reports the failure
-  Promise.all(call.references.map((p) => loadFeatures(p)))
+  Promise.all(call.references.map((p) => loadFeatures(p, species.band)))
     .then((fs) => {
       if (!alive) return;
       refs = fs;
@@ -497,12 +504,12 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     scoreEl.textContent = String(Math.round(result.score));
     scoreEl.dataset.score = String(result.score);
     fillStars(starsFor(result.score));
-    const isBest = saveBest(call.id, result.score);
-    const best = loadBest(call.id);
+    const isBest = saveBest(bestId(species, call), result.score);
+    const best = loadBest(bestId(species, call));
     $('practice-best').textContent = isBest ? 'New best!' : best !== null ? `Best: ${best}` : '';
     if (levels === undefined) levels = referenceLevels(refs, call.weights);
     const ref = refs[result.bestReference];
-    const tips = tipsFor(result, take, ref, levels);
+    const tips = tipsFor(result, take, ref, levels, noun);
     const step = nextStep(tips, result, levels, call.weights);
     $('practice-next').textContent = `Next try: ${step.charAt(0).toLowerCase()}${step.slice(1)}`;
     $('practice-subs').replaceChildren(
@@ -530,14 +537,14 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
     const takeSpans = takeNotes(take, plan, latencyMs / 1000);
     const marks = matchNotes(refSpans, takeSpans);
     const nHit = marks.refHit.filter(Boolean).length;
-    $('practice-overlay-ref').textContent = `Turkey, clip ${result.bestReference + 1} (closest match)`;
+    $('practice-overlay-ref').textContent = `${Noun}, clip ${result.bestReference + 1} (closest match)`;
     const hitCount = $('practice-hit-count');
-    hitCount.textContent = `You hit ${nHit} of ${refSpans.length} turkey ${refSpans.length === 1 ? 'note' : 'notes'}. You made ${takeSpans.length} ${takeSpans.length === 1 ? 'note' : 'notes'}.`;
+    hitCount.textContent = `You hit ${nHit} of ${refSpans.length} ${noun} ${refSpans.length === 1 ? 'note' : 'notes'}. You made ${takeSpans.length} ${takeSpans.length === 1 ? 'note' : 'notes'}.`;
     hitCount.dataset.hit = String(nHit);
     const overlay = $<HTMLCanvasElement>('practice-overlay');
     overlay.setAttribute(
       'aria-label',
-      `Your ${take.notes.length} notes against the ${ref.notes.length} notes of reference clip ${result.bestReference + 1}; ${nHit} of the turkey notes hit`,
+      `Your ${take.notes.length} notes against the ${ref.notes.length} notes of reference clip ${result.bestReference + 1}; ${nHit} of the ${noun} notes hit`,
     );
     drawOverlay(overlay, plan, refSpans, takeSpans, marks);
     $('practice-tips').replaceChildren(
@@ -571,7 +578,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       if (!alive || id !== takeId) return;
       const take = samples.slice(Math.round(p.performStart * sr));
       lastTake = { samples: take, rate: sr };
-      const f = extractFeatures({ samples: take, sampleRate: sr }, { noiseFloorDb: floor });
+      const f = extractFeatures({ samples: take, sampleRate: sr }, { noiseFloorDb: floor, band: species.band });
       showResult(scoreTake(f, refs, call.weights, { noiseFloorDb: floor }), f);
     }, 0);
   };
@@ -657,7 +664,7 @@ export function practiceScreen(root: HTMLElement, id: string): (() => void) | vo
       rate = c.sampleRate;
       countInSamples = Math.round(plan.performStart * rate);
       recorder = new TakeRecorder(Math.ceil(plan.end * rate));
-      pitch = new LivePitch(rate);
+      pitch = new LivePitch(rate, undefined, species.band);
       liveFloor = new LiveFloor(rate, countInSamples);
       lastChunkT = 0;
       lastChunkPerf = performance.now();

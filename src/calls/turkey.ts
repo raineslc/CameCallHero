@@ -2,44 +2,11 @@
 // (licenses in manifest.json and ATTRIBUTION.md). A call with no references is
 // locked: the app shows it but cannot score it.
 
-import type { Weights } from '../audio/score';
+import { UNCALIBRATED, type CallDef, type Source } from './call';
+
+export { lockInfo, LOCK_NO_RECORDINGS, type CallDef, type LockInfo, type Source } from './call';
 
 export type TurkeyCallId = 'yelp' | 'cut' | 'purr' | 'gobble' | 'kee-kee-run';
-
-export interface CallDef {
-  id: TurkeyCallId;
-  name: string;
-  /** True while the app cannot score this call (no references, or the scorer cannot tell it apart). */
-  locked: boolean;
-  /** Why a locked call is locked, as shown on screen. Default: LOCK_NO_RECORDINGS. */
-  lock?: LockInfo;
-  /** Paths relative to public/ (and to the site base URL). */
-  references: string[];
-  weights: Weights;
-  /** What the call is and when turkeys use it. Every claim cites one of `sources`. */
-  description: { meaning: string; when: string };
-  sources: Source[];
-}
-
-export interface LockInfo {
-  /** Short badge text. */
-  label: string;
-  /** One line on the call page. */
-  reason: string;
-}
-
-export const LOCK_NO_RECORDINGS: LockInfo = {
-  label: 'Recordings needed',
-  reason: 'There are no reference recordings with an allowed license for this call yet, so it cannot be played or practiced.',
-};
-
-/** Badge and reason of a locked call. */
-export const lockInfo = (call: CallDef): LockInfo => call.lock ?? LOCK_NO_RECORDINGS;
-
-export interface Source {
-  title: string;
-  url: string;
-}
 
 // Sources for the descriptions below. Both pages give near-identical text for each call.
 // shortcut: the page text was read through web-search excerpts because this build
@@ -52,9 +19,6 @@ const ODWC: Source = {
   title: 'Oklahoma Dept. of Wildlife Conservation, Wild Turkey Sounds',
   url: 'https://www.wildlifedepartment.com/hunting/resources/turkey/sounds',
 };
-
-/** shortcut: uncalibrated equal weights for calls without references; tune each once it has 3+ clips. */
-const UNCALIBRATED: Weights = { rhythm: 1, pitch: 1, tone: 1 };
 
 const refs = (call: TurkeyCallId, count: number) =>
   Array.from({ length: count }, (_, i) => `audio/turkey/${call}-${i + 1}.wav`);
