@@ -67,7 +67,7 @@ others as one note, so the rhythm part compares unlike things (pairwise rhythm 1
 trills); trills also differ in pitch (560-818 Hz), which lowers tone. Next to try (owner or a later
 phase): a trill-rate feature (pulses per second) as its own weight, kept off for the other species.
 
-Verified: `npm ci && npm test` (527 unit tests), `npm run build`, `npm run e2e` (93 passed, 4
+Verified: `npm ci && npm test` (525 unit tests), `npm run build`, `npm run e2e` (93 passed, 4
 screenshot tests skipped) incl. the new screens in the a11y design pass.
 Not verified: anything on a real phone; the full text of the cited pages.
 
