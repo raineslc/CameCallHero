@@ -130,3 +130,54 @@ test('unknown call shows not found', async ({ page }) => {
   await page.goto('#/call/nope');
   await expect(page.getByRole('heading', { name: 'Call not found' })).toBeVisible();
 });
+
+// UX review: a locked call with listen-only clips (src/calls/listen.ts) can still be played.
+test('locked call with listen-only clips: plays, credits each clip, offers no practice', async ({ page }) => {
+  const bad = noHttpErrors(page);
+  await page.goto('#/mallard/call/quack');
+  await expect(page.locator('#call-lock-reason')).toContainText('Coming soon');
+  await expect(page.locator('#call-listen-only')).toContainText('Listen only for now');
+  // No scorer numbers for a call the scorer cannot score.
+  await expect(page.locator('#call-measure')).toBeHidden();
+  await expect(page.getByRole('link', { name: 'Practice' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Practice' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Stop', exact: true })).toBeVisible();
+  await expect.poll(() => page.locator('#clip-audio').evaluate((a: HTMLAudioElement) => a.currentTime > 0), { timeout: 10_000 }).toBe(true);
+  await page.getByRole('button', { name: 'Stop', exact: true }).click();
+  await expect(page.locator('#clip-audio').evaluate((a: HTMLAudioElement) => a.paused)).resolves.toBe(true);
+
+  await page.getByText('Recordings and credits').click();
+  const clips = page.locator('.clip');
+  await expect(clips).toHaveCount(6);
+  for (const li of await clips.all()) {
+    await expect(li.locator('.attribution')).toContainText(/, .* \(\d+\.\d+–\d+\.\d+ s, trimmed\), CC/);
+    await expect(li.locator('.error')).toHaveCount(0);
+  }
+  // Practice is unreachable even by URL.
+  await page.goto('#/mallard/practice/quack');
+  await expect(page.getByRole('button', { name: "I'm ready" })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Back to Hen quack' })).toBeVisible();
+  expect(bad).toEqual([]);
+});
+
+// UX review: what a first-time user is told on the home screen, and the page title per screen.
+test('home: first-run line, how many calls are ready, page titles and heading focus', async ({ page }) => {
+  await page.goto('');
+  await expect(page.locator('#home-intro')).toContainText('Pick an animal');
+  await expect(page.locator('#home-summary')).toHaveText('2 of 5 calls ready to practice.');
+  await expect(page).toHaveTitle('Wild turkey · Game Call Hero');
+
+  await page.goto('#/mallard');
+  await expect(page.locator('#home-summary')).toHaveText('No calls to practice yet. 3 calls to listen to.');
+
+  // Each screen names itself in the tab title and takes focus, so a screen reader announces it.
+  await page.getByRole('link', { name: 'Mic check' }).first().click();
+  await expect(page).toHaveTitle('Mic check · Game Call Hero');
+  await expect(page.locator('main h2')).toBeFocused();
+  // The app name in the header goes home.
+  await page.getByRole('link', { name: 'Game Call Hero: all animals' }).click();
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(page.getByRole('heading', { name: 'Wild turkey' })).toBeVisible();
+});

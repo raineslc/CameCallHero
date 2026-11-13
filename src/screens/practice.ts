@@ -114,7 +114,8 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
       <button type="button" class="btn" id="practice-cancel">Cancel</button>
     </section>
 
-    <section id="practice-results" hidden>
+    <section id="practice-results" hidden aria-labelledby="practice-results-title">
+      <h3 id="practice-results-title" tabindex="-1">Your take</h3>
       <div class="rejected" id="practice-rejected-box" role="alert" hidden>
         <p class="error" id="practice-rejected"></p>
         <p id="practice-rejected-help"></p>
@@ -247,7 +248,11 @@ export function practiceScreen(root: HTMLElement, param: string): (() => void) |
     // The lane help is out of the way during a take and folded (still one tap away) under the results.
     const help = $<HTMLDetailsElement>('practice-help');
     help.hidden = section === 'run';
-    if (section === 'results') help.open = false;
+    if (section === 'results') {
+      help.open = false;
+      // The results replace the screen in place: move focus so a screen reader reads them out.
+      $('practice-results-title').focus({ preventScroll: true });
+    }
     // The new section starts at the top, also when the tapped button was further down the page.
     window.scrollTo(0, 0);
   };

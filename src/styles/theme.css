@@ -209,6 +209,10 @@ details.more > :last-child:not(summary) { margin-bottom: 10px; }
 
 /* Results: Try again stays in reach at the bottom of the screen while the results scroll. */
 .sticky-actions { position: sticky; bottom: 0; z-index: 5; margin: 8px -16px 0; padding: 0 16px; background: var(--bg); border-top: 1px solid var(--surface-2); }
+/* On a short screen (landscape) a sticky bar would cover the results; let it scroll instead. */
+@media (max-height: 480px) {
+  .sticky-actions { position: static; margin: 8px 0 0; padding: 0; border-top: 0; }
+}
 #practice-results:not([hidden]) ~ .help { margin-top: 8px; }
 
 .back {
@@ -243,6 +247,8 @@ footer p { margin: 6px 0; }
 .footer-link { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--text); }
 
 h3 { margin: 16px 0 6px; font-size: 1rem; }
+h3:focus { outline: none; }
+#practice-results-title, #challenge-results-title { margin: 4px 0 0; }
 
 .btn {
   min-height: var(--tap);

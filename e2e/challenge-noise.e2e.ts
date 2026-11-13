@@ -8,4 +8,5 @@ test.use({ viewport: { width: 360, height: 740 }, launchOptions: { args: fakeMic
 test('steady noise is rejected and cannot be saved or shared', async ({ page }) => {
   await rejectedTake(page, /^Not scored: Too noisy/);
   await expect(page.locator('#challenge-quiet')).toHaveAttribute('data-state', 'bad');
+  await expect(page.locator('#challenge-rejected-help')).toContainText('Move away from wind');
 });

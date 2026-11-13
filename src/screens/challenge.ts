@@ -93,7 +93,8 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
       </div>
     </section>
 
-    <section id="challenge-results" hidden>
+    <section id="challenge-results" hidden aria-labelledby="challenge-results-title">
+      <h3 id="challenge-results-title" tabindex="-1">Your take</h3>
       <div class="rejected" id="challenge-rejected-box" role="alert" hidden>
         <p class="error" id="challenge-rejected"></p>
         <p id="challenge-rejected-help"></p>
@@ -219,6 +220,7 @@ export function challengeScreen(root: HTMLElement, param = ''): () => void {
     $('challenge-board').hidden = section === 'run';
     $('challenge-help').hidden = section === 'run';
     window.scrollTo(0, 0);
+    if (section === 'results') $('challenge-results-title').focus({ preventScroll: true });
   };
 
   // --- Leaderboard ------------------------------------------------------------------------
