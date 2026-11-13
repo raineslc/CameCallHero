@@ -13,6 +13,7 @@ following `AGENTS.md`. Progress is in `docs/STATUS.md`.
 | 13 | Great horned owl | Species phase |
 | 14 | Wood duck | Species phase |
 | 15 | Eastern screech-owl | Species phase |
+| 16 | Scoring upgrade for trills, raspy and trending calls | New optional scorer features (pulse rate, raspiness, note level/length trend), default off; every locked call re-calibrated; brief `docs/phases/phase-16-scoring-upgrade.md` |
 
 ### What every species phase delivers
 
