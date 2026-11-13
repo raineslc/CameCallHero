@@ -91,6 +91,24 @@ h2 { margin: 4px 0 8px; font-size: 1.3rem; line-height: 1.25; }
 .accent { color: var(--accent); }
 .muted { color: var(--text-muted); }
 
+/* Home: species picker (segmented control; the picked species is filled orange). */
+.species-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; margin: 4px 0 6px; }
+.species-option {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.species-option[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.species-option:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+
 /* Home: one compact row per call. */
 .cards { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 6px; }
 .card {

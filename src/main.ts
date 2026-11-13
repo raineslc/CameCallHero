@@ -1,4 +1,5 @@
 import './styles/theme.css';
+import { SPECIES } from './calls/species';
 import { backHref, startRouter } from './router';
 import { callDetailScreen } from './screens/call-detail';
 import { homeScreen } from './screens/home';
@@ -35,4 +36,5 @@ startRouter(
     back.hidden = href === null;
     if (href) back.href = href;
   },
+  SPECIES.map((s) => s.id),
 );

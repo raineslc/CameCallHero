@@ -1,6 +1,6 @@
 # Game Call Hero
 
-Practice hunting game calls like a rhythm game: hear a real wild turkey, make the call
+Practice hunting game calls like a rhythm game: hear a real wild turkey or barred owl, make the call
 yourself, and get a score for how close you came. Free test build, Android phones first.
 
 **Try it:** https://raineslc.github.io/GameCallHero/
@@ -13,6 +13,10 @@ yourself, and get a score for how close you came. Free test build, Android phone
 - **Cut, purr and kee kee run are listed but locked.** Cut and purr: "Recordings needed" (no
   usable free-licensed recordings found yet). Kee kee run: "Coming soon" (4 clips exist, but
   the scorer cannot yet tell it apart from a yelp).
+- **Barred owl: only the hoo-wah can be practiced** (3 clips, 3 recordists). "Who cooks for
+  you" and the ascending hoot are "Coming soon" (the scorer cannot yet tell them apart); the
+  caterwaul is a two-owl duet and is not practicable. Pick the species at the top of the
+  Calls screen.
 - **Tested platform: Chrome on Android.** Other browsers and iPhone are untested. Even on
   Android, the automated tests use a simulated microphone; real-phone results are what this
   test round is for.

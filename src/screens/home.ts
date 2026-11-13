@@ -1,21 +1,31 @@
-// Library home: one compact row per wild turkey call (name, one-line meaning, small
-// spectrogram of the first reference clip or a lock badge ("Recordings needed" / "Coming soon"), and the best
-// practice score saved on this device).
+// Library home: a species picker, then one compact row per call of the picked species (name,
+// one-line meaning, small spectrogram of the first reference clip or a lock badge
+// ("Recordings needed" / "Coming soon"), and the best practice score saved on this device).
+// The species comes from the route (#/ = wild turkey, #/<species>).
 
-import { lockInfo, TURKEY_CALLS } from '../calls/turkey';
+import { lockInfo } from '../calls/call';
+import { bestId, callHref, DEFAULT_SPECIES, homeHref, SPECIES, speciesById } from '../calls/species';
 import { loadSpectrogram } from '../library/references';
 import { loadBest } from '../practice/storage';
 import { showSpectrogram } from '../ui/spectrogram';
 
-export function homeScreen(root: HTMLElement): () => void {
+export function homeScreen(root: HTMLElement, param = ''): () => void {
+  const species = speciesById(param) ?? DEFAULT_SPECIES;
   root.innerHTML = `
-    <h2>Wild turkey</h2>
+    <div class="species-picker" role="group" aria-label="Species">
+      ${SPECIES.map(
+        (s) =>
+          `<a class="species-option" href="${homeHref(s)}" data-species="${s.id}"${s === species ? ' aria-current="true"' : ''}>${s.name}</a>`,
+      ).join('')}
+    </div>
+    <h2>${species.name}</h2>
     <ul class="cards">
-      ${TURKEY_CALLS.map((c) => {
-        const best = c.locked ? null : loadBest(c.id);
-        return `
+      ${species.calls
+        .map((c) => {
+          const best = c.locked ? null : loadBest(bestId(species, c));
+          return `
         <li>
-          <a class="card" href="#/call/${c.id}" data-call="${c.id}">
+          <a class="card" href="${callHref(species, c)}" data-call="${c.id}">
             <span class="card-text">
               <span class="card-head">
                 <span class="card-name">${c.name}</span>
@@ -30,7 +40,8 @@ export function homeScreen(root: HTMLElement): () => void {
             }
           </a>
         </li>`;
-      }).join('')}
+        })
+        .join('')}
     </ul>
     <div class="inline-cta">
       <p class="muted">Before practicing, check what your phone's microphone does.</p>
@@ -38,10 +49,10 @@ export function homeScreen(root: HTMLElement): () => void {
     </div>
   `;
   let alive = true;
-  for (const c of TURKEY_CALLS) {
+  for (const c of species.calls) {
     const canvas = root.querySelector<HTMLCanvasElement>(`[data-call="${c.id}"] canvas`);
     if (!canvas || !c.references[0]) continue;
-    loadSpectrogram(c.references[0])
+    loadSpectrogram(c.references[0], species.band)
       .then((img) => alive && showSpectrogram(canvas, img))
       .catch(() => {
         if (alive) canvas.replaceWith(Object.assign(document.createElement('span'), { className: 'muted', textContent: 'Spectrogram unavailable' }));

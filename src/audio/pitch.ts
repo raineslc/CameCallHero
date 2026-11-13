@@ -1,9 +1,9 @@
 // Live dominant frequency of the newest mic samples, for the practice lane's trail.
-// Same measure as Features.domHz (loudest FFT bin between MIN_HZ and min(MAX_HZ, 0.45 x rate)),
+// Same measure as Features.domHz (loudest FFT bin between band.minHz and min(band.maxHz, 0.45 x rate)),
 // on buffers allocated once, so it can run on every mic chunk without garbage.
 
 import { fft } from './fft';
-import { MAX_HZ, MIN_HZ } from './features';
+import { FULL_BAND, type Band } from './features';
 
 export class LivePitch {
   private readonly ring: Float32Array;
@@ -16,16 +16,16 @@ export class LivePitch {
   private pos = 0;
   private seen = 0;
 
-  /** `size` must be a power of two (2048 is ~43 ms at 48 kHz). */
-  constructor(sampleRate: number, readonly size = 2048) {
+  /** `size` must be a power of two (2048 is ~43 ms at 48 kHz). `band`: the species' analysis band. */
+  constructor(sampleRate: number, readonly size = 2048, band: Band = FULL_BAND) {
     this.ring = new Float32Array(size);
     this.re = new Float64Array(size);
     this.im = new Float64Array(size);
     this.win = Float64Array.from({ length: size }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / size));
     const rate = Number.isFinite(sampleRate) && sampleRate > 0 ? sampleRate : 1;
     this.binHz = rate / size;
-    this.loBin = Math.max(1, Math.ceil(MIN_HZ / this.binHz));
-    this.hiBin = Math.min(size / 2, Math.floor(Math.min(MAX_HZ, 0.45 * rate) / this.binHz));
+    this.loBin = Math.max(1, Math.ceil(band.minHz / this.binHz));
+    this.hiBin = Math.min(size / 2, Math.floor(Math.min(band.maxHz, 0.45 * rate) / this.binHz));
   }
 
   push(x: Float32Array): void {

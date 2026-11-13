@@ -2,11 +2,11 @@
 // engine's own feature extraction, and keeps features, the rendered spectrogram and the
 // manifest (attribution) in memory for the rest of the visit.
 
-import { extractFeatures, HOP_SEC, type Features } from '../audio/features';
+import { extractFeatures, FULL_BAND, HOP_SEC, type Band, type Features } from '../audio/features';
 import { parseWav } from '../audio/wav';
 import { renderSpectrogram } from '../ui/spectrogram';
 
-/** One entry of public/audio/turkey/manifest.json (fields the app uses). */
+/** One entry of public/audio/<species>/manifest.json (fields the app uses). */
 export interface ClipInfo {
   file: string;
   call: string;
@@ -26,7 +26,7 @@ export interface Measure {
 }
 
 const base = import.meta.env.BASE_URL;
-const MANIFEST = 'audio/turkey/manifest.json';
+const manifestPath = (speciesId: string) => `audio/${speciesId}/manifest.json`;
 
 /** Site URL of a path relative to public/. */
 export const assetUrl = (path: string) => `${base}${path}`;
@@ -52,18 +52,22 @@ const featureCache = new Map<string, Promise<Features>>();
 const imageCache = new Map<string, Promise<HTMLCanvasElement>>();
 const manifestCache = new Map<string, Promise<ClipInfo[]>>();
 
-export const loadFeatures = (path: string): Promise<Features> =>
-  once(featureCache, path, async () => {
+const bandKey = (path: string, band: Band) => `${band.minHz}-${band.maxHz}:${path}`;
+
+/** The clip analyzed in `band` (the species' band; default FULL_BAND, as for turkey). */
+export const loadFeatures = (path: string, band: Band = FULL_BAND): Promise<Features> =>
+  once(featureCache, bandKey(path, band), async () => {
     const bytes = new Uint8Array(await (await fetchOk(path)).arrayBuffer());
-    return extractFeatures(parseWav(bytes));
+    return extractFeatures(parseWav(bytes), { band });
   });
 
 /** The clip's spectrogram, rendered once per visit. Copy it with drawImage; do not draw on it. */
-export const loadSpectrogram = (path: string): Promise<HTMLCanvasElement> =>
-  once(imageCache, path, async () => renderSpectrogram(await loadFeatures(path)));
+export const loadSpectrogram = (path: string, band: Band = FULL_BAND): Promise<HTMLCanvasElement> =>
+  once(imageCache, bandKey(path, band), async () => renderSpectrogram(await loadFeatures(path, band)));
 
-export const loadManifest = (): Promise<ClipInfo[]> =>
-  once(manifestCache, MANIFEST, async () => ((await (await fetchOk(MANIFEST)).json()) as { clips: ClipInfo[] }).clips);
+/** Clips of public/audio/<speciesId>/manifest.json. */
+export const loadManifest = (speciesId: string): Promise<ClipInfo[]> =>
+  once(manifestCache, speciesId, async () => ((await (await fetchOk(manifestPath(speciesId))).json()) as { clips: ClipInfo[] }).clips);
 
 /** Manifest entry for a reference path such as 'audio/turkey/gobble-1.wav'. */
 export const clipInfo = (manifest: ClipInfo[], path: string): ClipInfo | undefined =>

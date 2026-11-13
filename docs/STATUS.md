@@ -1,5 +1,97 @@
 # Status
 
+## Phase 8: multi-species app and barred owl calls (2026-11-13, PR link added after opening)
+
+**Owner: please check / try**
+1. **Owl call wording** (owner: check owl call wording against sources). The owl text on screen
+   (`src/calls/barred-owl.ts`) comes from Odom & Mennill 2010 and Birds of the World, read only
+   through web-search excerpts: this environment still blocks birdsoftheworld.org, doi.org,
+   bioone.org and academic.oup.com (checked 2026-11-13). The "when" line of the ascending hoot
+   says the sources used do not say when owls give it.
+2. **On the phone**: Calls → **Barred owl** → **Hoo-wah** → Practice. Make a hoo-wah (one note
+   that rises, then falls, ~0.5–0.9 s). Is the score sensible? Does the orange trail follow the
+   note? Does a gobble or a yelp score clearly lower?
+3. Your turkey best scores should still show on the Wild turkey list (same storage keys).
+
+Gate: passed (one owl call unlocked), so the phase hands off.
+
+What changed:
+- **Species → calls.** `src/calls/call.ts` (shared call type), `turkey.ts` (unchanged calls and
+  weights), `barred-owl.ts`, `species.ts` (species list, link helpers, best-score keys).
+- **Routes:** `#/<species>`, `#/<species>/call/<id>`, `#/<species>/practice/<id>`. Turkey is the
+  default species and keeps its old short links (`#/call/<id>`, `#/practice/<id>`) as the links
+  the app makes, so saved links and home-screen shortcuts work without a redirect (no reload, no
+  extra history entry); `#/turkey/call/<id>` also works. Owl links always carry `barred-owl`.
+- **Best scores:** turkey keys unchanged (`camecallhero.best.<call>`); owl keys
+  `camecallhero.best.barred-owl.<call>` (unit test and owl e2e check both).
+- **Manifests per species:** `loadManifest(species)` reads `public/audio/<species>/manifest.json`.
+- **Home:** species picker (two 44 px buttons, picked one filled orange), then that species' calls.
+- **Owl screens say "owl"**: "When owls use it", "Play owl", "Your notes vs. the owl", lane label,
+  help text, tips (`tipsFor(..., noun)`; turkey text unchanged by default).
+- **Owl analysis band 200–1500 Hz** (`OWL_BAND`): mel bands and dominant-frequency search
+  (references, takes, live pitch trail) for owl calls only. Loudness, gates, note segmentation,
+  quiet light and meter do not use the band, so they are the same for both species. Turkey
+  features use the old 150–8000 Hz band; `extractFeatures` without a band is unchanged
+  (unit test), and the turkey calibration output is byte-identical to `main` (diffed).
+
+### Owl calibration (`test/calibration-owl.test.ts`)
+
+Same rules as Phase 2/2b: leave-one-out, margin ≥ 15 over every negative (other owl calls, all
+turkey references incl. kee kee run, turkey wrong-call fixtures, junk), all analyzed in the owl
+band; plus the matrix rule (lowest same-call score − highest other-owl-call score ≥ 15). Margin
+not changed. Weights: grid over rhythm/pitch/tone 0.5..3 (step 0.5), per call.
+
+| Call | Clips | Best weights (r/p/t) | Worst-case margin | Result |
+|---|---|---|---|---|
+| Hoo-wah (inspection call) | 3 | 1 / 2.5 / 1.5 | **18.3** (matrix 18.3) | **unlocked** |
+| Who cooks for you (two-phrase hoot) | 7 | 2 / 0.5 / 2.5 | 4.1 | locked, "Coming soon" |
+| Ascending hoot | 6 | 2.5 / 2 / 2.5 | 4.0 | locked, "Coming soon" |
+| Caterwaul (duet) | 3 | 0.5 / 0.5 / 3 | -39.2 | locked, "Not practicable" |
+
+Hoo-wah leave-one-out: clip 1 87.1 (margin 36.0), clip 2 87.1 (36.5), clip 3 69.4 (18.3; worst
+negative two-phrase-hoot-2 at 51.2).
+
+Owl confusion matrix (mean score; row = call made, column = call scored as; own row leave-one-out):
+
+| take \ target | two-phrase | ascending | hoo-wah | caterwaul |
+|---|---|---|---|---|
+| two-phrase hoot | 64.7 | 54.3 | 48.3 | 33.6 |
+| ascending hoot | 49.3 | 63.3 | 44.8 | 35.0 |
+| hoo-wah | 40.4 | 39.2 | **81.2** | 29.5 |
+| caterwaul | 28.0 | 28.7 | 21.7 | 24.3 |
+
+How the band was chosen: 4 bands tried on the calibration set (150–8000, 150–2000, 200–1500,
+250–3000 Hz). Hoo-wah best margins: 15.3, 13.6, 18.3, 5.5. At 150–8000 Hz only 2 of 343 weight
+sets passed (15.3, 15.1), at 200–1500 Hz 38 did, so 200–1500 Hz is the less fragile choice; it
+also matches the measured owl range (hoots 0.35–0.75 kHz, caterwaul high notes ≤ 1.4 kHz). Also
+tried a lower note threshold (15/20 dB below peak instead of 30, to split echo-merged notes):
+no hoot series reached 15 (best 7.2), so it was not kept.
+
+Why the hoot series fail: within-call scores are about as low as cross-call scores (two-phrase
+same-call 60–75 vs. ascending clips at ~59). Causes seen in the measurements: echo merges notes
+(two-phrase-hoot-5/6 come out as 3 notes, -3/-4 as 6), and the recordings differ a lot from
+each other. More clips per call, or a feature for the pitch rise across notes, would be the
+next thing to try.
+
+Checks asked for in the brief:
+- **Quiet clips:** two-phrase-hoot-3/4 (loudest frame -37.2 dBFS) pass every gate unchanged
+  (gate is -50 dBFS); a 30× louder copy scores the same (unit test). No normalisation needed:
+  level never enters the score. The only owl clip failing a gate is caterwaul-2 (too noisy).
+- **Note segmentation:** fine for the hoo-wah (always 1 note); poor for the hoot series (echo), see above.
+- **Quiet light:** unchanged and species-independent (-21.2 dBFS, from a 6.1 dB turkey crest).
+  Hoo-wah crests are 4.25, 4.23 and 6.40 dB, so for a call like clip 3 a green light at a floor
+  between -21.5 and -21.2 dBFS could still be refused as too noisy (0.3 dB; the turkey yelp-3
+  has the same kind of 0.07 dB gap).
+
+Verified: `npm ci && npm test` (230 unit tests), `npm run build`, `npm run e2e` (59 passed, 3 screenshot tests skipped: existing
+43 untouched except owl screens added to the a11y screen list, plus new `e2e/species.e2e.ts`
+(picker, owl call page, locked owl calls, new-style turkey link) and `e2e/practice-owl.e2e.ts`
+(fake mic plays hoo-wah 1: scored 88.3, saved under the owl key, no "turkey" text)). Screenshots:
+`docs/screenshots/home-owl-360.png`, `call-owl-hoo-wah-360.png`.
+
+Not verified: anything on a real phone; a human hoo-wah (only recorded owls were scored); the
+owl text against the full sources.
+
 ## Phase 7: barred owl reference audio (owner request, 2026-11-12, [#15](https://github.com/raineslc/GameCallHero/pull/15))
 
 Gate: passed. Every call has ≥ 3 clips from ≥ 3 recordists; no call is short.
