@@ -42,6 +42,15 @@ export interface Features {
   notes: Note[];
   /** First note start to last note end, or null if no notes. */
   span: Note | null;
+  /** Fine loudness envelope: RMS in dBFS of ENV_WIN_HOPS hops of envHopSec, every envHopSec (pulse rate). */
+  envDb: Float32Array;
+  /** Hop of envDb in seconds (ENV_HOP_SEC rounded to whole samples). */
+  envHopSec: number;
+  /**
+   * Per frame: spectral flatness in dB (<= 0; 0 = white noise, very negative = tonal) of the
+   * in-band power spectrum above the recording's own background noise. Inside notes only, 0 elsewhere.
+   */
+  flatDb: Float32Array;
 }
 
 export const HOP_SEC = 0.01;
@@ -66,6 +75,11 @@ const MEL_FRAME_RANGE_DB = 40;
 /** Frames this close to a note are not background; at least MIN_BACKGROUND_FRAMES are needed. */
 const BACKGROUND_GUARD_FRAMES = 3;
 const MIN_BACKGROUND_FRAMES = 10;
+/** Fine envelope (envDb): hop and window. 2.5 ms resolves pulses up to 50 per second (measured trills: 10-29). */
+export const ENV_HOP_SEC = 0.0025;
+const ENV_WIN_HOPS = 2;
+/** Flatness: power within this fraction of the background noise in a bin counts as that fraction (keeps logs finite). */
+const FLAT_NOISE_FRACTION = 0.1;
 /** shortcut: takes longer than this are cut (DTW cost grows with length^2); raise if longer calls are added. */
 export const MAX_SECONDS = 15;
 
@@ -332,6 +346,9 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
 
   const rmsDb = new Float32Array(frameCount);
   const logMel: Float32Array[] = [];
+  // In-band power spectrum of every frame, kept for the flatness below (needs the notes first).
+  const flatBins = Math.max(0, hiBin - loBin + 1);
+  const inBand = new Float32Array(frameCount * flatBins);
   const peakBin = new Int32Array(frameCount);
   const frame = new Float64Array(fftSize);
   for (let f = 0; f < frameCount; f++) {
@@ -351,6 +368,7 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
       m[b] = toDb(e);
     });
     logMel.push(m);
+    for (let k = 0; k < flatBins; k++) inBand[f * flatBins + k] = p[loBin + k];
     let best = loBin;
     for (let k = loBin; k <= hiBin; k++) if (p[k] > p[best]) best = k;
     peakBin[f] = best;
@@ -384,6 +402,41 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
   const domHz = new Float32Array(frameCount);
   for (const n of notes) for (let f = n.start; f < n.end; f++) domHz[f] = peakBin[f] * binHz;
 
+  // Flatness inside notes, above the mean background spectrum (background frames as for the mel floor).
+  const noise = new Float64Array(flatBins);
+  let backgroundFrames = 0;
+  for (let f = 0; f < frameCount; f++)
+    if (!nearNote[f]) {
+      backgroundFrames++;
+      for (let k = 0; k < flatBins; k++) noise[k] += inBand[f * flatBins + k];
+    }
+  for (let k = 0; k < flatBins; k++) noise[k] = backgroundFrames >= MIN_BACKGROUND_FRAMES ? noise[k] / backgroundFrames : 0;
+  const flatDb = new Float32Array(frameCount);
+  if (flatBins > 0)
+    for (const n of notes)
+      for (let f = n.start; f < n.end; f++) {
+        let logSum = 0;
+        let sum = 0;
+        for (let k = 0; k < flatBins; k++) {
+          const q = Math.max(inBand[f * flatBins + k] - noise[k], FLAT_NOISE_FRACTION * noise[k]) + 1e-20;
+          logSum += Math.log(q);
+          sum += q;
+        }
+        const db = 10 * Math.log10(Math.exp(logSum / flatBins) / (sum / flatBins));
+        flatDb[f] = Number.isFinite(db) ? Math.min(0, db) : 0;
+      }
+
+  // Fine envelope for the pulse rate: the 23 ms analysis frames smooth out pulses faster than ~20 per second.
+  const envHop = sampleRate > 0 ? Math.max(1, Math.round(ENV_HOP_SEC * sampleRate)) : 1;
+  const envWin = ENV_WIN_HOPS * envHop;
+  const envCount = sampleRate > 0 && x.length >= envWin ? 1 + Math.floor((x.length - envWin) / envHop) : 0;
+  const envDb = new Float32Array(envCount);
+  for (let e = 0; e < envCount; e++) {
+    let sq = 0;
+    for (let i = e * envHop, end = i + envWin; i < end; i++) sq += x[i] * x[i];
+    envDb[e] = toDb(sq / envWin);
+  }
+
   return {
     sampleRate,
     frameCount,
@@ -399,5 +452,8 @@ export function extractFeatures(clip: AudioClip, opts: FeatureOptions = {}): Fea
     sampleCount: x.length,
     notes,
     span: notes.length ? { start: notes[0].start, end: notes[notes.length - 1].end } : null,
+    envDb,
+    envHopSec: sampleRate > 0 ? envHop / sampleRate : ENV_HOP_SEC,
+    flatDb,
   };
 }
