@@ -259,3 +259,8 @@ describe('every unlocked call scores exactly as before Phase 16', () => {
     }
   }, 60_000);
 });
+
+it('no call uses the Phase 16 parts yet (no locked call reached the margin with them, docs/STATUS.md)', () => {
+  for (const sp of SPECIES)
+    for (const c of sp.calls) for (const k of ['pulse', 'rasp', 'trend'] as const) expect(c.weights[k] ?? 0, `${sp.id}/${c.id} ${k}`).toBe(0);
+});
