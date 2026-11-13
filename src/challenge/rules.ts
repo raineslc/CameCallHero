@@ -56,6 +56,17 @@ export const CHALLENGE_RULES: Readonly<Record<string, ChallengeRules>> = {
     // Made-up fun titles, not owl terms or facts.
     ranks: ['Night listener', 'Hoot rookie', 'Night caller', 'Moon hooter', 'Who-cooker supreme'],
   },
+  // Phase 12. Only the calf call is unlocked, and each calf call reference is one note, so the
+  // longest within-call gap is 0 s and the rule gives a 0 s split gap: any pause the note finder
+  // keeps starts a new call. Wrong sounds: junk and the bugle, glug and cow mew recordings
+  // (locked). calf call: worst bugle-7 54.2. Lowest leave-one-out 77.2.
+  // shortcut: a 0 s gap splits a calf call with a break in it; revisit with real takes or more calf clips.
+  elk: {
+    gapSec: 0,
+    recognizeMin: { 'calf-call': 55 },
+    // Made-up fun titles, not elk terms or facts.
+    ranks: ['Meadow walker', 'Trail listener', 'Ridge caller', 'Valley echo', 'Mountain voice'],
+  },
 };
 
 export const challengeRules = (s: Species): ChallengeRules | undefined => CHALLENGE_RULES[s.id];

@@ -3,7 +3,7 @@
 ## Phase 12: elk (2026-11-13, PR link below once opened)
 
 **Owner: please check / try**
-1. **On the phone**: Calls → **Elk** → **Calf call** → Practice. Is the score sensible for a calf
+1. **On the phone**: Calls → **Elk** → **Calf call** → Practice (and Elk → Calling challenge). Is the score sensible for a calf
    call from a person or a call? Does a bugle or a cow call score clearly lower? The pass rests on
    3 clips of one calf (see below), so treat scores with caution.
 2. **License check (affects locked calls only)**: the Rocky Mountain National Park files
@@ -33,6 +33,11 @@ What changed:
   "Play elk", "When elk use it"). Analysis band 300–6000 Hz (`ELK_BAND`), measured on the clips:
   glug pulses and bugle onsets from ~0.45–0.6 kHz, whistles ~2.0–2.8 kHz, mews to ~3.1 kHz,
   harmonics to ~5.5 kHz.
+- **Elk calling challenge** (`#/elk/challenge`, Phase 10 rules, data only in
+  `src/challenge/rules.ts`): calf call threshold **55** (worst wrong sound bugle-7 54.2; lowest
+  leave-one-out 77.2). Split gap **0 s** by the rule (each calf reference is one note, so the
+  longest within-call gap is 0): any pause the note finder keeps starts a new call, so a calf call
+  with a break in it is split (shortcut, revisit with real takes). Rank titles are made-up names.
 - Tests: `test/calibration-elk.test.ts`, elk in `test/reference-audio.test.js` and
   `test/species.test.ts`; e2e `e2e/practice-elk.e2e.ts` (fake mic plays calf-call-1: scored 99.6,
   saved under the elk key, no turkey/owl wording) and the elk screens in `e2e/a11y.e2e.ts`.
@@ -84,8 +89,8 @@ Sources checked for clips:
 Next for elk: more bugles per bull and more bulls (or a whistle-contour feature) for the bugle;
 clearer cow mews (another park, or recordists to ask); recordings of other calves.
 
-Verified: `npm ci && npm test` (311 unit tests), `npm run build`, `npm run e2e` (73 passed, 3
-skipped). Not verified: anything on a real phone; a person's or a commercial call's calf call.
+Verified: `npm ci && npm test` (330 unit tests), `npm run build`, `npm run e2e` (77 passed, 3
+skipped; includes the elk challenge design pass). Not verified: anything on a real phone; a person's or a commercial call's calf call.
 ## Phase 10: calling challenge for every species (2026-11-13, [#19](https://github.com/raineslc/GameCallHero/pull/19))
 
 **Owner: please try on the phone**

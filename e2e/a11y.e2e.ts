@@ -18,7 +18,7 @@ screens.push('#/challenge');
 screens.push('#/barred-owl/challenge');
 screens.push('#/barred-owl', ...BARRED_OWL.calls.flatMap((c) => [`#/barred-owl/call/${c.id}`, `#/barred-owl/practice/${c.id}`]));
 // Phase 12: the elk home (three species in the picker), call pages and practice pages.
-screens.push('#/elk', ...ELK.calls.flatMap((c) => [`#/elk/call/${c.id}`, `#/elk/practice/${c.id}`]));
+screens.push('#/elk', '#/elk/challenge', ...ELK.calls.flatMap((c) => [`#/elk/call/${c.id}`, `#/elk/practice/${c.id}`]));
 
 async function settle(page: Page) {
   await page.locator('main h2').first().waitFor();
