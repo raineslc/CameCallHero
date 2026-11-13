@@ -43,6 +43,8 @@ function star(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number):
 }
 
 export interface CardData {
+  /** Heading under the app name, e.g. "Turkey calling challenge". */
+  title: string;
   name: string;
   date: string;
   result: Pick<ChallengeResult, 'score' | 'stars' | 'rank' | 'segments'>;
@@ -93,7 +95,7 @@ export async function drawCard(canvas: HTMLCanvasElement, data: CardData): Promi
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = c.muted;
   ctx.font = `600 40px ${FONT}`;
-  ctx.fillText('Turkey calling challenge', 72, 300);
+  ctx.fillText(fit(ctx, data.title, CARD_W - 144), 72, 300);
   ctx.fillStyle = c.text;
   ctx.font = `800 80px ${FONT}`;
   ctx.fillText(fit(ctx, data.name, CARD_W - 144), 72, 400);

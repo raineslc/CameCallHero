@@ -1,24 +1,16 @@
 // Calling challenge: one free take (up to CHALLENGE_SECONDS) that can hold a whole sequence of
 // calls. The take is split into calls at pauses, each call is scored against every unlocked
-// call of the species with the practice scorer, and the take gets one 0-100 score.
+// call of the species with the practice scorer, and the take gets one 0-100 score. The split
+// gap, thresholds and rank titles are per species (src/challenge/rules.ts).
 
 import { extractFeatures, frameGeometry, HOP_SEC, type AudioClip, type Band, type Features, type Note } from '../audio/features';
 import { checkTake, scoreTake, type Rejection } from '../audio/score';
 import type { CallDef } from '../calls/call';
 import { starsFor } from '../practice/hits';
+import type { ChallengeRules } from './rules';
 
 /** Longest take, seconds (after the count-in). */
 export const CHALLENGE_SECONDS = 20;
-
-/**
- * A pause of at least this long between two notes starts a new call. Measured on the turkey
- * references with the scorer's own note finder (gaps between notes, 10 ms frames):
- * yelp 0.08-0.28 s (largest: yelp-3), gobble 0.04 s (gobble-3; the others are one note).
- * 0.5 s leaves room for a caller about 1.8x slower than the slowest reference yelp. Kee kee
- * run (locked) has gaps up to 0.37 s, and kee-kee-run-3 one of 1.01 s between the kee kee and
- * the yelp, so that clip would split in two.
- */
-export const SEGMENT_GAP_SEC = 0.5;
 
 /**
  * Audio kept on each side of a call when it is scored on its own: the references keep at
@@ -27,22 +19,9 @@ export const SEGMENT_GAP_SEC = 0.5;
  */
 export const SEGMENT_PAD_SEC = 0.3;
 
-/**
- * Lowest score that counts as each call: the highest score any wrong sound reached as that
- * call, rounded down, plus 1 (so a call must beat it). Wrong sounds: the putts and junk clips
- * in test/fixtures and the other unlocked call's references, each scored both as a whole clip
- * (the calibration measure) and as the challenge sees it (split at pauses, each part scored on
- * its own). yelp: worst putt-2 39.6; gobble: worst putt-4 52.8 (one putt of the series, split
- * off by its 0.7 s pauses). Both stay below the lowest leave-one-out score of the call
- * (yelp 62.2, gobble 67.7). test/challenge.test.ts recomputes these from the files and fails
- * if a call is unlocked without an entry or a value drifts.
- * Kee kee run clips are left out of the yelp negatives: the call ends in a yelp (SC DNR), and
- * they score 50-66 as a yelp.
- */
-export const RECOGNIZE_MIN: Readonly<Record<string, number>> = { yelp: 40, gobble: 53 };
-
-export const isRecognized = (callId: string, score: number): boolean =>
-  Number.isFinite(score) && score >= (RECOGNIZE_MIN[callId] ?? Infinity);
+/** True if `score` reaches the species' threshold for `callId` (no threshold: never). */
+export const isRecognized = (rules: Pick<ChallengeRules, 'recognizeMin'>, callId: string, score: number): boolean =>
+  Number.isFinite(score) && score >= (rules.recognizeMin[callId] ?? Infinity);
 
 /** Groups notes (frames, in order) into calls: a gap of `gapFrames` or more starts a new call. */
 export function segmentNotes(notes: readonly Note[], gapFrames: number): Note[] {
@@ -89,9 +68,8 @@ export function challengeScore(segments: readonly Pick<SegmentResult, 'start' | 
   return total > 0 ? Math.min(100, Math.max(0, sum / total)) : 0;
 }
 
-/** Rank names by star band (1-5 stars). Hunting terms used as rank names only. */
-export const RANKS = ['Poult', 'Jake', 'Gobbler', 'Longbeard', 'Boss gobbler'] as const;
-export const rankFor = (score: number): string => RANKS[starsFor(score) - 1];
+/** Rank title by star band (1-5 stars), from the species' rank titles. */
+export const rankFor = (ranks: ChallengeRules['ranks'], score: number): string => ranks[starsFor(score) - 1];
 
 /** A call of the species with its analyzed references. */
 export interface CallRefs {
@@ -126,19 +104,19 @@ export interface SplitTake {
 }
 
 /**
- * Splits a take into calls at pauses of SEGMENT_GAP_SEC, after the scorer's take gates
+ * Splits a take into calls at pauses of `gapSec` (the species' split gap), after the scorer's take gates
  * (clipping, too quiet, too noisy, no call) on the whole take. Each call is cut out with
  * SEGMENT_PAD_SEC of audio around it and analyzed on its own, as a practice take would be.
  * `noiseFloorDb` is the count-in floor (as in practice); `band` the species' analysis band.
  */
-export function splitTake(take: AudioClip, noiseFloorDb: number | undefined, band: Band): SplitTake {
+export function splitTake(take: AudioClip, noiseFloorDb: number | undefined, band: Band, gapSec: number): SplitTake {
   const seconds = take.sampleRate > 0 ? take.samples.length / take.sampleRate : 0;
   const whole = extractFeatures(take, { noiseFloorDb, band, maxSeconds: CHALLENGE_SECONDS + 1 });
   const rejected = checkTake(whole, noiseFloorDb);
   if (rejected) return { rejected, seconds, parts: [] };
 
   const { hop, fftSize } = frameGeometry(whole.sampleRate);
-  const groups = segmentNotes(whole.notes, Math.round(SEGMENT_GAP_SEC / HOP_SEC));
+  const groups = segmentNotes(whole.notes, Math.round(gapSec / HOP_SEC));
   const startSample = (n: Note) => n.start * hop;
   const endSample = (n: Note) => (n.end - 1) * hop + fftSize;
   const pad = Math.round(SEGMENT_PAD_SEC * whole.sampleRate);
@@ -155,9 +133,12 @@ export function splitTake(take: AudioClip, noiseFloorDb: number | undefined, ban
   return { rejected: null, seconds, parts };
 }
 
-/** Splits a take into calls and scores each against every call in `calls`; the best match names it. */
-export function analyzeChallenge(take: AudioClip, calls: readonly CallRefs[], noiseFloorDb: number | undefined, band: Band): ChallengeResult {
-  const split = splitTake(take, noiseFloorDb, band);
+/**
+ * Splits a take into calls and scores each against every call in `calls`; the best match names
+ * it. `rules` are the species' split gap, thresholds and rank titles (src/challenge/rules.ts).
+ */
+export function analyzeChallenge(take: AudioClip, calls: readonly CallRefs[], noiseFloorDb: number | undefined, band: Band, rules: ChallengeRules): ChallengeResult {
+  const split = splitTake(take, noiseFloorDb, band, rules.gapSec);
   if (split.rejected) return { rejected: split.rejected, seconds: split.seconds, segments: [], score: 0, stars: 0, rank: '' };
   const segments = split.parts.map(({ start, end, features }): SegmentResult => {
     let best: { call: CallDef | null; score: number; bestReference: number } = { call: null, score: 0, bestReference: -1 };
@@ -165,10 +146,10 @@ export function analyzeChallenge(take: AudioClip, calls: readonly CallRefs[], no
       const r = scoreTake(features, refs, call.weights, { noiseFloorDb });
       if (!r.rejected && r.score > best.score) best = { call, score: r.score, bestReference: r.bestReference };
     }
-    return { start, end, ...best, recognized: best.call !== null && isRecognized(best.call.id, best.score) };
+    return { start, end, ...best, recognized: best.call !== null && isRecognized(rules, best.call.id, best.score) };
   });
   const score = challengeScore(segments);
-  return { rejected: null, seconds: split.seconds, segments, score, stars: starsFor(score), rank: rankFor(score) };
+  return { rejected: null, seconds: split.seconds, segments, score, stars: starsFor(score), rank: rankFor(rules.ranks, score) };
 }
 
 /**

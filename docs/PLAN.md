@@ -73,7 +73,8 @@ Each phase is one session and one PR. Details in `docs/phases/`.
 | 5 | Practice screen | Scrolling lane, count-in, record, score, best score saved |
 | 6 | Feedback release | End-to-end fake-mic test, README, issue template, tester instructions |
 
-Progress is tracked in `docs/STATUS.md`.
+Progress is tracked in `docs/STATUS.md`. Later phases (Phase 10 on: challenge for every species, more species):
+`docs/ROADMAP.md`.
 
 ## Not in this phase set
 
