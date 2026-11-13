@@ -1,6 +1,6 @@
 # Status
 
-## Phase 14: wood duck (2026-11-13, PR link below)
+## Phase 14: wood duck (2026-11-13, [#24](https://github.com/raineslc/GameCallHero/pull/24))
 
 **Owner: please check / try**
 1. **On the phone**: Calls → **Wood duck** → **Drake whistle** → Practice (and Wood duck →
