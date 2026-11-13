@@ -1,5 +1,120 @@
 # Status
 
+## Phase 14: wood duck (2026-11-13, [#24](https://github.com/raineslc/GameCallHero/pull/24))
+
+**Owner: decisions and checks**
+1. **Drake whistle: four clips pass, five do not.** Clips 1–4 (two birds, both recorded by Paul
+   Marvin) pass with worst-case margin 40.7 (matrix 44.5, and 17.4 even when each clip's own
+   recording is left out). Clip 5 (XC679723, Aziza Cooper, British Columbia) has other wood ducks
+   calling over the whistle (the note finder sees 4 notes); with it the best margin is **−6.5**.
+   I first dropped clip 5 under a "no other call within 0.3 s" rule, but I wrote that rule after
+   seeing the result; Codex flagged it (P1) and I agree, so clip 5 is back (marked uncertain) and
+   the call is **locked**. To unlock, a reason to exclude overlapped clips that you accept, or more
+   clean drake recordings from other recordists, is needed. Your call.
+2. **Wording**: the call text comes from All About Birds and Birds of the World, read only through
+   web-search excerpts (this environment blocks allaboutbirds.org, birdsoftheworld.org and
+   ducks.org). Please check `src/calls/wood-duck.ts` and the manifest's `callDefinitions`.
+
+Gate: every call has ≥ 3 legal clips (hen flush call 9, drake whistle 5), but none passes, so the
+species is merged with both calls locked ("Coming soon") and no hand-off of a playable call.
+
+What changed:
+- **Calls** (definitions and sources in `public/audio/wood-duck/manifest.json` `callDefinitions`):
+  - **Hen flush call**: All About Birds: females give a loud "oo-eek, oo-eek" when disturbed and
+    taking flight; Birds of the World: the female's loud call also finds the mate after separation
+    and keeps contact in flight.
+  - **Drake whistle**: All About Birds: the male has a thin, rising and falling, zeeting whistle.
+    The excerpts do not say when drakes give it, and the screen says so.
+  - Not included: hen squeal (no source read separates it from the flush call; Ducks Unlimited
+    mentions a "wheet-wheet" squeal in flight without saying which sex); the short broadband female
+    "reek"/alarm notes on several pages (no source excerpt defines them).
+- **References**: 14 clips, 2.4 MB, all xeno-canto, all "Playback used: no", licenses CC BY-NC-SA
+  4.0 (12) and 3.0 (2), checked on each page. 116 wood duck recordings listed; NoDerivatives
+  licenses (21) and "playback unknown" pages excluded; **only US and Canada recordings** (the
+  European ones say feral or escaped, e.g. XC522565, XC855694); pages naming a park left out
+  (XC177728 Powderhorn Park, XC170062 Valley Forge National Historic Park, XC754267, XC760868/9,
+  XC509715/7, XC540314/5, XC540500/2); originals with samples at full scale rejected (XC724843, XC170061);
+  clips failing the take gates replaced (XC389582, XC318745, XC1049246 too noisy).
+
+  | Call | Clips | Recordings (recordists) |
+  |---|---|---|
+  | hen flush call | 9 | XC450846 (2 clips, Ed Pandolfino), XC169267 (2), XC356416, XC174539 (2) (Paul Marvin), XC312435 (Matt Wistrand), XC331424 (Martin St-Michel) — 6 recordings, 4 recordists |
+  | drake whistle | 5 | XC174542 (2), XC453757 (2) (Paul Marvin), XC679723 (Aziza Cooper; uncertain: other birds overlap) — 3 recordings, 2 recordists |
+
+  Classified by measurement against the cited definitions (per-clip notes in the manifest). Hen:
+  2–5 harmonic notes, 0.1–0.6 s, every 0.5–1.0 s, fundamental 1.3–1.7 kHz rising within most notes.
+  Drake: one tonal note rising from ~4.5–6.3 kHz to 6.4–9.0 kHz, falling a little at the end.
+- **App**: `src/calls/wood-duck.ts`, `WOOD_DUCK` in `src/calls/species.ts` (seventh picker button,
+  after the eastern screech-owl; "duck" wording; best-score keys `wood-duck.<call>`), analysis band
+  300–10000 Hz. Other species' code, weights, scores and keys unchanged (their calibration and
+  challenge output is identical to `main`, diffed). No challenge rules (no unlocked call): the wood
+  duck challenge shows "Coming soon".
+- **Tests**: `test/calibration-wood-duck.test.ts` (mallard rules: leave-one-out, margin 15, matrix
+  rule; negatives: other wood duck call, all turkey, barred owl, elk, mallard, great horned owl and
+  eastern screech-owl references, turkey wrong-call fixtures, junk; every reference passes the take gates; plus
+  leave-one-recording-out ≥ 15 for unlocked calls); `test/reference-audio.test.js` covers the wood
+  duck folder (licenses, no playback, wild-bird and native-range checks, call definitions cite
+  sources, < 15 MB; the park/domestic word check now also rejects "escaped" and "collection", for
+  the mallard too, which still passes); `test/species.test.ts`; `e2e/practice-wood-duck.e2e.ts`
+  (picker, both calls locked, challenge "Coming soon"); a11y e2e covers the wood duck home,
+  challenge and call pages.
+
+### Calibration (margin 15, not changed)
+
+| Call | Clips | Weights (r/p/t/s) | Worst-case margin | Result |
+|---|---|---|---|---|
+| Drake whistle | 5 | 0.5 / 0.5 / 3 / – | −6.5 (matrix −5.0); clips 1–4 alone 40.7 | locked, "Coming soon" |
+| Hen flush call | 9 | 0.5 / 2 / 3 / 1 | −9.0 (matrix −0.1) | locked, "Coming soon" |
+
+Wood duck confusion matrix (mean score; own row leave-one-out):
+
+| take \ target | hen flush | drake whistle |
+|---|---|---|
+| hen flush | **48.2** | 18.6 |
+| drake whistle | 38.0 | **58.4** |
+
+Bands tried (grid r/p/t 0.5, 1, 2, 3 × structure 0, 1, 2 = 192 sets; best worst-case margin):
+
+| Band (Hz) | Drake whistle (5 clips) | Drake whistle (clips 1–4 only, diagnosis) | Hen flush call |
+|---|---|---|---|
+| 300–10000 (kept) | −6.5 | 40.7 | −9.0 |
+| 500–10000 | −7.1 | 39.1 | −10.5 |
+| 800–10000 | −6.7 | 38.4 | −11.4 |
+| 500–12000 | −6.9 | 38.0 | −10.1 |
+| 500–8000 | −11.0 | 34.1 | −8.5 |
+| 1000–9000 | −6.9 | 34.7 | −11.5 |
+| 2000–9000 | −6.5 | 27.1 | −9.1 |
+| 1000–4000 | −14.1 | 6.1 | −7.1 |
+
+- Hen flush call: its worst negatives are the mallard drake raeb (a series of evenly spaced notes)
+  and elk bugles; its own clips differ in note count (2–5) and note length, so leave-one-out
+  scores are low (42–54). Same pattern as the mallard hail call (Phase 11). More clips did not
+  fix it: in 1000–9000 Hz, an earlier set of 6 clips (one later dropped under the park rule) gave −12.8 and the final 9 give −11.5.
+- Drake whistle: clip 5 scores only 19.3 against clips 1–4 (overlapping calls change its tone and
+  note count); its worst negative is mallard quack-5 (25.8). Clips 1–4 score 66.5–70.0, mostly
+  against their sibling from the same bird.
+- Challenge check (Phase 11 lesson), done on clips 1–4 before the lock: split at 0 s, no hen flush
+  note or junk clip scored above 32.1 as a drake whistle. Moot while the call is locked.
+- Measured, not assumed: for clips 1–4 the whistle's pitch sweep and high band separate it (tone
+  weight 3 carries it; in 1000–4000 Hz, the mallard band, they fall to 6.1). Pitch contour did not
+  help the hen flush call (best weights still lose to the mallard drake raeb).
+
+Next for the wood duck: more clean drake whistle recordings from other recordists (only Paul
+Marvin's two and one overlapped clip were usable here); when the whistle is unlocked, extend the
+practice lane's pitch axis (`pitchRange()` in `src/practice/plan.ts` caps at 8 kHz; the whistle
+reaches ~9 kHz, Codex review on #24); for the hen flush call, the same scoring work as the mallard hail call (a
+per-note feature for a series of similar notes).
+
+- **Species picker** (`src/styles/theme.css`): with a seventh species, three columns took three rows
+  at 360 px and pushed the last turkey call off the first screen (library e2e). Now four columns
+  (min 72 px), labels 0.875 rem and allowed to wrap: two rows, every button still ≥ 44 px tall,
+  colours unchanged.
+
+Verified: `npm ci && npm test` (592 unit tests), `npm run build`, `npm run e2e` (98 passed,
+5 skipped), after merging Phase 13 (great horned owl) and Phase 15 (eastern screech-owl).
+Not verified: anything on a real phone; whether a phone mic and a person or call can produce a
+6–9 kHz whistle; classifications by an expert or the recordists; the source text against the full
+pages.
 ## Phase 15: eastern screech-owl (2026-11-13, [#23](https://github.com/raineslc/GameCallHero/pull/23))
 
 **Owner: please check**

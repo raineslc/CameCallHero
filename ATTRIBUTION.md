@@ -1,8 +1,8 @@
 # Attribution
 
 Audio used in Game Call Hero. Machine-readable source of truth:
-`public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json`, `public/audio/elk/manifest.json` and
-`public/audio/mallard/manifest.json` (trim times, quality notes),
+`public/audio/turkey/manifest.json`, `public/audio/barred-owl/manifest.json`, `public/audio/elk/manifest.json`,
+`public/audio/mallard/manifest.json` and `public/audio/wood-duck/manifest.json` (trim times, quality notes),
 `test/fixtures/junk/manifest.json` and `test/fixtures/phone/manifest.json`.
 
 ## Wild turkey reference recordings
@@ -212,6 +212,36 @@ Machine-readable details, measurements and cited call definitions:
 | `public/audio/mallard/hail-call-9.wav` | hail call | [XC189880](https://xeno-canto.org/189880), 23.07–25.26 s | Albert Lastukhin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | `public/audio/mallard/drake-raeb-7.wav` | drake raeb | [XC140461](https://xeno-canto.org/140461), 2.35–5.02 s | Bernard BOUSQUET | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
 | `public/audio/mallard/drake-raeb-8.wav` | drake raeb | [XC1007773](https://xeno-canto.org/1007773), 5.04–7.52 s | David A. Brinkman | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+
+## Wood duck reference recordings
+
+Wild wood ducks (*Aix sponsa*) from xeno-canto, recorded in the United States and Canada; every
+recording's page says no playback was used, and none mentions an escaped, feral, captive,
+domestic or park bird (European recordings are of escaped or feral birds and were not used). All
+clips were trimmed from the original and converted to mono 44.1 kHz 16-bit WAV (stereo originals:
+channels averaged; 48 kHz originals: resampled). No filtering or gain change by this project.
+Clips are shared under the same license as the original (CC BY-NC-SA requires this).
+NonCommercial (NC) clips may only be used non-commercially; Game Call Hero is free, with no ads,
+purchases or donations. Calls were classified by measurement, not confirmed by the recordists or
+an expert. Machine-readable details, measurements and cited call definitions:
+`public/audio/wood-duck/manifest.json`.
+
+| File | Call | Original | Recordist | License |
+|---|---|---|---|---|
+| `public/audio/wood-duck/hen-flush-1.wav` | hen flush | [XC450846](https://xeno-canto.org/450846), 0.25–2.80 s | Ed Pandolfino | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-2.wav` | hen flush | [XC169267](https://xeno-canto.org/169267), 1.35–4.00 s | Paul Marvin | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/wood-duck/hen-flush-3.wav` | hen flush | [XC312435](https://xeno-canto.org/312435), 0.90–3.70 s | Matt Wistrand | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-4.wav` | hen flush | [XC331424](https://xeno-canto.org/331424), 3.86–5.95 s | Martin St-Michel | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-5.wav` | hen flush | [XC356416](https://xeno-canto.org/356416), 0.74–2.85 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-6.wav` | hen flush | [XC174539](https://xeno-canto.org/174539), 99.60–102.40 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-7.wav` | hen flush | [XC174539](https://xeno-canto.org/174539), 103.40–105.80 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/hen-flush-8.wav` | hen flush | [XC169267](https://xeno-canto.org/169267), 4.60–6.55 s | Paul Marvin | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/wood-duck/hen-flush-9.wav` | hen flush | [XC450846](https://xeno-canto.org/450846), 4.35–6.75 s | Ed Pandolfino | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-1.wav` | drake whistle | [XC174542](https://xeno-canto.org/174542), 5.00–6.10 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-2.wav` | drake whistle | [XC174542](https://xeno-canto.org/174542), 12.10–13.20 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-3.wav` | drake whistle | [XC453757](https://xeno-canto.org/453757), 12.60–13.90 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-4.wav` | drake whistle | [XC453757](https://xeno-canto.org/453757), 0.85–2.10 s | Paul Marvin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/wood-duck/drake-whistle-5.wav` | drake whistle | [XC679723](https://xeno-canto.org/679723), 8.10–9.15 s | Aziza Cooper | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
 ## Test fixtures
 
