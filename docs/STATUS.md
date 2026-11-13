@@ -17,6 +17,109 @@ Before/after screenshots: `docs/screenshots/ux/before/` and `docs/screenshots/ux
    measurement only) and the clips marked `uncertain` should be listenable.
 
 Scoring, calibration and lock decisions were not touched (Phase 16 owns them).
+## Phase 16: scoring upgrade for trills, raspy and trending calls (2026-11-13, [#25](https://github.com/raineslc/GameCallHero/pull/25))
+
+**Owner: decisions and checks**
+1. **No call was unlocked.** The three new scorer parts (pulse rate, raspiness, note level/length
+   trend) are in the code, unit-tested and switched off (weight 0) for every call. They raise
+   several locked calls' best margins (screech-owl whinny −9.1 → 2.8, mallard drake raeb −3.3 →
+   0.0, wood duck drake whistle −6.5 → −0.5, elk glug 3.3 → 10.4), but none reaches the unchanged
+   margin of 15. Nothing changes in the app: every score, lock and screen is as on `main`.
+2. **Decision: which negatives count?** The brief asked for "all negatives incl. other species".
+   The species phases each used their own set (turkey: fixtures only; mallard: turkey and barred
+   owl; ...). With **every other species' clips** as negatives, most calls that are unlocked
+   today would not pass either (best of the same grid, no new parts): turkey yelp −2.3 (worst:
+   mallard hail-call-6), gobble 12.3 (mallard quack-4), barred owl two-phrase hoot 13.8 (great
+   horned owl hoot-6), hoo-wah 10.6 (screech-owl trill-9), great horned owl hoot 10.7 (mallard
+   drake-raeb-4); only the elk calf call passes (26.2). I did not change them (not this phase's
+   job). If cross-species confusion matters for practice (a person picks the call, so a mallard
+   being scored as a yelp may not matter), say so and a later phase can apply one rule to all.
+3. **Mallard hen quack** still passes practice (39.4 with its species test's negatives, 23.0 with
+   all species), but still fails the challenge split: single hail-call and drake notes score up to
+   ~90 as a quack. Best over the 434 weight sets that pass practice: threshold 6.9 points above the
+   lowest leave-one-out score (10.0 without the new parts). Same decision as Phase 11.
+
+Gate (brief): no call passes, so the features are merged with weight 0 everywhere, plus the
+measurements below. The practice lane's 8 kHz pitch cap is unchanged (the wood duck drake
+whistle, which reaches ~9 kHz, stays locked).
+
+What changed:
+- **`src/audio/features.ts`**: two new fields per analysis, computed for every recording, used
+  only by the new parts: `envDb` (fine loudness envelope, 5 ms window every 2.5 ms; the 23 ms
+  analysis frames smooth out pulses faster than ~20/s) and `flatDb` (spectral flatness of each
+  note frame's in-band spectrum after subtracting the recording's mean background spectrum).
+  Every existing field is computed exactly as before.
+- **`src/audio/score.ts`**: three optional weights, like `structure`:
+  - `pulse`: rate and strength of the highest autocorrelation peak of the fine envelope over the
+    call, lags 20–125 ms (8–50 pulses/s). A trill measures the same whether the note finder
+    splits it into pulses or keeps it whole (screech-owl trills: 10.3–16.7 pulses/s, strength
+    0.63–0.97, with 1 to 33 notes found). Folded into rhythm on screen.
+  - `rasp`: median flatness (dB) over note frames. Folded into tone.
+  - `trend`: least-squares slope of note peak level (dB, relative to the call itself, never
+    absolute loudness) and of ln(note length) from first to last note. Mallard hail calls: level
+    −0.9 to −9.5 dB, length −0.29 to −0.93; drake raebs: level −3.5 to +4.7 dB, length −0.15 to
+    +0.23 (drake-raeb-8: −1.14). Folded into rhythm.
+  Distance scales set once before calibration and not tuned (`PULSE_STRENGTH_SCALE` 0.2,
+  `PULSE_RATE_SCALE` 0.25, `RASP_SCALE_DB` 4, `TREND_LEVEL_SCALE_DB` 6, `TREND_LENGTH_SCALE` 0.5).
+  The new code runs only when its weight is above 0.
+- **Tests** `test/score-features.test.ts`: each part on synthetic signals (a 10 pulses/s trill
+  measured at 10 ± 5 % both split into 16+ notes and as one note; tone < harmonic < noise in
+  flatness; a −12 dB / one-third-length falling series measured as such; level does not change
+  any of them; similarities 100 for equal input, 0 for NaN, always 0–100), the seven-part
+  weighted total, random input with every new weight stays finite and in 0–100, no call uses the
+  new weights, and **byte-identical scores** for every unlocked call (turkey yelp and gobble,
+  barred owl two-phrase hoot and hoo-wah, great horned owl hoot, elk calf call): 153 scores
+  recorded on `main` (`test/fixtures/unlocked-scores-phase15.json`: leave-one-out of each
+  reference and every other clip of the species plus the turkey wrong-call and junk fixtures, as
+  score/rhythm/pitch/tone/best reference) must come out exactly equal. Also diffed: the 216 lines
+  of calibration and challenge output of `npm test` are identical to `main`.
+- Comment on the screech-owl trill's weights updated (it named the trill-rate feature as next).
+
+### Before/after (best worst-case margin; margin 15 unchanged, leave-one-out, matrix rule)
+
+Grid: rhythm/pitch/tone 0.5–3 and structure 0–3 (step 0.5), times pulse, trend and rasp 0–3
+(step 1): 96 768 weight sets per call; "before" is the subset with the new weights at 0 (1512
+sets, the species phases' grid). Worst-case = the lower of the leave-one-out margin and the matrix
+margin. Same clips as `main` (none dropped or added), same bands. Two negative sets: the one each
+species' calibration test uses, and every other clip of every species plus fixtures and junk
+(each analysed in the target species' band).
+
+| Call | Clips | Reported (its phase) | Species-test negatives: before → after | All species: before → after | New part that helped | Result |
+|---|---|---|---|---|---|---|
+| Turkey kee kee run | 4 | 7.7 (2b, yelp only) | 0.5 → 0.5 | 0.0 → 0.0 | none | locked |
+| Barred owl ascending hoot | 6 | 13.0 | 13.0 → 13.0 | 12.1 → 12.1 | none | locked |
+| Barred owl caterwaul | 3 | −39.2 | −39.2 → −39.2 | −39.2 → −39.2 | none | locked |
+| Elk bugle | 7 | −12.0 | −12.0 → −9.7 | −15.5 → −12.4 | pulse | locked |
+| Elk glug | 3 | 3.3 | 3.3 → 10.4 | 1.7 → 3.5 | trend | locked |
+| Elk cow mew | 4 | all 4 clips fail the take gates | −31.5 → −26.5 | −32.9 → −32.7 | – | locked ("Recordings needed") |
+| Mallard hen quack | 6 | 39.4 practice; challenge −4.3 | 39.4 → 39.4 | 23.0 → 23.0 | – (challenge: −10.0 → −6.9, see 3.) | locked (challenge) |
+| Mallard hail call | 9 | 1.3 | 2.4 → 5.0 | 0.8 → 5.0 (5.3 with step 0.5) | trend, rasp | locked |
+| Mallard drake raeb | 8 | −3.8 | −3.3 → 0.0 | −6.0 → 0.0 | rasp | locked |
+| Wood duck hen flush call | 9 | −9.0 | −8.4 → −8.0 | −8.4 → −8.0 | trend (little) | locked |
+| Wood duck drake whistle | 5 | −6.5 | −6.5 → −0.5 | −6.5 → −0.5 | rasp, pulse | locked |
+| Eastern screech-owl monotone trill | 10 | 10.0 | 10.0 → 10.4 | 3.0 → 8.7 | pulse | locked |
+| Eastern screech-owl whinny | 10 | −9.1 | −9.1 → 2.8 | −9.1 → 2.3 (2.7 with step 0.5) | rasp, pulse | locked |
+
+Turkey cut and purr have no clips (skipped). The wood duck test already uses every species, so its
+two columns match. Small differences from the reported numbers come from the grid (e.g. the
+mallard phase used structure 0–3 in steps of 1) and, for the kee kee run, from the rule (Phase 2b
+compared it with yelps only). Elk cow mew: all 4 clips fail the take gates (Phase 12), so they score
+0 and no weights can pass. A finer grid (new weights 0–3 in steps of 0.5) for the hail call, trill and
+whinny added at most 0.4.
+
+What still sinks each call (worst negative of the best "after" weights, all species):
+- Screech-owl trill: the barred owl hoo-wah, which also pulses (16.7–40 pulses/s, strength
+  0.53–0.69); the matrix margin against the whinny is 14.8.
+- Screech-owl whinny: barred owl hoo-wah and turkey gobble-3; whinnies vary (1–5 notes, pulse
+  strength 0–0.61).
+- Mallard hail call: barred owl ascending hoot-1 (also a series whose level changes); drake raeb:
+  hail-call-1 (raeb and hail-call notes are equally raspy, flatness −7 to −15 dB in both).
+- Wood duck drake whistle: clip 5 (other ducks over the whistle, Phase 14) against turkey gobble-2
+  and mallard quack-5. Hen flush call: mallard drake raeb notes.
+- Elk glug: screech-owl trill-8 (all species), barred owl caterwaul-1 (species test).
+
+Verified: `npm ci && npm test` (614 unit tests), `npm run build`, `npm run e2e` (98 passed, 5 skipped). Not verified: anything on a
+real phone (nothing changed in the app); the new parts on real takes.
 
 ## Phase 14: wood duck (2026-11-13, [#24](https://github.com/raineslc/GameCallHero/pull/24))
 

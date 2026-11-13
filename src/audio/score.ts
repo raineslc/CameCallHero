@@ -7,9 +7,12 @@
 // Structure (only for calls whose weights set it, the owl hoots): how evenly the notes repeat
 // and whether a phrase repeats, from the loudness envelope's autocorrelation. It is part of
 // "rhythm" on screen (folded in by its weight), so the app still shows three parts.
+// Phase 16 adds three more optional parts, each off unless its weight is set: pulse (rate and
+// strength of fast amplitude pulses, for trills) and trend (how note level and length change
+// across the call) fold into rhythm; rasp (spectral flatness inside notes) folds into tone.
 // The take is compared with every reference; the best match counts.
 
-import { extractFeatures, HOP_SEC, NOTE_ABOVE_FLOOR_DB, NOTE_BELOW_PEAK_DB, type AudioClip, type Features } from './features';
+import { extractFeatures, frameGeometry, HOP_SEC, NOTE_ABOVE_FLOOR_DB, NOTE_BELOW_PEAK_DB, type AudioClip, type Features } from './features';
 
 export interface Weights {
   rhythm: number;
@@ -17,6 +20,12 @@ export interface Weights {
   tone: number;
   /** Weight of the envelope structure (see structureShape). Absent or 0: not used (turkey calls). */
   structure?: number;
+  /** Weight of the pulse rate (see pulseShape). Absent or 0: not used. Shown as part of rhythm. */
+  pulse?: number;
+  /** Weight of the raspiness (see raspDb). Absent or 0: not used. Shown as part of tone. */
+  rasp?: number;
+  /** Weight of the note level and length trend (see trendShape). Absent or 0: not used. Shown as part of rhythm. */
+  trend?: number;
 }
 
 export interface SubScores {
@@ -58,6 +67,12 @@ const PITCH_OFFSET_SCALE = 12; // semitones
 const NOTE_TIMING_SCALE = 0.5; // mean |ln ratio| of note length and spacing at which the note pattern falls to 1/e
 export const NOTE_BREAK_SCALE = 4; // mel bands of difference in a note's high-to-low break at which it falls to 1/e
 export const STRUCTURE_SCALE = 0.2; // mean autocorrelation difference at which structure falls to 1/e
+// Phase 16 scales, set once before its calibration and not tuned (same reasoning as above).
+export const PULSE_STRENGTH_SCALE = 0.2; // autocorrelation difference, as STRUCTURE_SCALE
+export const PULSE_RATE_SCALE = 0.25; // |ln ratio| of pulse rates (about 28 % apart) at full pulse strength
+export const RASP_SCALE_DB = 4; // dB of median flatness difference
+export const TREND_LEVEL_SCALE_DB = 6; // dB of difference in level change from first to last note
+export const TREND_LENGTH_SCALE = 0.5; // |ln ratio| difference in length change from first to last note, as NOTE_TIMING_SCALE
 
 /**
  * Lag windows of the structure feature, in seconds, measured from the owl references
@@ -67,6 +82,12 @@ export const STRUCTURE_SCALE = 0.2; // mean autocorrelation difference at which 
  */
 export const NOTE_LAG_SEC: readonly [number, number] = [0.25, 0.5];
 export const PHRASE_LAG_SEC: readonly [number, number] = [1.2, 2.5];
+/**
+ * Lag window of the pulse feature, in seconds (pulses 8-50 per second). Measured on the
+ * eastern screech-owl references with the fine envelope: trills pulse 10-17 per second, whinnies
+ * 11-29 (Phase 16, docs/STATUS.md). Shorter than NOTE_LAG_SEC, so it does not see note spacing.
+ */
+export const PULSE_LAG_SEC: readonly [number, number] = [0.02, 0.125];
 
 const clamp100 = (v: number) => (Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0);
 
@@ -285,12 +306,134 @@ export function structureSimilarity(a: StructureShape, b: StructureShape): numbe
 }
 
 /**
- * Weights of the three parts shown on screen: the structure weight is added to rhythm, whose
- * sub-score then includes structure in the same proportion (see compare).
+ * Fast amplitude pulses inside the call (trills): the fine envelope (envDb, dB above the note
+ * threshold, so level does not matter) over the call's span, its normalized autocorrelation (mean
+ * removed), and the highest local peak in PULSE_LAG_SEC. A trill gives the same pulses whether
+ * the note finder keeps it as one note or splits it into many. strength 0 (rate 0) when there is
+ * no local peak in the window: a smooth note, or a call shorter than the window.
+ */
+export interface PulseShape {
+  /** Pulses per second at the peak; 0 without one. */
+  rate: number;
+  /** Autocorrelation at the peak, 0..1. */
+  strength: number;
+}
+
+export function pulseShape(f: Features): PulseShape {
+  const none = { rate: 0, strength: 0 };
+  if (!f.span || !(f.envHopSec > 0)) return none;
+  const { hop, fftSize } = frameGeometry(f.sampleRate);
+  const toEnv = f.sampleRate > 0 ? 1 / (f.envHopSec * f.sampleRate) : 0;
+  const a = Math.max(0, Math.floor(f.span.start * hop * toEnv));
+  const b = Math.min(f.envDb.length, Math.ceil(((f.span.end - 1) * hop + fftSize) * toEnv));
+  const n = b - a;
+  const lo = Math.max(1, Math.round(PULSE_LAG_SEC[0] / f.envHopSec));
+  const hi = Math.round(PULSE_LAG_SEC[1] / f.envHopSec);
+  if (n <= hi + 1) return none;
+  const threshold = Math.max(f.noiseFloorDb + NOTE_ABOVE_FLOOR_DB, f.peakDb - NOTE_BELOW_PEAK_DB);
+  const x = new Float64Array(n);
+  let mean = 0;
+  for (let i = 0; i < n; i++) {
+    const v = f.envDb[a + i] - threshold;
+    x[i] = Number.isFinite(v) ? Math.max(0, v) : 0;
+    mean += x[i];
+  }
+  mean /= n;
+  let r0 = 0;
+  for (let i = 0; i < n; i++) {
+    x[i] -= mean;
+    r0 += x[i] * x[i];
+  }
+  if (!(r0 > 0)) return none;
+  const r = new Float64Array(hi + 2);
+  for (let lag = lo - 1; lag <= hi + 1; lag++) {
+    let sum = 0;
+    for (let i = 0; i + lag < n; i++) sum += x[i] * x[i + lag];
+    r[lag] = sum / r0;
+  }
+  let best = none;
+  for (let lag = lo; lag <= hi; lag++)
+    if (r[lag] > r[lag - 1] && r[lag] >= r[lag + 1] && r[lag] > best.strength) best = { rate: 1 / (lag * f.envHopSec), strength: Math.min(1, r[lag]) };
+  return best;
+}
+
+/** 0-100: how alike two pulse shapes are. The rate counts in proportion to the weaker pulse strength. */
+export function pulseSimilarity(a: PulseShape, b: PulseShape): number {
+  const weaker = Math.max(0, Math.min(a.strength, b.strength));
+  const rate = a.rate > 0 && b.rate > 0 ? weaker * Math.abs(Math.log(a.rate / b.rate)) : 0;
+  const d = Math.abs(a.strength - b.strength) / PULSE_STRENGTH_SCALE + rate / PULSE_RATE_SCALE;
+  return clamp100(100 * Math.exp(-d));
+}
+
+/** Raspiness: median spectral flatness (dB, <= 0) over the note frames; NaN without notes. */
+export function raspDb(f: Features): number {
+  const v: number[] = [];
+  for (const n of f.notes) for (let i = n.start; i < n.end; i++) v.push(f.flatDb[i]);
+  return v.length > 0 ? median(v) : NaN;
+}
+
+/** 0-100: how alike two raspiness values are; 0 if either is missing. */
+export function raspSimilarity(a: number, b: number): number {
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return 0;
+  return clamp100(100 * Math.exp(-Math.abs(a - b) / RASP_SCALE_DB));
+}
+
+/**
+ * How note level and length change across the call: least-squares slope of each note's peak
+ * level (dB, relative within the call, so the input level does not matter) and of ln(note
+ * length) against the note's position, first note 0 to last note 1. Both 0 for a single note.
+ * A hail call whose notes get softer and shorter has both slopes negative.
+ */
+export interface TrendShape {
+  /** dB change from first to last note (fitted). */
+  level: number;
+  /** ln(length) change from first to last note (fitted). */
+  length: number;
+}
+
+export function trendShape(f: Features): TrendShape {
+  const k = f.notes.length;
+  if (k < 2) return { level: 0, length: 0 };
+  const pos = f.notes.map((_, i) => i / (k - 1));
+  const level = f.notes.map((n) => {
+    let p = -Infinity;
+    for (let i = n.start; i < n.end; i++) p = Math.max(p, f.rmsDb[i]);
+    return p;
+  });
+  const length = f.notes.map((n) => Math.log(n.end - n.start));
+  const slope = (y: number[]) => {
+    const mx = 0.5;
+    const my = y.reduce((s, v) => s + v, 0) / k;
+    let sxy = 0;
+    let sxx = 0;
+    for (let i = 0; i < k; i++) {
+      sxy += (pos[i] - mx) * (y[i] - my);
+      sxx += (pos[i] - mx) ** 2;
+    }
+    const v = sxy / sxx;
+    return Number.isFinite(v) ? v : 0;
+  };
+  return { level: slope(level), length: slope(length) };
+}
+
+/** 0-100: how alike two trends are. */
+export function trendSimilarity(a: TrendShape, b: TrendShape): number {
+  const d = (Math.abs(a.level - b.level) / TREND_LEVEL_SCALE_DB + Math.abs(a.length - b.length) / TREND_LENGTH_SCALE) / 2;
+  return clamp100(100 * Math.exp(-d));
+}
+
+const positive = (v: number | undefined) => (v !== undefined && v > 0 ? v : 0);
+
+/**
+ * Weights of the three parts shown on screen: the structure, pulse and trend weights are added
+ * to rhythm and the rasp weight to tone; those sub-scores include them in the same proportion
+ * (see compare).
  */
 export function partWeights(w: Weights): { rhythm: number; pitch: number; tone: number } {
   const s = w.structure ?? 0;
-  return { rhythm: w.rhythm + (s > 0 ? s : 0), pitch: w.pitch, tone: w.tone };
+  const extra = positive(w.pulse) + positive(w.trend);
+  const rasp = positive(w.rasp);
+  return { rhythm: w.rhythm + (s > 0 ? s : 0) + extra, pitch: w.pitch, tone: rasp > 0 ? w.tone + rasp : w.tone };
 }
 
 /** Share of the rhythm part that comes from structure, in [0, 1]. */
@@ -344,11 +487,26 @@ export function compare(take: Features, ref: Features, weights?: Weights): SubSc
   let rhythm = 100 * Math.sqrt(durSim) * (0.25 * countSim + 0.25 * fillSim + 0.5 * pattern);
   const share = structureShare(weights);
   if (share > 0) rhythm = (1 - share) * rhythm + share * structureSimilarity(structureShape(take), structureShape(ref));
+  // Phase 16 parts. Each runs only when its weight is set, so calls without them score exactly as before.
+  let toneOut = tone;
+  if (weights) {
+    const pulseW = positive(weights.pulse);
+    const trendW = positive(weights.trend);
+    const raspW = positive(weights.rasp);
+    if (pulseW > 0 || trendW > 0) {
+      const base = weights.rhythm + positive(weights.structure);
+      let sum = base * rhythm;
+      if (pulseW > 0) sum += pulseW * pulseSimilarity(pulseShape(take), pulseShape(ref));
+      if (trendW > 0) sum += trendW * trendSimilarity(trendShape(take), trendShape(ref));
+      rhythm = sum / (base + pulseW + trendW);
+    }
+    if (raspW > 0) toneOut = (weights.tone * tone + raspW * raspSimilarity(raspDb(take), raspDb(ref))) / (weights.tone + raspW);
+  }
 
-  return { rhythm: clamp100(rhythm), pitch: clamp100(pitch), tone: clamp100(tone) };
+  return { rhythm: clamp100(rhythm), pitch: clamp100(pitch), tone: clamp100(toneOut) };
 }
 
-/** Weighted total of the three parts (rhythm already includes structure, see compare). */
+/** Weighted total of the three parts (rhythm already includes structure, pulse and trend, tone includes rasp; see compare). */
 export function combine(s: SubScores, weights: Weights): number {
   const w = partWeights(weights);
   const total = w.rhythm + w.pitch + w.tone;
