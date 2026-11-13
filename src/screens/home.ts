@@ -29,7 +29,7 @@ export function homeScreen(root: HTMLElement, param = ''): () => void {
     </div>`
         : `<div class="challenge-cta" id="challenge-soon">
       <p>Calling challenge: <span class="badge">Coming soon</span></p>
-      <p class="muted">It opens once the app can recognize a ${species.noun} call.</p>
+      <p class="muted">It opens once the app can recognize at least one ${species.noun} call.</p>
     </div>`
     }
     <ul class="cards">

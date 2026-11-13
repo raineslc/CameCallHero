@@ -39,7 +39,7 @@ export const GREAT_HORNED_OWL: Species = {
   band: OWL_BAND,
 };
 
-// Eastern screech-owl trills measure 560-904 Hz and whinnies 754-1227 Hz (manifest notes), inside
+// Eastern screech-owl trills measure 560-818 Hz and whinnies 754-1249 Hz (manifest notes), inside
 // the barred owl's band.
 export const EASTERN_SCREECH_OWL: Species = {
   id: 'eastern-screech-owl',

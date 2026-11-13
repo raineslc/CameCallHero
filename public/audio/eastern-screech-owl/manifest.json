@@ -1,5 +1,5 @@
 {
-  "about": "Reference recordings of wild eastern screech-owl (Megascops asio), all from xeno-canto, all from the United States (Pennsylvania, Delaware, Colorado, Massachusetts, Florida, Tennessee, Wisconsin, Alabama, New York). Licenses and the 'Playback used' field were checked on each recording's own page on 2026-11-13; every recording used says 'Playback used: no'. Pages describing a response to playback or to a whistled imitation were skipped even when 'Playback used' was 'no' (e.g. XC820866, XC336371, XC368483, XC301668), as were recordings the recordist filtered or noise-reduced (e.g. XC544849, XC624995, XC669305, XC1087470, XC310034, XC1071056), and southern Texas and Mexico (McCall's screech-owl, which Birds of the World says never gives the whinny). trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps about 0.45 s before the call for the noise floor. Calls were classified by measurement against the cited definitions in callDefinitions; uncertain clips say so (uncertain: true).",
+  "about": "Reference recordings of wild eastern screech-owl (Megascops asio), all from xeno-canto, all from the United States (Pennsylvania, Delaware, Colorado, Massachusetts, Florida, Tennessee, Wisconsin, Alabama). Licenses and the 'Playback used' field were checked on each recording's own page on 2026-11-13; every recording used says 'Playback used: no'. Pages describing a response to playback or to a whistled imitation were skipped even when 'Playback used' was 'no' (e.g. XC820866, XC336371, XC368483, XC301668), as were recordings the recordist filtered or noise-reduced (e.g. XC544849, XC624995, XC669305, XC1087470, XC310034, XC1071056), and southern Texas and Mexico (McCall's screech-owl, which Birds of the World says never gives the whinny). trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps about 0.45 s before the call for the noise floor. Calls were classified by measurement against the cited definitions in callDefinitions; uncertain clips say so (uncertain: true).",
   "calls": [
     "monotone-trill",
     "whinny"
@@ -30,8 +30,8 @@
         "name": "Monotone trill",
         "definition": "'Their most common sounds are an even-pitched trill, often called a \"bounce song\" or tremolo; and a shrill, descending whinny' (All About Birds). The trill is mostly given at a single pitch but may rise or fall slightly at the end (Birds of the World, search excerpt). Missouri Department of Conservation: 'Most often heard is the screech-owl's trilling (an even-pitched sound referred to as a tremolo)'. Minnesota DNR: a monotone trill on a single pitch.",
         "use": "'The tremolo is used by pairs or families to keep in touch and is 3-6 seconds long' (All About Birds). Male and female give both the trill and the whinny (Minnesota DNR, search summary).",
-        "classifyBy": "one continuous run of even pulses held at one pitch (start, middle and end within about 50 Hz). Measured here: 2.4-5.7 s, about 10-17 pulses per second (10 ms autocorrelation steps, coarse), 560-904 Hz.",
-        "caveat": "Several clips (2.4-2.6 s) are shorter than All About Birds' 3-6 s; a Birds of the World search excerpt says a typical trill in Kentucky averaged about 2.3 s, so length is not used to classify.",
+        "classifyBy": "one continuous run of even pulses held at one pitch (start, middle and end within about 50 Hz). Measured here: 2.1-5.7 s, about 10-17 pulses per second (10 ms autocorrelation steps, coarse), 560-818 Hz.",
+        "caveat": "Several clips (2.1-2.6 s) are shorter than All About Birds' 3-6 s; a Birds of the World search excerpt says a typical trill in Kentucky averaged about 2.3 s, so length is not used to classify.",
         "sources": [
           "aab-sounds",
           "bow-sounds",
@@ -44,7 +44,7 @@
         "name": "Descending whinny",
         "definition": "'A shrill, descending whinny' (All About Birds). Birds of the World (search excerpt): 'Typically, the initial portion exhibits a slight increase in frequency, and the latter portion a gradual decrease in frequency.' Missouri Department of Conservation: 'a call that sounds like a descending whinny'.",
         "use": "Territorial defense (All About Birds and Birds of the World, via a search summary: about 0.5-2 s, used to defend territories). Birds of the World (search excerpt): in territorial adults it is elicited particularly by dispersing juveniles.",
-        "classifyBy": "one call that falls in pitch from its first fifth to its last fifth, 0.5-2 s long. Measured here: 0.9-2.0 s, from 883-1227 Hz in the first fifth down to 754-958 Hz in the last fifth.",
+        "classifyBy": "one call that falls in pitch from its first fifth to its last fifth, 0.5-2 s long. Measured here: 0.9-1.4 s, from 883-1238 Hz in the first fifth down to 754-1012 Hz in the last fifth.",
         "caveat": "Birds of the World (search excerpt): the McCall's form of southern Texas and northern Mexico never gives the whinny; no clip comes from that range.",
         "sources": [
           "aab-sounds",
@@ -267,7 +267,7 @@
       "trimEndSec": 5.84,
       "modifications": "Trimmed; decoded from MP3 (44.1 kHz, stereo; channels averaged) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
       "uncertain": true,
-      "notes": "Measured (full recording, 400-1500 Hz, 10 ms frames, 2048-point FFT, 21.5 Hz bins): call at 4.43-5.49 s of the original. Classified as a whinny: one 1.06 s call that falls in pitch (883 Hz in the first fifth, 840 Hz in the middle, 754 Hz in the last fifth), matching the descending whinny of the cited definition. Lead-in 0.45 s; SNR 16.6 dB (loudest frame vs 10th-percentile frame of the recording, 400-1500 Hz); peak sample 0.075 of full scale, no clipped samples. Lower and flatter than the other whinnies (883 to 754 Hz, 130 Hz fall; the others fall 180-390 Hz) and faint; marked uncertain. Recorded 2014-12-27, Pittsburgh, Allegheny County, Pennsylvania, United States; recordist's type: song; animal seen: yes; Playback used: no. Recordist remarks: An Eastern Screech-Owl at the mouth of Fern Hollow, Frick Park, USA."
+      "notes": "Measured (full recording, 400-1500 Hz, 10 ms frames, 2048-point FFT, 21.5 Hz bins): call at 4.43-5.49 s of the original. Classified as a whinny: one 1.06 s call that falls in pitch (883 Hz in the first fifth, 840 Hz in the middle, 754 Hz in the last fifth), matching the descending whinny of the cited definition. Lead-in 0.45 s; SNR 16.6 dB (loudest frame vs 10th-percentile frame of the recording, 400-1500 Hz); peak sample 0.075 of full scale, no clipped samples. Lower and flatter than the other whinnies (883 to 754 Hz, 130 Hz fall; the others fall 150-390 Hz) and faint; marked uncertain. Recorded 2014-12-27, Pittsburgh, Allegheny County, Pennsylvania, United States; recordist's type: song; animal seen: yes; Playback used: no. Recordist remarks: An Eastern Screech-Owl at the mouth of Fern Hollow, Frick Park, USA."
     },
     {
       "file": "whinny-4.wav",

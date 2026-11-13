@@ -1,5 +1,76 @@
 # Status
 
+## Phase 15: eastern screech-owl (2026-11-13, PR link added after opening)
+
+**Owner: please check**
+1. **Both calls are locked ("Coming soon").** Each call has 10 legal wild clips, but neither passes
+   the unchanged calibration (margin 15): best worst-case margin **monotone trill 10.0**,
+   **descending whinny -0.4** (in a 400-1000 Hz band; -9.1 in the owl band the app uses). There is
+   no challenge entry (no unlocked call), so the screech-owl challenge shows "Coming soon".
+   Nothing to try on the phone yet except the call text and the "Coming soon" screens.
+2. **Wording**: the call text comes from All About Birds, Birds of the World, the Missouri
+   Department of Conservation and the Minnesota DNR, read only through web-search excerpts and
+   search summaries (this environment blocks all four hosts). Please check
+   `src/calls/eastern-screech-owl.ts` and `callDefinitions` in the manifest against the pages.
+
+Gate: passed for audio (both calls have ≥ 3 legal clips from ≥ 4 recordists); calibration failed
+for both calls, so per the brief the species is merged with all calls locked.
+
+What changed:
+- **References** `public/audio/eastern-screech-owl/` (20 clips, 5.4 MB), all xeno-canto, all
+  "Playback used: no", licenses CC BY-NC-SA 4.0 (15) and 3.0 (5), checked on each page.
+
+  | Call | Clips | Recordings (recordists) | Uncertain |
+  |---|---|---|---|
+  | monotone trill | 10 | XC138095 (2 clips), XC184375 (Paul Driver); XC478062 (2), XC285404 (Ted Floyd); XC633627 (Matthew Sabourin); XC941050 (Sue Riffe); XC712961 (Bruce Lagerquist); XC52455 (Mike Nelson) | – |
+  | descending whinny | 10 | XC153434 (2, Todd Wilson); XC208173, XC285404 (2) (Ted Floyd); XC450560, XC450561 (2) (Lance A. M. Benner); XC436434 (2, Vincent Weber) | whinny-3 (flat, faint) |
+
+  145 recordings listed; 136 non-ND; 86 say "Playback used: no". Also rejected: pages that
+  describe a response to playback or a whistled imitation although the field says "no" (XC820866,
+  XC336371, XC368483, XC301668); recordist-filtered or noise-reduced files (XC544849, XC624995,
+  XC669305, XC1087470, XC310034, XC1071056); southern Texas and Mexico (McCall's form, which per
+  Birds of the World never whinnies); a clipped whinny (XC450560 at 18.4 s); whinnies with a
+  second owl overlapping (XC62774, XC579975 at 59 s); clips that fail the take gates' 15 dB
+  full-band SNR (XC879112, XC579975, one XC450561 whinny); XC690617, whose full-band loudness is
+  the mobbing robins, not the trill.
+- **Calls** (definitions with sources in the manifest `callDefinitions`): monotone trill (AAB:
+  "an even-pitched trill, often called a 'bounce song' or tremolo", used by pairs or families to
+  keep in touch, 3-6 s) and descending whinny (AAB: "a shrill, descending whinny"; BOW: slight
+  rise, then gradual fall; territorial, given particularly to dispersing juveniles). Measured
+  here: trills 2.1-5.7 s, about 10-17 pulses/s, 560-818 Hz; whinnies 0.9-1.4 s, falling from
+  883-1238 Hz to 754-1012 Hz. Not included (manifest `notIncluded`): screech/hoot/bark alarm
+  calls, wail, squeal, bill snaps, juvenile calls, duet.
+- **App**: `src/calls/eastern-screech-owl.ts`, species `eastern-screech-owl` in `species.ts`
+  (owl band 200-1500 Hz, reused), both calls locked with a reason on screen. Best-score keys
+  would be `camecallhero.best.eastern-screech-owl.<call>`. No change under `src/audio/`.
+- **Species picker**: six species fit the three-column picker from Phase 13 (two rows at
+  360 px; screenshot `docs/screenshots/home-eastern-screech-owl-360.png`). The home-screen
+  "Coming soon" line now reads "at least one owl call" (it read "a owl call").
+- **Tests**: new `test/calibration-eastern-screech-owl.test.ts`; `test/reference-audio.test.js`
+  covers the folder, its call definitions, and checks that no clip's page describes a response
+  to playback or imitation; `test/species.test.ts`; a11y e2e covers the new home, challenge and
+  call pages.
+
+### Calibration (`test/calibration-eastern-screech-owl.test.ts`; margin 15, leave-one-out, matrix rule; negatives: the other screech-owl call, all barred owl and great horned owl clips, turkey references, turkey wrong-call fixtures, junk)
+
+| Call | Clips | Best weights (r/p/t/s), owl band | Worst-case margin | Matrix | Result |
+|---|---|---|---|---|---|
+| Monotone trill | 10 | 1.5 / 0.5 / 0.5 / 0 | **10.0** (barred owl ascending hoot / inspection call) | 14.8 | locked |
+| Descending whinny | 10 | 0.5 / 1 / 3 / 2 | **-9.1** (turkey gobble); best band 400-1000 Hz: -0.4 (worst: a turkey putt fixture) | 11.5 | locked |
+
+Tried: rhythm/pitch/tone 0.5..3 and structure 0..3 (step 0.5, 1512 sets per call) in 13 bands
+(200-1500, 300-1500, 400-1500, 500-1500, 400-2000, 200-2500, 300-1200, 200-1200, 450-1400,
+500-1300, 300-2000, 600-1400, 400-1000 Hz). No set passed either call.
+
+Why (measured): the note finder splits some trills into their pulses (up to 33 notes) and keeps
+others as one note, so the rhythm part compares unlike things (pairwise rhythm 11-99 between
+trills); trills also differ in pitch (560-818 Hz), which lowers tone. Next to try (owner or a later
+phase): a trill-rate feature (pulses per second) as its own weight, kept off for the other species.
+
+Verified: `npm ci && npm test` (527 unit tests), `npm run build`, `npm run e2e` (93 passed, 4
+screenshot tests skipped) incl. the new screens in the a11y design pass.
+Not verified: anything on a real phone; the full text of the cited pages.
+
 ## Phase 13: great horned owl (2026-11-13, [#21](https://github.com/raineslc/GameCallHero/pull/21))
 
 **Owner: please check / try**

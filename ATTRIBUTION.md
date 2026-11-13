@@ -102,6 +102,40 @@ www.xeno-canto.org/1141309." (same form for each number above).
 Calls were classified by measurement against cited descriptions (notes in the manifest), not
 confirmed by the recordists or an expert. The three caterwaul clips are marked uncertain.
 
+## Eastern screech-owl reference recordings
+
+Wild eastern screech-owls (*Megascops asio*) from xeno-canto; every recording's page says no
+playback was used, and none describes a response to playback or a whistled imitation. All clips
+were trimmed from the original and converted to mono 44.1 kHz 16-bit WAV (stereo originals:
+channels averaged; 48 and 96 kHz originals: resampled). No filtering or gain change by this
+project. Clips are shared under the same license as the original (CC BY-NC-SA requires this).
+NonCommercial (NC) clips may only be used non-commercially; Game Call Hero is free, with no ads,
+purchases or donations. Machine-readable details, measurements and cited call definitions:
+`public/audio/eastern-screech-owl/manifest.json`.
+
+| File | Call | Original | Recordist | License |
+|---|---|---|---|---|
+| `public/audio/eastern-screech-owl/monotone-trill-1.wav` | monotone trill | [XC138095](https://xeno-canto.org/138095), 5.42–10.12 s | Paul Driver | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-2.wav` | monotone trill | [XC138095](https://xeno-canto.org/138095), 168.16–172.72 s | Paul Driver | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-3.wav` | monotone trill | [XC184375](https://xeno-canto.org/184375), 2.35–5.74 s | Paul Driver | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-4.wav` | monotone trill | [XC478062](https://xeno-canto.org/478062), 2.87–9.41 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-5.wav` | monotone trill | [XC478062](https://xeno-canto.org/478062), 20.42–26.31 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-6.wav` | monotone trill | [XC633627](https://xeno-canto.org/633627), 47.30–52.30 s | Matthew Sabourin | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-7.wav` | monotone trill | [XC941050](https://xeno-canto.org/941050), 16.69–20.62 s | Sue Riffe | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-8.wav` | monotone trill | [XC285404](https://xeno-canto.org/285404), 3.56–6.45 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-9.wav` | monotone trill | [XC712961](https://xeno-canto.org/712961), 1.71–5.15 s | Bruce Lagerquist | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/monotone-trill-10.wav` | monotone trill | [XC52455](https://xeno-canto.org/52455), 0.72–3.94 s | Mike Nelson | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/eastern-screech-owl/whinny-1.wav` | whinny | [XC153434](https://xeno-canto.org/153434), 5.88–7.98 s | Todd Wilson | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/eastern-screech-owl/whinny-2.wav` | whinny | [XC153434](https://xeno-canto.org/153434), 29.69–31.90 s | Todd Wilson | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
+| `public/audio/eastern-screech-owl/whinny-3.wav` | whinny (uncertain) | [XC208173](https://xeno-canto.org/208173), 3.98–5.84 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-4.wav` | whinny | [XC450560](https://xeno-canto.org/450560), 26.99–29.14 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-5.wav` | whinny | [XC450561](https://xeno-canto.org/450561), 22.24–24.26 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-6.wav` | whinny | [XC450561](https://xeno-canto.org/450561), 28.77–30.60 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-7.wav` | whinny | [XC436434](https://xeno-canto.org/436434), 4.59–6.33 s | Vincent Weber | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-8.wav` | whinny | [XC436434](https://xeno-canto.org/436434), 14.49–16.32 s | Vincent Weber | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-9.wav` | whinny | [XC285404](https://xeno-canto.org/285404), 7.03–8.99 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/eastern-screech-owl/whinny-10.wav` | whinny | [XC285404](https://xeno-canto.org/285404), 14.90–16.76 s | Ted Floyd | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+
 ## Elk reference recordings
 
 Wild elk (*Cervus canadensis*) from National Park Service sound libraries: Yellowstone National
