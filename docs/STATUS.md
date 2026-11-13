@@ -1,6 +1,6 @@
 # Status
 
-## Phase 15: eastern screech-owl (2026-11-13, PR link added after opening)
+## Phase 15: eastern screech-owl (2026-11-13, [#23](https://github.com/raineslc/GameCallHero/pull/23))
 
 **Owner: please check**
 1. **Both calls are locked ("Coming soon").** Each call has 10 legal wild clips, but neither passes
