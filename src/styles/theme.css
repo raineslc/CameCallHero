@@ -92,13 +92,17 @@ h2 { margin: 4px 0 8px; font-size: 1.3rem; line-height: 1.25; }
 .muted { color: var(--text-muted); }
 
 /* Home: species picker (segmented control; the picked species is filled orange). */
-.species-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; margin: 4px 0 6px; }
+/* Three columns at 360 px, so five species take two rows and the calls stay on the first screen. */
+.species-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; margin: 4px 0 6px; }
 .species-option {
   min-height: var(--tap);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  padding: 4px 8px;
+  text-align: center;
+  line-height: 1.2;
+  font-size: 0.95rem;
   background: var(--surface);
   border: 1px solid var(--text-muted);
   border-radius: var(--radius);

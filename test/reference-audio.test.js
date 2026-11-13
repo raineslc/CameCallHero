@@ -1,6 +1,6 @@
 // Checks the reference-audio manifests: every WAV is listed, every entry has an
 // allowed license and proof URL, files are mono 44.1 kHz 16-bit, each species folder < 15 MB, and
-// every barred owl, elk and mallard call definition cites a source.
+// every owl, elk and mallard call definition cites a source.
 // Plain JS (not TS): the project has no @types/node and this test needs node:fs.
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -28,6 +28,8 @@ const sets = [
   // Wild elk only: no page states playback, so playbackUsed is null ("not stated"); true is rejected.
   { dir: 'public/audio/elk', needsCall: true, trimmed: true, wildOnly: true },
   { dir: 'public/audio/mallard', needsCall: true, trimmed: true, noPlayback: true },
+  // Same for the great horned owl (Phase 13).
+  { dir: 'public/audio/great-horned-owl', needsCall: true, trimmed: true, noPlayback: true },
   { dir: 'test/fixtures/junk', needsCall: false, trimmed: false },
   { dir: 'test/fixtures/turkey-other', needsCall: false, trimmed: true },
   // Real phone takes stay at the phone's own rate (48 kHz), unconverted.
@@ -94,13 +96,13 @@ for (const { dir, needsCall, trimmed, noPlayback = false, wildOnly = false, samp
   });
 }
 
-it.each(['public/audio/turkey', 'public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard'])('%s is under 15 MB', (d) => {
+it.each(['public/audio/turkey', 'public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl'])('%s is under 15 MB', (d) => {
   const dir = join(root, d);
   const total = readdirSync(dir).reduce((sum, f) => sum + statSync(join(dir, f)).size, 0);
   expect(total).toBeLessThan(15 * 1024 * 1024);
 });
 
-describe.each(['public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard'])('%s call definitions', (dir) => {
+describe.each(['public/audio/barred-owl', 'public/audio/elk', 'public/audio/mallard', 'public/audio/great-horned-owl'])('%s call definitions', (dir) => {
   const m = JSON.parse(readFileSync(join(root, dir, 'manifest.json'), 'utf8'));
   const defs = m.callDefinitions;
 

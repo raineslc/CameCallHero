@@ -70,6 +70,32 @@ Machine-readable details, measurements and cited call definitions:
 | `public/audio/barred-owl/caterwaul-2.wav` | caterwaul | [XC593644](https://xeno-canto.org/593644), 4.13–8.65 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | `public/audio/barred-owl/caterwaul-3.wav` | caterwaul | [XC911366](https://xeno-canto.org/911366), 8.21–14.30 s | Sunny Tseng | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
+## Great horned owl reference recordings
+
+Wild great horned owls (*Bubo virginianus*) from xeno-canto; every recording's page says no
+playback was used. All clips were trimmed from the original and converted to mono 44.1 kHz
+16-bit WAV (stereo originals: channels averaged; 48 kHz originals: resampled). No filtering or
+gain change by this project (XC545009 was normalized to -3 dB by its recordist). Clips are
+shared under the same license as the original (CC BY-NC-SA requires this). NonCommercial (NC)
+clips may only be used non-commercially; Game Call Hero is free, with no ads, purchases or
+donations. Machine-readable details, measurements and cited call definitions:
+`public/audio/great-horned-owl/manifest.json`.
+
+| File | Call | Original | Recordist | License |
+|---|---|---|---|---|
+| `public/audio/great-horned-owl/territorial-hoot-1.wav` | territorial hoot (male) | [XC767284](https://xeno-canto.org/767284), 1.30–4.20 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-2.wav` | territorial hoot (male) | [XC775891](https://xeno-canto.org/775891), 1.43–4.80 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-3.wav` | territorial hoot (male) | [XC688174](https://xeno-canto.org/688174), 1.78–4.75 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-4.wav` | territorial hoot (male) | [XC545009](https://xeno-canto.org/545009), 1.77–5.00 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-5.wav` | territorial hoot (male) | [XC548133](https://xeno-canto.org/548133), 2.86–6.00 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-6.wav` | territorial hoot (male) | [XC1048828](https://xeno-canto.org/1048828), 1.06–3.70 s | AUDEVARD Aurélien | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-7.wav` | territorial hoot (male) | [XC905916](https://xeno-canto.org/905916), 1.13–4.45 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-8.wav` | territorial hoot (female) | [XC854522](https://xeno-canto.org/854522), 1.35–3.90 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-9.wav` | territorial hoot (female) | [XC854522](https://xeno-canto.org/854522), 24.85–27.40 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-10.wav` | territorial hoot (female) | [XC688175](https://xeno-canto.org/688175), 7.41–10.35 s | Scott Olmstead | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-11.wav` | territorial hoot (female) | [XC492439](https://xeno-canto.org/492439), 4.35–7.25 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `public/audio/great-horned-owl/territorial-hoot-12.wav` | territorial hoot (female) | [XC492439](https://xeno-canto.org/492439), 9.37–12.20 s | Lance A. M. Benner | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+
 Citation form requested by xeno-canto, e.g. "Scott Olmstead, XC1141309. Accessible at
 www.xeno-canto.org/1141309." (same form for each number above).
 

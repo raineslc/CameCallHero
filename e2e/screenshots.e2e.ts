@@ -44,3 +44,12 @@ test('species picker and barred owl pages', async ({ page }) => {
   await expect(page.locator('#call-measure')).toHaveText(/note/);
   await page.screenshot({ path: out('call-owl-hoo-wah') });
 });
+
+test('great horned owl pages', async ({ page }) => {
+  await page.goto('#/great-horned-owl');
+  await expect.poll(() => page.locator('.card canvas').first().evaluate((el) => (el as HTMLCanvasElement).width)).toBeGreaterThan(1);
+  await page.screenshot({ path: out('home-great-horned-owl') });
+  await page.goto('#/great-horned-owl/call/territorial-hoot');
+  await expect(page.locator('#call-measure')).toHaveText(/note/);
+  await page.screenshot({ path: out('call-great-horned-owl-hoot') });
+});

@@ -1,0 +1,250 @@
+{
+  "about": "Reference recordings of wild great horned owl (Bubo virginianus), all from xeno-canto, all North American (Arizona, California, Alaska). Licenses were checked on each recording's own page on 2026-11-13. trimStartSec/trimEndSec are seconds in the original file as downloaded. Each clip keeps at least 0.35 s before the first hoot for the noise floor. Calls were classified by the recordist's sex label and by measured pitch against the cited call definitions in callDefinitions; uncertain clips say so in notes. All recordings used say 'Playback used: no' on their page.",
+  "calls": [
+    "territorial-hoot"
+  ],
+  "callDefinitions": {
+    "readVia": "shortcut: all sources were read through web-search excerpts, because this build environment's network blocks birdsoftheworld.org, allaboutbirds.org, bioone.org and researchgate.net (checked 2026-11-13); the quotes below are from those excerpts. Re-read the Birds of the World and All About Birds pages directly when next editing the app text.",
+    "sources": {
+      "bow-sounds": {
+        "title": "Birds of the World (Cornell Lab of Ornithology), Great Horned Owl, Sounds and Vocal Behavior",
+        "url": "https://birdsoftheworld.org/bow/species/grhowl/cur/sounds"
+      },
+      "aab-sounds": {
+        "title": "All About Birds (Cornell Lab of Ornithology), Great Horned Owl, Sounds",
+        "url": "https://www.allaboutbirds.org/guide/Great_Horned_Owl/sounds"
+      },
+      "kinstler-2009": {
+        "title": "Kinstler, K. A. (2009). Great Horned Owl Bubo virginianus vocalizations and associated behaviours. Ardea 97(4): 413-420 (peer reviewed)",
+        "url": "https://doi.org/10.5253/078.097.0403",
+        "urlNote": "DOI taken from the BioOne article URL; the DOI link itself was not opened. Known here only through Birds of the World's summary and search excerpts."
+      }
+    },
+    "calls": [
+      {
+        "id": "territorial-hoot",
+        "name": "Territorial hoot",
+        "definition": "Deep, soft hoots with a stuttering rhythm (All About Birds). Given by both sexes: female vocalizations are higher in pitch because of the smaller syrinx in the larger sex (Birds of the World); the female's voice is recognizably higher in pitch than the male's (All About Birds).",
+        "use": "Territorial advertising. Most territorial defense is performed by the male, but the female frequently assists her partner in hooting contests with neighbors or intruders, even during incubation (Birds of the World).",
+        "classifyBy": "a single hoot series from one bird whose sex the recordist labelled (per-clip \"sex\"); the female clips are higher in pitch than the male clips of the same recordists. Measured here: male 4-5 hoots in ~2.0-2.7 s at 269-388 Hz; female 4-6 hoots in ~1.9-2.3 s at 366-452 Hz.",
+        "caveat": "Note counts are not used to classify. A search summary attributed '4-5 notes for males, 6-9 for females' to Kinstler (2009); that was not confirmed from a direct quote, and another excerpt described the patterns differently. The clips here have 4-6 hoots for both sexes. Birds of the World's summary also says Kinstler's hoot types come mainly from an imprinted captive female. Male and female hoots were first defined as two calls; the scorer could not tell them apart (docs/STATUS.md, Phase 13), so the app has one call and the per-clip \"sex\" field keeps the split for later.",
+        "sources": [
+          "aab-sounds",
+          "bow-sounds"
+        ]
+      }
+    ],
+    "notIncluded": [
+      "Duet: male and female hooting back and forth (Birds of the World, All About Birds). Two birds; the parts overlap in the recordings checked (e.g. XC287331), so one bird's part cannot be cut out cleanly.",
+      "Scream: 'a high-pitched, hawk-like, piercing scream; especially pronounced during nest defense'; young also give a hawk-like scream as a begging call (Birds of the World). The candidate recordings are labelled 'squawk' or 'raspy honking call' by their recordists (XC492438, XC414254, XC963611); whether those are the scream Birds of the World describes could not be settled from the excerpts, and their energy sits at ~1.2-3.5 kHz, above the owl analysis band. Not included rather than guessed.",
+      "Bark: recordists label barks (XC403144, XC745743), but no Cornell, state-agency or peer-reviewed description of a great horned owl bark was found in the excerpts read.",
+      "Squawks and chitters: Kinstler (2009) names types (via Birds of the World), but no description was found to classify against."
+    ]
+  },
+  "clips": [
+    {
+      "file": "territorial-hoot-1.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/767284",
+      "sourceId": "XC767284",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.3,
+      "trimEndSec": 4.2,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.36, 0.65, 1.63, 2.30 s, lengths 0.11, 0.31, 0.34, 0.28 s; dominant frequency 301-323 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.22 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird seen) and its pitch (male clips 269-388 Hz). Lead-in 0.36 s; SNR 27.9 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.633 of full scale, no clipped samples. Recordist remarks: Just one hoot series from a male perched in a tall eucalyptus. Recorded 2022-12-08, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-2.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/775891",
+      "sourceId": "XC775891",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.43,
+      "trimEndSec": 4.8,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.36, 0.69, 1.87, 2.64 s, lengths 0.14, 0.41, 0.38, 0.38 s; dominant frequency 291-323 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.66 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird seen) and its pitch (male clips 269-388 Hz). Lead-in 0.36 s; SNR 26.7 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.632 of full scale, no clipped samples. Recordist remarks: One song phrase from the male, calling from a potential nest site; female heard in the background (not in this clip). Recorded 2023-01-04, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-3.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/688174",
+      "sourceId": "XC688174",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.78,
+      "trimEndSec": 4.75,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.35, 0.57, 1.57, 2.29 s, lengths 0.13, 0.33, 0.39, 0.37 s; dominant frequency 301-301 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.31 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird seen) and its pitch (male clips 269-388 Hz). Lead-in 0.35 s; SNR 26.5 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.560 of full scale, no clipped samples. Recordist remarks: Calling from a telephone pole in an urban, residential area. Recorded 2021-10-18, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-4.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/545009",
+      "sourceId": "XC545009",
+      "author": "Lance A. M. Benner",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.77,
+      "trimEndSec": 5.0,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz, stereo) and converted to mono 44.1 kHz 16-bit WAV (channels averaged, resampled). No filtering or gain change by this project. The recordist normalized the original to -3 dB.",
+      "notes": "Measured: 4 hoots, onsets 0.35, 0.63, 1.76, 2.54 s, lengths 0.14, 0.33, 0.39, 0.36 s; dominant frequency 269-301 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.55 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird not seen, so the label is not from sight) and its pitch (male clips 269-388 Hz). Lead-in 0.35 s; SNR 28.9 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.622 of full scale, no clipped samples. Recordist remarks: Recorded at roughly 20 m; recordist edits: trimmed and normalized to -3 dB. Recorded 2012-04-11, San Gabriel Mountains, Los Angeles County, California, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-5.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/548133",
+      "sourceId": "XC548133",
+      "author": "Lance A. M. Benner",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 2.86,
+      "trimEndSec": 6.0,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz, stereo) and converted to mono 44.1 kHz 16-bit WAV (channels averaged, resampled). No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.35, 0.61, 1.70, 2.44 s, lengths 0.10, 0.30, 0.38, 0.34 s; dominant frequency 291-323 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.43 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird not seen, so the label is not from sight) and its pitch (male clips 269-388 Hz). Lead-in 0.35 s; SNR 43.7 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.662 of full scale, no clipped samples. Recordist remarks: Spontaneous hoots recorded at roughly 20-30 m. Recorded 2020-04-18, San Gabriel Mountains, Los Angeles County, California, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-6.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/1048828",
+      "sourceId": "XC1048828",
+      "author": "AUDEVARD Aurélien",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.06,
+      "trimEndSec": 3.7,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz, stereo) and converted to mono 44.1 kHz 16-bit WAV (channels averaged, resampled). No filtering or gain change by this project.",
+      "notes": "Measured: 5 hoots, onsets 0.36, 0.62, 0.72, 1.50, 2.08 s, lengths 0.07, 0.09, 0.28, 0.33, 0.23 s; dominant frequency 366-388 Hz (150-1500 Hz search, 21.5 Hz bins). Call 1.95 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird seen) and its pitch (male clips 269-388 Hz). Lead-in 0.36 s; SNR 47.8 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.778 of full scale, no clipped samples. Recordist remarks: No remarks. Background: Varied Thrush. Recorded 2022-06-19, Kenai Peninsula, Alaska, USA; no playback. UNCERTAIN SEX BY PITCH: its notes (366-388 Hz) are higher than every other male clip (269-345 Hz) and overlap the female clips (366-452 Hz); the recordist labels it male and saw the bird, so it is kept as male. A different population (Alaska) from the other clips (Arizona, California)."
+    },
+    {
+      "file": "territorial-hoot-7.wav",
+      "call": "territorial-hoot",
+      "sex": "male",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/905916",
+      "sourceId": "XC905916",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.13,
+      "trimEndSec": 4.45,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.36, 0.71, 1.87, 2.66 s, lengths 0.10, 0.40, 0.40, 0.34 s; dominant frequency 323-345 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.64 s (first onset to end of last note). Classified as a territorial hoot (male) from the recordist's sex label (\"male\"; bird seen) and its pitch (male clips 269-388 Hz). Lead-in 0.36 s; SNR 31.6 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.533 of full scale, no clipped samples. Recordist remarks: Advertising from atop a utility pole; the male of a nest territory. Recorded 2024-03-04, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-8.wav",
+      "call": "territorial-hoot",
+      "sex": "female",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/854522",
+      "sourceId": "XC854522",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 1.35,
+      "trimEndSec": 3.9,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.36, 0.66, 1.43, 1.98 s, lengths 0.12, 0.36, 0.34, 0.25 s; dominant frequency 377-431 Hz (150-1500 Hz search, 21.5 Hz bins). Call 1.87 s (first onset to end of last note). Classified as a territorial hoot (female) from the recordist's sex label (\"female\"; bird seen) and its pitch (female clips 366-452 Hz, higher than the male clips of the same recordists). Lead-in 0.36 s; SNR 27.5 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.554 of full scale, no clipped samples. Recordist remarks: Perched on top of a utility pole in semi-natural desert habitat, suburban setting. Recorded 2023-02-21, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-9.wav",
+      "call": "territorial-hoot",
+      "sex": "female",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/854522",
+      "sourceId": "XC854522",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 24.85,
+      "trimEndSec": 27.4,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 4 hoots, onsets 0.36, 0.66, 1.45, 1.99 s, lengths 0.13, 0.37, 0.34, 0.25 s; dominant frequency 388-431 Hz (150-1500 Hz search, 21.5 Hz bins). Call 1.88 s (first onset to end of last note). Classified as a territorial hoot (female) from the recordist's sex label (\"female\"; bird seen) and its pitch (female clips 366-452 Hz, higher than the male clips of the same recordists). Lead-in 0.36 s; SNR 26.8 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.562 of full scale, no clipped samples. Recordist remarks: Perched on top of a utility pole in semi-natural desert habitat, suburban setting. Recorded 2023-02-21, Tucson, Arizona, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-10.wav",
+      "call": "territorial-hoot",
+      "sex": "female",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/688175",
+      "sourceId": "XC688175",
+      "author": "Scott Olmstead",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 7.41,
+      "trimEndSec": 10.35,
+      "modifications": "Trimmed; decoded from MP3 (44.1 kHz, mono) and converted to mono 44.1 kHz 16-bit WAV. No filtering or gain change by this project.",
+      "notes": "Measured: 6 hoots, onsets 0.35, 0.75, 0.99, 1.14, 1.77, 2.32 s, lengths 0.14, 0.15, 0.14, 0.20, 0.41, 0.30 s; dominant frequency 388-409 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.27 s (first onset to end of last note). Classified as a territorial hoot (female) from the recordist's sex label (\"female\"; bird seen) and its pitch (female clips 366-452 Hz, higher than the male clips of the same recordists). Lead-in 0.35 s; SNR 27.5 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.299 of full scale, no clipped samples. Recordist remarks: Female calling from a tall eucalyptus; male singing nearby but not audible on this cut. Recorded 2021-11-20, Tucson, Arizona, USA; no playback. The 258 Hz blip at 1.43 s is a short low sound, not one of the hoots (0.04 s)."
+    },
+    {
+      "file": "territorial-hoot-11.wav",
+      "call": "territorial-hoot",
+      "sex": "female",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/492439",
+      "sourceId": "XC492439",
+      "author": "Lance A. M. Benner",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 4.35,
+      "trimEndSec": 7.25,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz, stereo) and converted to mono 44.1 kHz 16-bit WAV (channels averaged, resampled). No filtering or gain change by this project.",
+      "notes": "Measured: 5 hoots, onsets 0.36, 0.72, 0.95, 1.73, 2.31 s, lengths 0.16, 0.17, 0.37, 0.41, 0.27 s; dominant frequency 366-452 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.22 s (first onset to end of last note). Classified as a territorial hoot (female) from the recordist's sex label (\"female\"; bird not seen, so the label is not from sight) and its pitch (female clips 366-452 Hz, higher than the male clips of the same recordists). Lead-in 0.36 s; SNR 29.5 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.562 of full scale, no clipped samples. Recordist remarks: Female hoots and squawks (only hoots in this clip); recordist edits: trimmed. Recorded 2019-08-12, Altadena, Los Angeles County, California, USA; no playback."
+    },
+    {
+      "file": "territorial-hoot-12.wav",
+      "call": "territorial-hoot",
+      "sex": "female",
+      "source": "xeno-canto",
+      "sourceUrl": "https://xeno-canto.org/492439",
+      "sourceId": "XC492439",
+      "author": "Lance A. M. Benner",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "licenseCheckedOn": "2026-11-13",
+      "playbackUsed": false,
+      "trimStartSec": 9.37,
+      "trimEndSec": 12.2,
+      "modifications": "Trimmed; decoded from MP3 (48 kHz, stereo) and converted to mono 44.1 kHz 16-bit WAV (channels averaged, resampled). No filtering or gain change by this project.",
+      "notes": "Measured: 5 hoots, onsets 0.35, 0.71, 0.92, 1.69, 2.26 s, lengths 0.15, 0.17, 0.36, 0.40, 0.25 s; dominant frequency 388-452 Hz (150-1500 Hz search, 21.5 Hz bins). Call 2.16 s (first onset to end of last note). Classified as a territorial hoot (female) from the recordist's sex label (\"female\"; bird not seen, so the label is not from sight) and its pitch (female clips 366-452 Hz, higher than the male clips of the same recordists). Lead-in 0.35 s; SNR 28.8 dB (loudest frame vs 10th-percentile frame, 150-2000 Hz); peak sample 0.631 of full scale, no clipped samples. Recordist remarks: Female hoots and squawks (only hoots in this clip); recordist edits: trimmed. Recorded 2019-08-12, Altadena, Los Angeles County, California, USA; no playback."
+    }
+  ]
+}

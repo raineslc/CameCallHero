@@ -67,6 +67,17 @@ export const CHALLENGE_RULES: Readonly<Record<string, ChallengeRules>> = {
     // Made-up fun titles, not elk terms or facts.
     ranks: ['Meadow walker', 'Trail listener', 'Ridge caller', 'Valley echo', 'Mountain voice'],
   },
+  // Phase 13. Within-call gaps (OWL_BAND): territorial hoot up to 0.83 s (territorial-hoot-7,
+  // the pause after the second hoot). 0.83 x 1.8 = 1.49 -> 1.5 s. Wrong sounds: junk only (one
+  // call, no locked calls, no fixtures). Worst: tone-sweep 43.3; lowest leave-one-out 74.9.
+  // shortcut: other owls' hoots are not wrong sounds here (they are negatives in the calibration
+  // test, worst margin 17.8); add great-horned-owl-other fixtures if takes get misnamed.
+  'great-horned-owl': {
+    gapSec: 1.5,
+    recognizeMin: { 'territorial-hoot': 44 },
+    // Made-up fun titles, not owl terms or facts.
+    ranks: ['Night listener', 'Hoot rookie', 'Night caller', 'Deep hooter', 'Horned hoot master'],
+  },
 };
 
 export const challengeRules = (s: Species): ChallengeRules | undefined => CHALLENGE_RULES[s.id];

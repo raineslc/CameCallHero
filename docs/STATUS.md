@@ -1,5 +1,82 @@
 # Status
 
+## Phase 13: great horned owl (2026-11-13, [#21](https://github.com/raineslc/GameCallHero/pull/21))
+
+**Owner: please check / try**
+1. **Decision: one hoot call or two?** The brief asked for the male and female territorial hoots
+   (they differ in pitch per Cornell). Calibrated as two calls, the scorer cannot tell them apart
+   (best worst-case margins 0.2 male, -3.6 female; 15 needed), so the app has **one call,
+   "Territorial hoot"**, with all 12 clips (7 male, 5 female). It passes with margin 17.8. The
+   sex of each clip stays in the manifest (`sex`). If you would rather have two locked calls,
+   say so; nothing else depends on it.
+2. **On the phone**: Calls → **Great horned owl** → Territorial hoot → Practice. Hoot like a
+   great horned owl (or use an owl locator call). The male references are 4–5 deep hoots in
+   ~2–2.7 s: a short first hoot (0.07–0.14 s), then longer ones (0.3–0.4 s). Is the score sensible? Does a barred owl
+   "who cooks for you" score clearly lower?
+3. **Wording**: the call text comes from Birds of the World and All About Birds, read only
+   through web-search excerpts (this environment blocks both hosts, and bioone/researchgate).
+   Please check `src/calls/great-horned-owl.ts` against the pages.
+
+Gate: passed (the territorial hoot has 12 legal clips from 3 recordists and is unlocked).
+
+What changed:
+- **References** `public/audio/great-horned-owl/territorial-hoot-1..12.wav` (3.1 MB), all
+  xeno-canto, all CC BY-NC-SA 4.0, all "Playback used: no", all with the recordist's sex label.
+  Male 1–7: XC767284, XC775891, XC688174, XC905916 (Scott Olmstead, Arizona), XC545009,
+  XC548133 (Lance A. M. Benner, California), XC1048828 (Aurélien Audevard, Alaska). Female 8–12:
+  XC854522 (two series), XC688175 (Olmstead), XC492439 (two series, Benner). Manifest notes
+  give the measured hoots, pitch, SNR and reasoning per clip; `ATTRIBUTION.md` lists them all.
+- Measured: male 4–5 hoots, 1.95–2.66 s, 269–388 Hz; female 4–6 hoots, 1.87–2.27 s, 366–452 Hz.
+  **territorial-hoot-6 (Alaska male, 366–388 Hz) overlaps the female pitch range**: marked uncertain
+  by pitch, kept as male because the recordist saw the bird and labelled it male.
+- **Not included** (manifest `notIncluded`): duet (parts overlap, cannot be cut per bird);
+  scream (Birds of the World describes it, but whether the recordists' "squawks" are that scream
+  could not be settled, and their energy is at 1.2–3.5 kHz, above the owl band); bark (no
+  Cornell/agency/peer-reviewed description found); Kinstler (2009) squawks/chitters (named, not
+  described in what could be read). The "male 4–5 notes, female 6–9" counts from a search
+  summary of Kinstler (2009) were not confirmed and are not used (the female clips here have 4–6 hoots).
+- **App**: `src/calls/great-horned-owl.ts`, species `great-horned-owl` in `species.ts` (owl band
+  200–1500 Hz, reused: hoots measure 269–452 Hz). Picker, routes, call page, practice and
+  challenge come from the species list. Best-score key `camecallhero.best.great-horned-owl.territorial-hoot`.
+  Turkey and barred owl code, weights and keys unchanged (no change under `src/audio/`).
+- **Species picker** (`theme.css`): three columns at 360 px (min 96 px, label may wrap to two
+  lines, still ≥ 44 px tall), so five species take two rows and all five turkey calls stay on
+  the first screen (`e2e/library.e2e.ts` failed with the old two-column picker and five species).
+- **Challenge** (`src/challenge/rules.ts`): split gap 1.5 s (longest within-call gap 0.83 s ×
+  1.8), recognition line 44 (worst wrong sound: tone sweep 43.3; wrong sounds are junk only, as
+  the species has one call), made-up rank titles. Barred owl hoots are not wrong sounds in this
+  challenge (`shortcut:` comment).
+
+### Calibration (`test/calibration-great-horned-owl.test.ts`; margin 15, leave-one-out, matrix rule; negatives: all barred owl clips, turkey references, turkey wrong-call fixtures, junk)
+
+| Call | Clips | Weights (r/p/t/s) | Worst-case margin | Result |
+|---|---|---|---|---|
+| Territorial hoot (both sexes) | 12 | 3 / 0.5 / 0.5 / 2.5 | **17.8** (worst negative barred owl two-phrase-hoot-3, 57.1) | **unlocked** |
+| Male hoot alone (tried first) | 7 | best 3 / 0.5 / 2.5 / 0 | 0.2 (male-hoot-6 vs a female clip) | not kept |
+| Female hoot alone (tried first) | 5 | best 3 / 0.5 / 2 / 1 | -3.6 (female clip vs a male clip) | not kept |
+
+Lowest leave-one-out: 74.9 (clips 10, 11); highest 90.7. Every clip's worst negative is a barred
+owl two-phrase hoot.
+
+What was tried (grid rhythm/pitch/tone 0.5..3, structure 0..3, step 0.5 = 1512 sets per call):
+- Male vs female, bands 200–1500, 150–1000, 200–800, 150–8000 Hz: best margins male
+  0.2 / -0.6 / -0.1 / -8.3, female -3.6 / -1.9 / -0.6 / -7.0. No set passed. The scorer's pitch
+  part is mostly the pitch *shape* (offset term 30 of 100 points), and clip 6 sits in the female range.
+- One call, 200–1500 Hz: 33 of 1512 sets reach 15 (best 17.8). Narrow, like the barred owl
+  two-phrase hoot. No new feature, no change to the margin or the negatives.
+
+Limits:
+- Fitted to 12 clips from 10 recordings (8/9 and 11/12 are two series of one recording each, which
+  helps their leave-one-out). Only 3 recordists; Arizona-heavy.
+- Not verified: anything on a real phone; a human or a mouth/tube owl call (only recorded owls
+  were scored). Next for a male/female split: an absolute-pitch feature as its own weight, and
+  more clips from more birds.
+
+Verified: `npm ci && npm test` (452 unit tests, after rebasing onto elk #20 and mallard #22), `npm run build`, `npm run e2e` (89 passed,
+4 screenshot tests skipped) incl. new `e2e/practice-great-horned-owl.e2e.ts` (picker, call card,
+fake mic plays territorial-hoot-8: scored 95.6, saved under the great horned owl key) and the
+new screens in the a11y design pass. Screenshots: `docs/screenshots/home-great-horned-owl-360.png`,
+`call-great-horned-owl-hoot-360.png`.
 ## Phase 11: mallard (2026-11-13, [#22](https://github.com/raineslc/GameCallHero/pull/22))
 
 **Owner: decisions and checks**
