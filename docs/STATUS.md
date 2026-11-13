@@ -1,6 +1,6 @@
 # Status
 
-## Phase 8: multi-species app and barred owl calls (2026-11-13, PR link added after opening)
+## Phase 8: multi-species app and barred owl calls (2026-11-13, [#16](https://github.com/raineslc/GameCallHero/pull/16))
 
 **Owner: please check / try**
 1. **Owl call wording** (owner: check owl call wording against sources). The owl text on screen
