@@ -1,6 +1,6 @@
 # Status
 
-## Phase 11: mallard (2026-11-13, PR_LINK)
+## Phase 11: mallard (2026-11-13, [#22](https://github.com/raineslc/GameCallHero/pull/22))
 
 **Owner: decisions and checks**
 1. **Hen quack: unlock for practice only?** It passes the practice calibration (worst-case margin
