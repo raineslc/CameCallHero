@@ -1,6 +1,6 @@
 # Status
 
-## Phase 10: calling challenge for every species (2026-11-13, PR link below)
+## Phase 10: calling challenge for every species (2026-11-13, [#19](https://github.com/raineslc/GameCallHero/pull/19))
 
 **Owner: please try on the phone**
 1. Calls → **Barred owl** → **Calling challenge** → I'm ready. Stay quiet for the 3-2-1, then make a
